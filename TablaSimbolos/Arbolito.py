@@ -121,6 +121,7 @@ class Arbolito:
         cadena +="<th scope=\"col\">Ámbito</th>"
         cadena +="<th scope=\"col\">Fila</th>"
         cadena +="<th scope=\"col\">Columna</th>"
+        cadena +="<th scope=\"col\">Apuntador</th>"
         cadena +="</tr>"
         cadena +="</thead>"
         cadena +="<tbody>"
@@ -149,6 +150,9 @@ class Arbolito:
                 cadena+="</td>"
                 cadena+="<td>"
                 cadena+= str(simbolo.getColumna())
+                cadena+="</td>"
+                cadena+="<td>"
+                cadena+= str(simbolo.getApuntador())
                 cadena+="</td>"
                 cadena+="</tr>"
 

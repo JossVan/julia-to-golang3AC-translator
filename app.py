@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from gramatica.gramatica import parse
+from gramatica.gramatica import parse, traduce
 app = Flask(__name__)
 import logging
 import sys
@@ -17,8 +17,8 @@ def principal():
         global tmp_val
         tmp_val=inpt  
         global result
-        result =  parse(tmp_val+"\n")
-        return render_template('principal.html', resultado=result, entrada = inpt)
+        result =  traduce(tmp_val+"\n")
+        return render_template('principal.html', salida=result[0], entrada = inpt)
 
     else:
         return render_template('principal.html')
@@ -37,9 +37,10 @@ def AST():
             return render_template('AST.html', dot ="")
     except:
         return render_template('AST.html', dot ="")'''
+        
 @app.route('/TablaSimbolos')
 def tabla():
-    return render_template('tabla.html', '''tabla = result[2]''')
+    return render_template('tabla.html', tabla = result[1])
 
 @app.route('/Errores')
 def errores():

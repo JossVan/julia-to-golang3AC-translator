@@ -19,6 +19,9 @@ class Identificador(NodoAST):
         b = resultado.getValor()
         return b
     
+    def traducir(self, tree, table):
+        print("paso por traducir")
+
     def getNodo(self):
         NuevoNodo = NodoArbol("ID")
         NuevoNodo.agregarHijo(self.id)

@@ -95,7 +95,7 @@ class TablaSimbolos:
     def addSimboloLocal(self, simbolo):
         self.tabla[simbolo.getID()] = simbolo
         return None
-
+    
     def actualizarSimboloGlobal(self,simbolo):
         tablaActual = self
         while tablaActual.anterior != None:

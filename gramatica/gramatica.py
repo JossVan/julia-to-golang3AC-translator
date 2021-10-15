@@ -1,5 +1,6 @@
 from Expresiones.Acceso import Acceso
 from Abstractas.NodoAST import NodoAST
+from Objetos.KeepData import KeepData
 from TablaSimbolos.Errores import Errores
 from Abstractas.NodoArbol import NodoArbol
 from Expresiones.Array import Array
@@ -232,7 +233,7 @@ def p_iniciop(t):
 def p_iniciofi(t):
     '''INIT     : FUNCIONES
                 | INSTRUCCIONES
-                | STRUCTS '''
+                | STRUCTS'''
     
     t[0] = t[1]
 
@@ -849,3 +850,42 @@ def parse(input) :
     taberr = AST.htmlErrores()
     retorno.append(taberr)
     return retorno
+
+def traduce(input):
+    global lexer
+    lexer = lex.lex(reflags= re.IGNORECASE)
+    parser = yacc.yacc()
+    instrucciones=parser.parse(input)
+
+    AST = Arbolito(instrucciones)
+    tablaGlobal = TablaSimbolos("Global")
+    AST.setTSglobal(tablaGlobal)
+
+    retorno=[]
+    inst = ""
+    keep = KeepData()
+    NodoRaiz = NodoArbol("Raiz")
+    for instruccion in AST.getInstrucciones():
+        if isinstance(instruccion, Funciones):
+            AST.addFuncion(instruccion)
+            NodoRaiz.agregarHijoNodo(instruccion.getNodo())
+        elif isinstance(instruccion, Struct):
+            AST.addStruct(instruccion)
+            NodoRaiz.agregarHijoNodo(instruccion.getNodo())
+        else:
+            for inst in instruccion:
+                instr= inst.traducir(AST,AST.getTSGlobal(),keep)
+                if isinstance(instr,Errores):
+                    continue
+                else:
+                    NodoRaiz.agregarHijoNodo(inst.getNodo())
+    
+    keep.init()
+    codigo = keep.addVariables()
+    codigo += keep.codigo
+    codigo += keep.endFuncion()
+    print(codigo)
+    retorno.append(codigo)
+    tab = AST.htmlTablaSimbolos()
+    retorno.append(tab)
+    return retorno 
