@@ -881,11 +881,14 @@ def traduce(input):
                     NodoRaiz.agregarHijoNodo(inst.getNodo())
     
     keep.init()
+    codigo2 = keep.FuncionPrint()
     codigo = keep.addVariables()
+    codigo += codigo2
+    codigo += keep.funcionMain()
     codigo += keep.codigo
     codigo += keep.endFuncion()
-    print(codigo)
     retorno.append(codigo)
     tab = AST.htmlTablaSimbolos()
     retorno.append(tab)
+    keep.eliminarTemps()
     return retorno 

@@ -72,6 +72,90 @@ class Print(NodoAST):
                         tree.updateConsola(str(resultado))
             tree.updateConsola("\n")
 
+
+    def traducir(self, tree, table, keep):
+        if self.tipo == Tipo_Print.PRINT:  
+            if self.contenido != "":
+                for instrucciones in self.contenido:
+                    resultado = instrucciones.traducir(tree,table,keep)
+                    if isinstance(resultado, float) or isinstance(resultado,int):
+                        result=keep.imprimir(resultado,"f")
+                        keep.addCodigo(result)
+                    elif isinstance(resultado,str):
+                        result= keep.llamada("Native_PrintString")
+                        keep.addCodigo(result)
+                    elif isinstance(resultado, dict):
+                        if "apuntador" in resultado:
+                            #guardo el valor actual del stack
+                            actual = keep.getStack()
+                            #obtengo la posicion del stack de donde está la variable
+                            puntero = resultado['apuntador']
+                            #obtengo el tipo de variable
+                            tipo = resultado['tipo']
+                    
+                            if tipo == "String" or tipo == "Bool" or tipo == "nothing":
+                                temp = keep.getNuevoTemporal()
+                                cod =keep.addIgual(temp, "SP")
+                                cod+=keep.addOperacion("SP", str(puntero),"+",1)
+                                keep.addCodigo(cod)
+                                result= keep.llamada("Native_PrintString")
+                                keep.addCodigo(result)
+                            elif tipo == "Int64" or tipo == "Float64":
+                                temp = keep.getNuevoTemporal()
+                                cod = keep.addIgual(temp, keep.getValStack(puntero))
+                                keep.addCodigo(cod)
+                                result=keep.imprimir(temp,"f")
+                                keep.addCodigo(result)
+                            keep.addCodigo(keep.addIgual("SP",actual))
+                            keep.liberarTemporales(temp)
+                            keep.PS = actual
+                        elif "temp" in resultado:
+                            result=keep.imprimir(resultado['temp'],"f")
+                            keep.addCodigo(result)
+        if self.tipo == Tipo_Print.PRINTLN:
+            if self.contenido != "":
+                for instrucciones in self.contenido:
+                    resultado = instrucciones.traducir(tree,table,keep)
+                    print(type(resultado))
+                    if isinstance(resultado, float) or isinstance(resultado,int):
+                        result=keep.imprimir(resultado,"d")
+                        keep.addCodigo(result)
+                        keep.addCodigo(keep.imprimir("10","c"))
+                    elif isinstance(resultado,str):
+                        result= keep.llamada("Native_PrintString")
+                        keep.addCodigo(result)
+                        keep.addCodigo(keep.imprimir("10","c"))
+                    elif isinstance(resultado, dict):
+                        if "apuntador" in resultado:
+                            #guardo el valor actual del stack
+                            actual = keep.getStack()
+                            #obtengo la posicion del stack de donde está la variable
+                            puntero = resultado['apuntador']
+                            #obtengo el tipo de variable
+                            tipo = resultado['tipo']
+                    
+                            if tipo == "String" or tipo == "Bool" or tipo == "nothing":
+                                temp = keep.getNuevoTemporal()
+                                cod =keep.addIgual(temp, "SP")
+                                cod+=keep.addOperacion("SP", str(puntero),"+",1)
+                                keep.addCodigo(cod)
+                                result= keep.llamada("Native_PrintString")
+                                keep.addCodigo(result)
+                                keep.addCodigo(keep.imprimir("10","c"))
+                            elif tipo == "Int64" or tipo == "Float64":
+                                temp = keep.getNuevoTemporal()
+                                cod = keep.addIgual(temp, keep.getValStack(puntero))
+                                keep.addCodigo(cod)
+                                result=keep.imprimir(temp,"d")
+                                keep.addCodigo(result)
+                                keep.addCodigo(keep.imprimir("10","c"))
+                            keep.addCodigo(keep.addIgual("SP",actual))
+                            keep.liberarTemporales(temp)
+                            keep.PS = actual
+                        elif "temp" in resultado:
+                            result=keep.imprimir(resultado['temp'],"d")
+                            keep.addCodigo(result)
+                            keep.addCodigo(keep.imprimir("10","c"))
     def getNodo(self):
         
         NodoNuevo = NodoArbol("Impresión")

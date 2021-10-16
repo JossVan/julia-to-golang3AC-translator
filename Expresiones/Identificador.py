@@ -19,8 +19,16 @@ class Identificador(NodoAST):
         b = resultado.getValor()
         return b
     
-    def traducir(self, tree, table):
-        print("paso por traducir")
+    def traducir(self, tree, table, keep):
+        id = self.id
+        self.id = self.id.lower()
+        resultado = table.BuscarIdentificador(self.id)
+        if resultado == None:
+            tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
+            return
+        apuntador = resultado.getApuntador()
+        tipo = resultado.getTipo()
+        return {"apuntador":apuntador, "tipo":tipo}
 
     def getNodo(self):
         NuevoNodo = NodoArbol("ID")

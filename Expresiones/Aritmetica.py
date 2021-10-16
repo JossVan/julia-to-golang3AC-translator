@@ -94,6 +94,65 @@ class Aritmetica(NodoAST):
                     for i in range(result2):
                         cadena+=result1
                     return cadena
+    
+    def traducir(self, tree, table, keep):
+        if self.operador1 != None and self.operador2!=None:
+
+            if isinstance(self.operador1,dict):
+                op1 = self.operador1['temp']
+            if isinstance(self.operador2,dict):
+                op2 = self.operador2['temp']
+            if not isinstance(self.operador1,dict):
+                op1 = self.operador1.traducir(tree,table,keep)
+                #pos1 = keep.getStack()-1
+                if isinstance(op1,dict):
+                    op1 = op1['temp']
+            if not isinstance(self.operador2,dict):
+                op2 = self.operador2.traducir(tree,table,keep)
+                #pos2 = keep.getStack()-1
+                if isinstance(op2,dict):
+                    op2 = op2['temp']
+            if self.operacion == Tipo_Aritmetico.SUMA:                
+                temp = keep.getNuevoTemporal()
+                codigo = keep.addOperacion(temp,op1,"+",op2)
+                keep.addCodigo(codigo)
+                return {"temp":temp}  
+            if self.operacion == Tipo_Aritmetico.RESTA:                
+                temp = keep.getNuevoTemporal()
+                codigo = keep.addOperacion(temp,op1,"-",op2)
+                keep.addCodigo(codigo)
+                return {"temp":temp}    
+            if self.operacion == Tipo_Aritmetico.MULTIPLICACION:                
+                temp = keep.getNuevoTemporal()
+                codigo = keep.addOperacion(temp,op1,"*",op2)
+                keep.addCodigo(codigo)
+                return {"temp":temp} 
+            if self.operacion == Tipo_Aritmetico.DIVISION:                
+                
+                #COMPROVACION DE DIVISIÓN POR 0
+                ef = keep.getNuevaEtiqueta()
+                es = keep.getNuevaEtiqueta()
+                codigo = ""
+                if isinstance(op1,int) or isinstance(op1,float):
+                    temp1 = keep.getNuevoTemporal()
+                    codigo += keep.addIgual(temp1,str(op1))
+                    op1 = temp1
+                if isinstance(op2,int) or isinstance(op2,float):
+                    temp2 = keep.getNuevoTemporal()
+                    codigo += keep.addIgual(temp2,str(op2))
+                    op2 = temp2
+
+                temp = keep.getNuevoTemporal()
+                codigo += "if ("+str(op2)+" != 0){\ngoto "+ef+"}\n"
+                codigo += self.generarC3D_Cadenas(keep,"MATH ERROR")
+                codigo += "goto "+ es+"\n"
+                codigo += ef+":\n"
+                codigo += keep.addOperacion(temp,"float64("+str(op1)+")","/","float64("+str(op2)+")")
+                codigo += es+":\n"
+                keep.addCodigo(codigo)
+                return {"error":"error"}      
+                
+                             
     def getNodo(self):
         NuevoNodo = NodoArbol("Operación_Aritmetica")
         NuevoNodo.agregarHijoNodo(self.operador1.getNodo())
@@ -117,4 +176,15 @@ class Aritmetica(NodoAST):
         for i in array:
             if isinstance(i,NodoAST):
                 val = i.ejecutar(tree,table)
-            
+    
+
+    def generarC3D_Cadenas(self,keep,cadena):
+
+        codigo = ""
+
+        for caracter in cadena:
+
+            codigoascii = ord(caracter)
+            codigo += keep.imprimir(codigoascii,"c")
+
+        return codigo

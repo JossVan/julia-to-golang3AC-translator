@@ -244,14 +244,31 @@ class Asignacion(NodoAST):
                         else:
                             print("ERROR")
                 else:           
-                    self.valor.traducir(tree,table,keep)
-                    valor = self.valor.ejecutar(tree,table)
+                    valor = self.valor.traducir(tree,table,keep)
                     if isinstance(valor,Errores):
                         return valor
                     elif isinstance(valor, TablaSimbolos):
                         simbolo = Simbolo(id,"",self.acceso,self.fila,self.columna, "STRUCT")
                     else:
-                        simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"nothing",keep.getStack())
+
+                        if isinstance(valor,str):
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"String",keep.getStack())
+                        elif isinstance(valor,bool):
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                        elif isinstance(valor,float):
+                            temp = keep.getNuevoTemporal()
+                            codigo = keep.addIgual(temp,valor)
+                            codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Float64",keep.getStack())
+                            keep.liberarTemporales(temp)
+                            keep.addCodigo(codigo)
+                        elif isinstance(valor,int):
+                            temp = keep.getNuevoTemporal()
+                            codigo = keep.addIgual(temp,valor)
+                            codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Int64",keep.getStack())
+                            keep.liberarTemporales(temp)
+                            keep.addCodigo(codigo)
                         keep.incrementarStack()
                     if self.acceso == Tipo_Acceso.GLOBAL:           
                         table.actualizarSimboloGlobal(simbolo)
@@ -331,8 +348,13 @@ class Asignacion(NodoAST):
                     if isinstance(self.valor,NodoAST):
                         valor = self.valor.traducir(tree,table,keep)
                         if isinstance(valor, float):
+                            temp = keep.getNuevoTemporal()
+                            codigo = keep.addIgual(temp,valor)
+                            codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
                             simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Float64",keep.getStack())
+                            keep.liberarTemporales(temp)    
                             keep.incrementarStack()
+                            keep.addCodigo(codigo)
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
@@ -353,8 +375,13 @@ class Asignacion(NodoAST):
                     if isinstance(self.valor,NodoAST):
                         valor = self.valor.traducir(tree,table, keep)
                         if isinstance(valor, int):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna, "Int64",keep.getStack())
+                            temp = keep.getNuevoTemporal()
+                            codigo = keep.addIgual(temp,valor)
+                            codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
+                            simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Int64",keep.getStack())
+                            keep.liberarTemporales(temp)    
                             keep.incrementarStack()
+                            keep.addCodigo(codigo)
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
