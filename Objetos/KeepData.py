@@ -38,7 +38,7 @@ class KeepData:
         return  var+" = "+str(op1)+op+str(op2)+"\n"
     
     def addCodigo(self,codigo):
-        self.codigo += codigo+"\n"
+        self.codigo += codigo
     
     def addIgual(self,arg1,arg2):
         return arg1 +" = "+str(arg2)+"\n"
@@ -131,7 +131,4 @@ class KeepData:
             
         return "fmt.Print("+str(valor)+")\n"
     
-    def eliminarTemps(self):
-            self.listaTemporalesEnUso=[]
-            self.listaTemporalesLibres=[]
         

@@ -890,5 +890,4 @@ def traduce(input):
     retorno.append(codigo)
     tab = AST.htmlTablaSimbolos()
     retorno.append(tab)
-    keep.eliminarTemps()
     return retorno 
