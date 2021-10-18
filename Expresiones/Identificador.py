@@ -28,7 +28,7 @@ class Identificador(NodoAST):
             return
         apuntador = resultado.getApuntador()
         tipo = resultado.getTipo()
-        return {"apuntador":apuntador, "tipo":tipo}
+        return {"apuntador":apuntador, "tipo":tipo, "valor":resultado.getValor()}
 
     def getNodo(self):
         NuevoNodo = NodoArbol("ID")

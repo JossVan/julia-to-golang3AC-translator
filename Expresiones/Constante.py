@@ -81,20 +81,20 @@ class Constante(NodoAST):
     def generarC3D_Cadenas(self,keep,cadena):
         temp = keep.getNuevoTemporal()
         codigo = ""
-        heap = keep.getHeap()
+        
         codigo += keep.addIgual(temp,"HP")
         for caracter in cadena:
-            heap = keep.getHeap()
             codigoascii = ord(caracter)
-            valor = keep.addIgual(keep.getValHeap(heap),codigoascii)
+            valor = keep.addIgual(keep.getValHeap("HP"),codigoascii)
             valor += keep.addOperacion("HP","HP","+","1")
             codigo+=valor
             keep.incrementarHeap()
-        heap = keep.getHeap()
-        codigo += keep.addIgual(keep.getValHeap(heap),"-1")
+
+        codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
         keep.incrementarHeap()
         codigo += keep.addOperacion("HP","HP","+","1")
         codigo += keep.addIgual(keep.getValStack("SP"),temp)
         codigo += keep.addOperacion("SP","SP","+","1")
+        keep.incrementarStack()
         keep.addCodigo(codigo)
         keep.liberarTemporales(temp)

@@ -1,3 +1,4 @@
+
 from TablaSimbolos.Errores import Errores
 from TablaSimbolos.Tipos import Tipo_Aritmetico
 from Abstractas.NodoArbol import NodoArbol
@@ -97,11 +98,19 @@ class Aritmetica(NodoAST):
     
     def traducir(self, tree, table, keep):
         if self.operador1 != None and self.operador2!=None:
-
+            tipo = ""
+            apuntador = 0
+            tipo2 = ""
+            apuntador2 = 0
+            valor = ""
+            valor2 = ""
+            cadena = False
+            cadena2 = False
             if isinstance(self.operador1,dict):
                 if "apuntador" in self.operador1:
                     apuntador = int(self.operador1["apuntador"])
                     tipo = self.operador1["tipo"]
+                    valor = self.operador1["valor"]
                     if tipo == "Float64" or tipo =="Int64":
                         temp = keep.getNuevoTemporal()
                         codigo = keep.addIgual(temp,keep.getValStack(apuntador))
@@ -113,11 +122,12 @@ class Aritmetica(NodoAST):
                     return self.operador1
             if isinstance(self.operador2,dict):
                 if "apuntador" in self.operador2:
-                    apuntador = int(self.operador2["apuntador"])
-                    tipo = self.operador2["tipo"]
-                    if tipo == "Float64" or tipo =="Int64":
+                    apuntador2 = int(self.operador2["apuntador"])
+                    tipo2 = self.operador2["tipo"]
+                    valor2 = self.operador2["valor"]
+                    if tipo2 == "Float64" or tipo2 =="Int64":
                         temp = keep.getNuevoTemporal()
-                        codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                        codigo = keep.addIgual(temp,keep.getValStack(apuntador2))
                         keep.addCodigo(codigo)
                         op2 = temp
                 elif "temp" in self.operador2:
@@ -126,51 +136,83 @@ class Aritmetica(NodoAST):
                     return self.operador2
             if not isinstance(self.operador1,dict):
                 op1 = self.operador1.traducir(tree,table,keep)
-                #pos1 = keep.getStack()-1
+                # si es un diccionario quiere decir que es ID
                 if isinstance(op1,dict):
                     if "apuntador" in op1:
                         apuntador = int(op1["apuntador"])
                         tipo = op1["tipo"]
+                        valor = op1["valor"]
                         if tipo == "Float64" or tipo =="Int64":
                             temp = keep.getNuevoTemporal()
                             codigo = keep.addIgual(temp,keep.getValStack(apuntador))
                             keep.addCodigo(codigo)
                             op1 = temp
                     elif "temp" in op1:
+                        valor = int(op1['valor'])
                         op1= op1['temp']
+                        
                     elif "error" in op1:
                         return op1
+                elif isinstance(op1,str):
+                    tipo = "String"
+                    apuntador = keep.getStack()-1
+                    valor = op1
+                    cadena = True
+                elif isinstance(op1,int) or isinstance(op1,float):
+                    apuntador= op1 
+                    if valor == "":
+                        valor = op1 
             if not isinstance(self.operador2,dict):
                 op2 = self.operador2.traducir(tree,table,keep)
                 #pos2 = keep.getStack()-1
                 if isinstance(op2,dict):
                     if "apuntador" in op2:
-                        apuntador = int(op2["apuntador"])
-                        tipo = op2["tipo"]
-                        if tipo == "Float64" or tipo =="Int64":
+                        apuntador2 = int(op2["apuntador"])
+                        tipo2 = op2["tipo"]
+                        valor2 = op2["valor"]
+                        if tipo2 == "Float64" or tipo2 =="Int64":
                             temp = keep.getNuevoTemporal()
-                            codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                            codigo = keep.addIgual(temp,keep.getValStack(apuntador2))
                             keep.addCodigo(codigo)
                             op2 = temp
                     elif "temp" in op2:
+                        valor2 = int(op2['valor'])
                         op2= op2['temp']
+                        
                     elif "error" in op2:
-                        return op2
-            if self.operacion == Tipo_Aritmetico.SUMA:                
-                temp = keep.getNuevoTemporal()
-                codigo = keep.addOperacion(temp,op1,"+",op2)
-                keep.addCodigo(codigo)
-                return {"temp":temp}  
+                        return op2       
+                elif isinstance(op2,str):
+                    tipo2 = "String"
+                    apuntador2 = keep.getStack()-1
+                    valor2 = op2
+                    cadena2 = True  
+                elif isinstance(op2,int) or isinstance(op2,float):
+                    apuntador2= op2
+                    if valor2 == "":
+                        valor2 = op2
+            if self.operacion == Tipo_Aritmetico.SUMA:    
+                result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
+                if not result:
+                    temp = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(temp,op1,"+",op2)
+                    keep.addCodigo(codigo)
+                    return {"temp":temp, "valor": (valor+valor2)}  
+                else:
+                    return result
             elif self.operacion == Tipo_Aritmetico.RESTA:                
                 temp = keep.getNuevoTemporal()
                 codigo = keep.addOperacion(temp,op1,"-",op2)
                 keep.addCodigo(codigo)
-                return {"temp":temp}    
-            elif self.operacion == Tipo_Aritmetico.MULTIPLICACION:                
-                temp = keep.getNuevoTemporal()
-                codigo = keep.addOperacion(temp,op1,"*",op2)
-                keep.addCodigo(codigo)
-                return {"temp":temp} 
+                return {"temp":temp , "valor": (valor-valor2)}    
+            elif self.operacion == Tipo_Aritmetico.MULTIPLICACION:  
+                result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
+                if not result:              
+                    temp = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(temp,op1,"*",op2)
+                    keep.addCodigo(codigo)
+                    return {"temp":temp,"valor": (valor*valor2)} 
+                else:
+                    return result
             elif self.operacion == Tipo_Aritmetico.DIVISION:                
                 
                 #COMPROVACION DE DIVISIÓN POR 0
@@ -195,33 +237,36 @@ class Aritmetica(NodoAST):
                 codigo += es+":\n"
                 keep.addCodigo(codigo)
                 if aux2 != 0:
-                    return {"temp":temp}      
+                    return {"temp":temp, "valor": (valor/valor2)}      
                 else:
                     return {"error": "error"}      
             elif self.operacion == Tipo_Aritmetico.POTENCIA:
-                temp0 = keep.getNuevoTemporal()
-                temp1 = keep.getNuevoTemporal()
-                temp2 = keep.getNuevoTemporal()
-                temp3 = keep.getNuevoTemporal()
-                codigo = keep.addIgual(temp0,op1)
-                codigo += keep.addIgual(temp1,op2)
-                codigo += keep.addIgual(temp2,1)
-                codigo += keep.addIgual(temp3,op1)
-                ei = keep.getNuevaEtiqueta()
-                ev = keep.getNuevaEtiqueta()
-                es = keep.getNuevaEtiqueta()
-                codigo += ei+":\n"
-                codigo += "if ("+temp2+"<"+temp1+"){\n\tgoto "+ ev+"\n}\ngoto "+es+"\n"
-                codigo += ev+":\n"
-                codigo += keep.addOperacion(temp3,temp3,"*",temp0)
-                codigo += keep.addOperacion(temp2,temp2,"+","1")
-                codigo += "goto "+ei+"\n"
-                codigo += es +":\n"
-                keep.addCodigo(codigo)
-                keep.liberarTemporales(temp0)
-                keep.liberarTemporales(temp1)
-                keep.liberarTemporales(temp2)
-                return {"temp":temp3}
+                if tipo == "String":
+                    return self.multiplicidad(keep,valor,valor2)
+                elif tipo != "String" and tipo2 != "String":
+                    temp0 = keep.getNuevoTemporal()
+                    temp1 = keep.getNuevoTemporal()
+                    temp2 = keep.getNuevoTemporal()
+                    temp3 = keep.getNuevoTemporal()
+                    codigo = keep.addIgual(temp0,op1)
+                    codigo += keep.addIgual(temp1,op2)
+                    codigo += keep.addIgual(temp2,1)
+                    codigo += keep.addIgual(temp3,op1)
+                    ei = keep.getNuevaEtiqueta()
+                    ev = keep.getNuevaEtiqueta()
+                    es = keep.getNuevaEtiqueta()
+                    codigo += ei+":\n"
+                    codigo += "if ("+temp2+"<"+temp1+"){\n\tgoto "+ ev+"\n}\ngoto "+es+"\n"
+                    codigo += ev+":\n"
+                    codigo += keep.addOperacion(temp3,temp3,"*",temp0)
+                    codigo += keep.addOperacion(temp2,temp2,"+","1")
+                    codigo += "goto "+ei+"\n"
+                    codigo += es +":\n"
+                    keep.addCodigo(codigo)
+                    keep.liberarTemporales(temp0)
+                    keep.liberarTemporales(temp1)
+                    keep.liberarTemporales(temp2)
+                    return {"temp":temp3, "valor": (pow(valor,valor2))}
     def getNodo(self):
         NuevoNodo = NodoArbol("Operación_Aritmetica")
         NuevoNodo.agregarHijoNodo(self.operador1.getNodo())
@@ -248,12 +293,167 @@ class Aritmetica(NodoAST):
     
 
     def generarC3D_Cadenas(self,keep,cadena):
-
         codigo = ""
-
         for caracter in cadena:
-
             codigoascii = ord(caracter)
             codigo += keep.imprimir(codigoascii,"c")
-
         return codigo
+    
+    def concatenar(self,keep,apuntador):
+        codigo="//INICIO DE LA CONCATENACIÓN DE SUMA\n"
+        # CRANDO VARIABLES TEMPORALES PARA ALMACENAR EL APUNTADO Y VALOR DEL STACK EN ESA POSICION
+        temp = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp,apuntador)
+        temp2 = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp2,keep.getValStack(temp))
+        # AQUÍ EMPIEZA EL ACCESO AL HEAP
+        # GENERO UNA ETIQUETA NUEVA
+        etiquetaNueva = keep.getNuevaEtiqueta()
+        etiquetaSalida = keep.getNuevaEtiqueta()
+        codigo += etiquetaNueva+":\n"
+        temp3 = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
+        codigo += "if ("+temp3+"== -1){\n\tgoto "+etiquetaSalida+"\n}\n"
+        codigo += keep.addIgual(keep.getValHeap("HP"), temp3)
+        codigo += keep.addOperacion(temp2,temp2,"+","1")
+        codigo += keep.addOperacion("HP","HP","+","1")
+        keep.incrementarHeap()
+        codigo += "goto "+ etiquetaNueva+"\n"
+        codigo += etiquetaSalida+":\n"
+        #codigo += keep.addOperacion("SP","SP","+","1")
+        #incrementamos el valor del stack para la siguiente entrada
+        #keep.incrementarStack()
+        keep.addCodigo(codigo)
+        keep.liberarTemporales(temp)
+        keep.liberarTemporales(temp2)
+        keep.liberarTemporales(temp3)
+    
+    def concatenarNumerosVariables(self,keep,posicion):
+        codigo = "//CONCATENAR EL NÚMERO DE VARIABLE\n"
+        temp = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp,keep.getValStack(posicion))
+        codigo += keep.addIgual(keep.getValHeap("HP"),temp)
+        codigo += keep.addOperacion("HP","HP","+","1")
+        keep.incrementarHeap()
+        keep.addCodigo(codigo)
+    
+    def concatenarNumeros(self,keep,numero):
+        codigo = "//CONCATENAR EL NÚMERO\n"
+        temp = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp,numero)
+        codigo += keep.addIgual(keep.getValHeap("HP"),temp)
+        codigo += keep.addOperacion("HP","HP","+","1")
+        keep.incrementarHeap()
+        keep.addCodigo(codigo)
+
+    def Concatenacion(self, keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2):
+        codigo = ""
+        if tipo == "String":
+            temp = keep.getNuevoTemporal()
+            keep.addCodigo(keep.addIgual(temp,"HP"))
+            self.concatenar(keep,apuntador)
+            if tipo2 == "String":
+                self.concatenar(keep,apuntador2)
+                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+                codigo += keep.addOperacion("HP","HP","+","1")
+                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                codigo += keep.addOperacion("SP","SP","+","1")
+                keep.incrementarHeap()
+                if cadena or cadena2:
+                    keep.incrementarStack()
+                keep.addCodigo(codigo)
+                return valor+valor2
+            elif tipo2 == "Int64" or tipo2 == "Float64":
+                self.concatenarNumerosVariables(keep,apuntador2)
+                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+                codigo += keep.addOperacion("HP","HP","+","1")
+                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                codigo += keep.addOperacion("SP","SP","+","1")
+                if cadena or cadena2:
+                    keep.incrementarStack()
+                keep.incrementarHeap()
+                keep.addCodigo(codigo)
+                return valor+valor2
+            else:
+                self.concatenarNumeros(keep,apuntador2)
+                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+                codigo += keep.addOperacion("HP","HP","+","1")
+                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                codigo += keep.addOperacion("SP","SP","+","1")
+                if cadena or cadena2:
+                    keep.incrementarStack()
+                keep.incrementarHeap()
+                keep.addCodigo(codigo)
+                return "cadena"      
+        if tipo2 == "String":
+            temp = keep.getNuevoTemporal()
+            keep.addCodigo(temp,"HP")
+            self.concatenar(keep,apuntador2)
+            if tipo == "String":
+                self.concatenar(keep,apuntador)
+                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+                codigo += keep.addOperacion("HP","HP","+","1")
+                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                codigo += keep.addOperacion("SP","SP","+","1")
+                if cadena or cadena2:
+                    keep.incrementarStack()
+                keep.incrementarHeap()
+                keep.addCodigo(codigo)
+                return "cadena"
+            elif tipo == "Int64" or tipo == "Float64":
+                self.concatenarNumerosVariables(keep,apuntador)
+                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+                codigo += keep.addOperacion("HP","HP","+","1")
+                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                codigo += keep.addOperacion("SP","SP","+","1")
+                if cadena or cadena2:
+                    keep.incrementarStack()
+                keep.incrementarHeap()
+                keep.addCodigo(codigo)
+                return "cadena"
+            else:
+                self.concatenarNumeros(keep,apuntador)
+                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+                codigo += keep.addOperacion("HP","HP","+","1")
+                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                codigo += keep.addOperacion("SP","SP","+","1")
+                if cadena or cadena2:
+                    keep.incrementarStack()
+                keep.incrementarHeap()
+                keep.addCodigo(codigo)
+                return "cadena"            
+        return False        
+    
+    def multiplicidad(self,keep,cadena, cantidad):
+        temp = keep.getNuevoTemporal()
+        codigo = ""
+        temp2 = keep.getNuevoTemporal()
+        temp3 = keep.getNuevoTemporal()
+        etiquetaRetorno = keep.getNuevaEtiqueta()
+        codigo += keep.addIgual(temp2,cantidad)
+        codigo += keep.addIgual(temp3,"0")
+        codigo += keep.addIgual(temp,"HP")
+        codigo += etiquetaRetorno+":\n"
+        for caracter in cadena:
+            codigoascii = ord(caracter)
+            valor = keep.addIgual(keep.getValHeap("HP"),codigoascii)
+            valor += keep.addOperacion("HP","HP","+","1")
+            codigo+=valor
+            keep.incrementarHeap()
+        codigo += keep.addOperacion(temp3,temp3,"+","1")
+        codigo += "if ("+temp3+" <"+temp2+"){\n\tgoto "+etiquetaRetorno+"\n}\n"
+        codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
+        keep.incrementarHeap()
+        codigo += keep.addOperacion("HP","HP","+","1")
+        codigo += keep.addIgual(keep.getValStack("SP"),temp)
+        codigo += keep.addOperacion("SP","SP","+","1")
+        keep.incrementarStack()
+        keep.addCodigo(codigo)
+        keep.liberarTemporales(temp)
+        keep.liberarTemporales(temp2)
+        keep.liberarTemporales(temp3)
+        cad  =""
+        for i in range(cantidad):
+            cad+=cadena
+        return cad
+         

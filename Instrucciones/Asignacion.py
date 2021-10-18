@@ -250,17 +250,17 @@ class Asignacion(NodoAST):
                     elif isinstance(valor, TablaSimbolos):
                         simbolo = Simbolo(id,"",self.acceso,self.fila,self.columna, "STRUCT")
                     else:
-
                         if isinstance(valor,str):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"String",keep.getStack())
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"String",keep.getStack()-1)
                         elif isinstance(valor,bool):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack()-1)
                         elif isinstance(valor,float):
                             temp = keep.getNuevoTemporal()
                             codigo = keep.addIgual(temp,valor)
                             codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
                             simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Float64",keep.getStack())
                             keep.liberarTemporales(temp)
+                            codigo += keep.addOperacion("SP","SP","+","1")
                             keep.addCodigo(codigo)
                         elif isinstance(valor,int):
                             temp = keep.getNuevoTemporal()
@@ -268,13 +268,26 @@ class Asignacion(NodoAST):
                             codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
                             simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Int64",keep.getStack())
                             keep.liberarTemporales(temp)
+                            codigo += keep.addOperacion("SP","SP","+","1")
                             keep.addCodigo(codigo)
-                        keep.incrementarStack()
-                    if self.acceso == Tipo_Acceso.GLOBAL:           
-                        table.actualizarSimboloGlobal(simbolo)
-                    else:
-                        table.actualizarSimbolo(simbolo)
-                    tree.agregarTS(id,simbolo)
+                        
+                        elif isinstance(valor,dict):
+                            if "valor" in valor:
+                                val = valor["valor"]
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,valor["temp"])
+                                codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
+                                simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,"Float64",keep.getStack())
+                                keep.liberarTemporales(temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                keep.addCodigo(codigo)
+                        if not isinstance(valor,str) and not isinstance(valor,bool):
+                            keep.incrementarStack()
+                        if self.acceso == Tipo_Acceso.GLOBAL:           
+                            table.actualizarSimboloGlobal(simbolo)
+                        else:
+                            table.actualizarSimbolo(simbolo)
+                        tree.agregarTS(id,simbolo)
         else:
             
             if self.valor != None:
@@ -282,8 +295,8 @@ class Asignacion(NodoAST):
                     if isinstance(self.valor,NodoAST):
                         valor = self.valor.traducir(tree,table,keep)
                         if isinstance(valor, str):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna, "String", keep.getStack())
-                            keep.incrementarStack()
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna, "String", keep.getStack()-1)
+                            #keep.incrementarStack()
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
@@ -304,8 +317,8 @@ class Asignacion(NodoAST):
                     if isinstance(self.valor,NodoAST):
                         valor = self.valor.traducir(tree,table,keep)
                         if isinstance(valor, bool):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
-                            keep.incrementarStack()
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack()-1)
+                            #keep.incrementarStack()
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
@@ -326,8 +339,8 @@ class Asignacion(NodoAST):
                      if isinstance(self.valor,NodoAST):
                         valor = self.valor.traducir(tree,table,keep)
                         if isinstance(valor, chr):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Char",keep.getStack())
-                            keep.incrementarStack()
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Char",keep.getStack()-1)
+                            #keep.incrementarStack()
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
@@ -353,6 +366,7 @@ class Asignacion(NodoAST):
                             codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
                             simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Float64",keep.getStack())
                             keep.liberarTemporales(temp)    
+                            codigo += keep.addOperacion("SP","SP","+","1")
                             keep.incrementarStack()
                             keep.addCodigo(codigo)
                             if self.acceso == Tipo_Acceso.GLOBAL:
@@ -380,6 +394,7 @@ class Asignacion(NodoAST):
                             codigo += keep.addIgual(keep.getValStack(keep.getStack()),temp)
                             simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Int64",keep.getStack())
                             keep.liberarTemporales(temp)    
+                            codigo += keep.addOperacion("SP","SP","+","1")
                             keep.incrementarStack()
                             keep.addCodigo(codigo)
                             if self.acceso == Tipo_Acceso.GLOBAL:
