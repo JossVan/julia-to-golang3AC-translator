@@ -253,7 +253,21 @@ class Asignacion(NodoAST):
                         if isinstance(valor,str):
                             simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"String",keep.getStack()-1)
                         elif isinstance(valor,bool):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack()-1)
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                            if valor: 
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,"1")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                keep.addCodigo(codigo)
+                                keep.incrementarStack()
+                            else:
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,"0")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                keep.addCodigo(codigo)
+                                keep.incrementarStack()
                         elif isinstance(valor,float):
                             temp = keep.getNuevoTemporal()
                             codigo = keep.addIgual(temp,valor)
@@ -288,6 +302,8 @@ class Asignacion(NodoAST):
                         else:
                             table.actualizarSimbolo(simbolo)
                         tree.agregarTS(id,simbolo)
+                    if len(keep.etiquetas) == 1:
+                        keep.addCodigo(keep.etiquetas.pop()+":\n")
         else:
             
             if self.valor != None:

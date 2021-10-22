@@ -31,7 +31,7 @@ class Constante(NodoAST):
         if isinstance(self.valor,Primitivo):
             if self.valor.tipo == TipoObjeto.CADENA:
                 cad = self.valor.toString()
-                self.generarC3D_Cadenas(keep,cad) 
+                keep.generarC3D_Cadenas(cad) 
                 return cad
             elif self.valor.tipo == TipoObjeto.ENTERO:
                 return self.valor.getEntero()
@@ -39,19 +39,12 @@ class Constante(NodoAST):
                 return self.valor.getFloat()
             elif self.valor.tipo == TipoObjeto.BOOLEANO:
                 valor = self.valor.getBoolean()
-                if valor:
-                    cadena = "true"    
-                    self.generarC3D_Cadenas(keep,cadena) 
-                    return valor
-                else:
-                    cadena = "false"
-                    self.generarC3D_Cadenas(keep,cadena) 
-                    return cadena
+                return valor
             elif self.valor.tipo == TipoObjeto.NOTHING:
                 self.generarC3D_Cadenas(keep,self.valor.toString())
                 return "nothing"
             elif self.valor.tipo == TipoObjeto.NEGATIVO:
-                Valor = self.valor.valor.traducir(tree,table)
+                Valor = self.valor.valor.traducir(tree,table,keep)
                 temporal = keep.getNuevoTemporal()
                 keep.addOperacion(temporal,Valor,"*","-1") 
                 resultado = self.valor.valor.ejecutar(tree,table)
@@ -78,23 +71,4 @@ class Constante(NodoAST):
                 NuevoNodo.agregarHijoNodo("-"+ self.valor.getNodo())
         return NuevoNodo
 
-    def generarC3D_Cadenas(self,keep,cadena):
-        temp = keep.getNuevoTemporal()
-        codigo = ""
-        
-        codigo += keep.addIgual(temp,"HP")
-        for caracter in cadena:
-            codigoascii = ord(caracter)
-            valor = keep.addIgual(keep.getValHeap("HP"),codigoascii)
-            valor += keep.addOperacion("HP","HP","+","1")
-            codigo+=valor
-            keep.incrementarHeap()
-
-        codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-        keep.incrementarHeap()
-        codigo += keep.addOperacion("HP","HP","+","1")
-        codigo += keep.addIgual(keep.getValStack("SP"),temp)
-        codigo += keep.addOperacion("SP","SP","+","1")
-        keep.incrementarStack()
-        keep.addCodigo(codigo)
-        keep.liberarTemporales(temp)
+    

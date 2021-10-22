@@ -55,7 +55,46 @@ class If(NodoAST):
                     elif isinstance(resp, Errores):
                         return resp
         
-    
+    def traducir(self, tree, table, keep):
+        self.condicion.traducir(tree,table,keep)
+        if len(keep.etiquetas) == 2 :
+            ev = keep.etiquetas.pop()
+            ef = keep.etiquetas.pop()
+            es = keep.getNuevaEtiqueta()
+            keep.addCodigo(ev+":\n")
+            nuevaTabla = TablaSimbolos("If",table)
+            for instruccion in self.instrucciones_if:
+                resp = instruccion.traducir(tree,nuevaTabla,keep)
+            keep.addCodigo(ef+":\n")
+            if self.instrucciones_elseif != None:
+                nuevaTabla = TablaSimbolos("elseif",table)
+                resp = self.instrucciones_elseif.traducir(tree,nuevaTabla,keep)
+                keep.addCodigo("goto "+es+";\n")
+            if self.instrucciones_else != None:
+                nuevaTabla = TablaSimbolos("else",table)
+                for instruccion in self.instrucciones_else:
+                    resp= instruccion.traducir(tree,nuevaTabla,keep)
+                    keep.addCodigo(es+":\n")
+        elif len(keep.etiquetas) == 1:
+            e = keep.etiquetas.pop()
+            es = keep.getNuevaEtiqueta()
+            nuevaTabla = TablaSimbolos("If",table)
+            for instruccion in self.instrucciones_if:
+                resp = instruccion.traducir(tree,nuevaTabla,keep)
+            keep.addCodigo(e+":\n")
+            if self.instrucciones_elseif != None:
+                nuevaTabla = TablaSimbolos("elseif",table)
+                resp = self.instrucciones_elseif.traducir(tree,nuevaTabla,keep)
+                keep.addCodigo("goto "+es+";\n")
+            if self.instrucciones_else != None:
+                nuevaTabla = TablaSimbolos("else",table)
+                for instruccion in self.instrucciones_else:
+                    resp= instruccion.traducir(tree,nuevaTabla,keep)
+                    keep.addCodigo(es+":\n")
+        elif len (keep.etiquetas) == 0:
+            nuevaTabla = TablaSimbolos("if",table)
+            for instruccion in self.instrucciones_if:
+                resp = instruccion.traducir(tree,nuevaTabla,keep)
     def getNodo(self):
         NodoPadre = NodoArbol("If")
         # Se crea un nodo para la condición y se le introduce el hijo que es la condición

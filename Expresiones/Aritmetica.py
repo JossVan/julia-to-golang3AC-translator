@@ -118,6 +118,7 @@ class Aritmetica(NodoAST):
                         op1 = temp
                 elif "temp" in self.operador1:
                     op1 = self.operador1['temp']
+                    valor = op1
                 elif "error" in self.operador1:
                     return self.operador1
             if isinstance(self.operador2,dict):
@@ -132,10 +133,12 @@ class Aritmetica(NodoAST):
                         op2 = temp
                 elif "temp" in self.operador2:
                     op2 = self.operador2['temp']
+                    valor2 = op2
                 elif "error" in self.operador2:
                     return self.operador2
             if not isinstance(self.operador1,dict):
-                op1 = self.operador1.traducir(tree,table,keep)
+                if isinstance(self.operador1,NodoAST):
+                    op1 = self.operador1.traducir(tree,table,keep)
                 # si es un diccionario quiere decir que es ID
                 if isinstance(op1,dict):
                     if "apuntador" in op1:
@@ -158,12 +161,21 @@ class Aritmetica(NodoAST):
                     apuntador = keep.getStack()-1
                     valor = op1
                     cadena = True
-                elif isinstance(op1,int) or isinstance(op1,float):
+                elif isinstance(op1,bool):
+                    valor = op1 
+                elif isinstance(op1,int):
                     apuntador= op1 
                     if valor == "":
                         valor = op1 
+                    tipo = "Int64"
+                elif isinstance(op1,float):
+                    apuntador= op1 
+                    if valor == "":
+                        valor = op1 
+                    tipo = "Float64"
             if not isinstance(self.operador2,dict):
-                op2 = self.operador2.traducir(tree,table,keep)
+                if isinstance(self.operador2,NodoAST):
+                    op2 = self.operador2.traducir(tree,table,keep)
                 #pos2 = keep.getStack()-1
                 if isinstance(op2,dict):
                     if "apuntador" in op2:
@@ -186,31 +198,51 @@ class Aritmetica(NodoAST):
                     apuntador2 = keep.getStack()-1
                     valor2 = op2
                     cadena2 = True  
-                elif isinstance(op2,int) or isinstance(op2,float):
+                elif isinstance(op2,bool):
+                    valor2 = op2
+                elif isinstance(op2,int):
                     apuntador2= op2
                     if valor2 == "":
                         valor2 = op2
+                    tipo2 = "Int64"
+                elif isinstance(op2,float):
+                    apuntador2= op2
+                    if valor2 == "":
+                        valor2 = op2
+                    tipo2 = "Float64"
             if self.operacion == Tipo_Aritmetico.SUMA:    
                 result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
                 if not result:
                     temp = keep.getNuevoTemporal()
                     codigo = keep.addOperacion(temp,op1,"+",op2)
                     keep.addCodigo(codigo)
-                    return {"temp":temp, "valor": (valor+valor2)}  
+                    if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                    else:
+                        tipo = "Float64"
+                    return {"temp":temp, "valor": (valor+valor2), "tipo":tipo}  
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.RESTA:                
                 temp = keep.getNuevoTemporal()
                 codigo = keep.addOperacion(temp,op1,"-",op2)
                 keep.addCodigo(codigo)
-                return {"temp":temp , "valor": (valor-valor2)}    
+                if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                else:
+                    tipo = "Float64"
+                return {"temp":temp , "valor": (valor-valor2),"tipo":tipo}    
             elif self.operacion == Tipo_Aritmetico.MULTIPLICACION:  
                 result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
                 if not result:              
                     temp = keep.getNuevoTemporal()
                     codigo = keep.addOperacion(temp,op1,"*",op2)
                     keep.addCodigo(codigo)
-                    return {"temp":temp,"valor": (valor*valor2)} 
+                    if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                    else:
+                        tipo = "Float64"
+                    return {"temp":temp,"valor": (valor*valor2), "tipo":tipo} 
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.DIVISION:                
@@ -229,15 +261,19 @@ class Aritmetica(NodoAST):
                     codigo += keep.addIgual(temp2,str(op2))
                     op2 = temp2
                 temp = keep.getNuevoTemporal()
-                codigo += "if ("+str(op2)+" != 0){\n\tgoto "+ef+"\n}\n"
+                codigo += "if "+str(op2)+" != 0 {\n\tgoto "+ef+";\n}\n"
                 codigo += self.generarC3D_Cadenas(keep,"MATH ERROR")
-                codigo += "goto "+ es+"\n"
+                codigo += "goto "+ es+";\n"
                 codigo += ef+":\n"
-                codigo += keep.addOperacion(temp,"float64("+str(op1)+")","/","float64("+str(op2)+")")
+                codigo += keep.addOperacion(temp,str(op1),"/",str(op2))
                 codigo += es+":\n"
                 keep.addCodigo(codigo)
                 if aux2 != 0:
-                    return {"temp":temp, "valor": (valor/valor2)}      
+                    if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                    else:
+                        tipo = "Float64"
+                    return {"temp":temp, "valor": (valor/valor2), "tipo":tipo}      
                 else:
                     return {"error": "error"}      
             elif self.operacion == Tipo_Aritmetico.POTENCIA:
@@ -256,17 +292,51 @@ class Aritmetica(NodoAST):
                     ev = keep.getNuevaEtiqueta()
                     es = keep.getNuevaEtiqueta()
                     codigo += ei+":\n"
-                    codigo += "if ("+temp2+"<"+temp1+"){\n\tgoto "+ ev+"\n}\ngoto "+es+"\n"
+                    codigo += "if "+temp2+"<"+temp1+" {\n\tgoto "+ ev+";\n}\ngoto "+es+";\n"
                     codigo += ev+":\n"
                     codigo += keep.addOperacion(temp3,temp3,"*",temp0)
                     codigo += keep.addOperacion(temp2,temp2,"+","1")
-                    codigo += "goto "+ei+"\n"
+                    codigo += "goto "+ei+";\n"
                     codigo += es +":\n"
                     keep.addCodigo(codigo)
                     keep.liberarTemporales(temp0)
                     keep.liberarTemporales(temp1)
                     keep.liberarTemporales(temp2)
-                    return {"temp":temp3, "valor": (pow(valor,valor2))}
+                    if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                    else:
+                        tipo = "Float64"
+                    return {"temp":temp3, "valor": (pow(valor,valor2)), "tipo":tipo}
+            elif self.operacion == Tipo_Aritmetico.MODAL:
+                #COMPROVACION DE DIVISIÓN POR 0
+                ef = keep.getNuevaEtiqueta()
+                es = keep.getNuevaEtiqueta()
+                codigo = ""
+                aux2 = op2
+                if isinstance(op1,int) or isinstance(op1,float):
+                    temp1 = keep.getNuevoTemporal()
+                    codigo += keep.addIgual(temp1,str(op1))
+                    op1 = temp1
+                if isinstance(op2,int) or isinstance(op2,float):
+                    temp2 = keep.getNuevoTemporal()
+                    codigo += keep.addIgual(temp2,str(op2))
+                    op2 = temp2
+                temp = keep.getNuevoTemporal()
+                codigo += "if "+str(op2)+" != 0 {\n\tgoto "+ef+";\n}\n"
+                codigo += self.generarC3D_Cadenas(keep,"MATH ERROR")
+                codigo += "goto "+ es+";\n"
+                codigo += ef+":\n"
+                codigo += keep.addIgual(temp,"math.Mod("+str(op1)+","+str(op2)+")")
+                codigo += es+":\n"
+                keep.addCodigo(codigo)
+                if aux2 != 0:
+                    if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                    else:
+                        tipo = "Float64"
+                    return {"temp":temp, "valor": (valor%valor2), "tipo":tipo}      
+                else:
+                    return {"error": "error"}  
     def getNodo(self):
         NuevoNodo = NodoArbol("Operación_Aritmetica")
         NuevoNodo.agregarHijoNodo(self.operador1.getNodo())
@@ -313,12 +383,12 @@ class Aritmetica(NodoAST):
         codigo += etiquetaNueva+":\n"
         temp3 = keep.getNuevoTemporal()
         codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
-        codigo += "if ("+temp3+"== -1){\n\tgoto "+etiquetaSalida+"\n}\n"
+        codigo += "if "+temp3+"== -1 {\n\tgoto "+etiquetaSalida+";\n}\n"
         codigo += keep.addIgual(keep.getValHeap("HP"), temp3)
         codigo += keep.addOperacion(temp2,temp2,"+","1")
         codigo += keep.addOperacion("HP","HP","+","1")
         keep.incrementarHeap()
-        codigo += "goto "+ etiquetaNueva+"\n"
+        codigo += "goto "+ etiquetaNueva+";\n"
         codigo += etiquetaSalida+":\n"
         #codigo += keep.addOperacion("SP","SP","+","1")
         #incrementamos el valor del stack para la siguiente entrada
@@ -441,7 +511,7 @@ class Aritmetica(NodoAST):
             codigo+=valor
             keep.incrementarHeap()
         codigo += keep.addOperacion(temp3,temp3,"+","1")
-        codigo += "if ("+temp3+" <"+temp2+"){\n\tgoto "+etiquetaRetorno+"\n}\n"
+        codigo += "if "+temp3+" <"+temp2+" {\n\tgoto "+etiquetaRetorno+";\n}\n"
         codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
         keep.incrementarHeap()
         codigo += keep.addOperacion("HP","HP","+","1")
