@@ -10,7 +10,7 @@ class KeepData:
     listaTemporalesEnUso = []
     listaTemporalesLibres = []
     etiquetas = []
-    
+
 
     codigo3d = None
 
@@ -30,6 +30,8 @@ class KeepData:
         self.listaTemporalesEnUso = []
         self.listaTemporalesLibres = []
         self.etiquetas = []
+        self.etiquetaFalsa = ""
+        self.etiquetaVerdadera = ""
         self.codigo3d = None
 
 

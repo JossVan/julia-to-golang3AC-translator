@@ -142,8 +142,7 @@ class Print(NodoAST):
                         elif "temp" in resultado:
                             result=keep.imprimir(resultado['temp'],"f")
                             keep.addCodigo(result)
-                if len(keep.etiquetas) == 1:
-                    keep.addCodigo(keep.etiquetas.pop()+":\n")
+                
         if self.tipo == Tipo_Print.PRINTLN:
             if self.contenido != "":
                 for instrucciones in self.contenido:
@@ -192,14 +191,21 @@ class Print(NodoAST):
                             #obtengo el tipo de variable
                             tipo = resultado['tipo']
                     
-                            if tipo == "String" or tipo == "Bool" or tipo == "nothing":
+                            if tipo == "String" or tipo == "nothing":
                                 temp = keep.getNuevoTemporal()
                                 cod =keep.addIgual(temp, "SP")
                                 cod+=keep.addOperacion("SP", str(puntero),"+",1)
                                 keep.addCodigo(cod)
                                 result= keep.llamada("Native_PrintString")
                                 keep.addCodigo(result)
-                                
+                                keep.addCodigo(keep.addIgual("SP",actual))
+                                keep.liberarTemporales(temp)
+                                keep.PS = actual
+                            elif tipo == "Bool":
+                                temp = keep.getNuevoTemporal()
+                                cod = keep.addIgual(temp,keep.getValStack(puntero))
+                                keep.addCodigo(cod)
+                                keep.comparar(temp)
                             elif tipo == "Int64":
                                 temp = keep.getNuevoTemporal()
                                 cod = keep.addIgual(temp, keep.getValStack(puntero))
@@ -213,10 +219,6 @@ class Print(NodoAST):
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"f")
                                 keep.addCodigo(result)
-                                
-                            keep.addCodigo(keep.addIgual("SP",actual))
-                            keep.liberarTemporales(temp)
-                            keep.PS = actual
                         elif "temp" in resultado:
                             result=keep.imprimir(resultado['temp'],"f")
                             keep.addCodigo(result)

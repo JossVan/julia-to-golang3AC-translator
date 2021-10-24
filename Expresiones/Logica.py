@@ -5,9 +5,7 @@ from TablaSimbolos.Tipos import Tipo_Logico, Tipo_Relacional
 from Abstractas.NodoAST import NodoAST
 
 class Logica(NodoAST):
-    tipo = None
-    apuntador = None
-    valor = None
+
     
     def __init__(self, operador1, operador2, tipooperacion, fila, columna):
         self.operador1=operador1
@@ -42,144 +40,108 @@ class Logica(NodoAST):
     def traducir(self, tree, table, keep):
         if self.operador1!=None and self.operador2!=None:
             # AQUI REALIZO LA PRIMERA CONDICIÓN DEL OPERADOR
-            resultado1= self.operador1.traducir(tree,table,keep)
-            self.verificar(resultado1,tree,table,keep)
-            # ASIGNO LAS VARIABLES RESULTANTES A LOCALES
-            valor = self.valor 
-            tipo = self.tipo 
-            apuntador = self.apuntador
-            if self.tipooperacion == Tipo_Logico.AND:               
-                if len(keep.etiquetas) == 0:
-                    # LIMPIO LAS VARIABLES GLOBALES
-                    self.valor = None
-                    self.tipo = None 
-                    self.apuntador = None 
-                    # REALIZO LA SEGUNDA CONDICIÓN DEL OPERADOR 2
-                    resultado2= self.operador2.traducir(tree,table,keep)
-                    self.verificar(resultado2,tree,table,keep)
-                    # ASIGNO LAS VARIABLES RESULTANTES A LAS LOCALES
-                    valor2 = self.valor
-                    apuntador2 = self.apuntador
-                    tipo2 = self.tipo
-                    if len(keep.etiquetas) == 0:
-                        codigo = "//**********EMPEZANDO IF LÓGICOS**********\n"
-                        if tipo == "Int64" or tipo == "Float64" or tipo2 == "Int64" or tipo2 == "Float64":
-                            print("La condición debe ser booleana we")
-                            return
-                        elif tipo == "Bool":
-                            if apuntador == None:
-                                ev = keep.getNuevaEtiqueta()
-                                ef = keep.getNuevaEtiqueta()
-                                temp = keep.getNuevoTemporal()
-                                val1 = ""
-                                val2 =""
-                                if valor:
-                                    val1 = "1"
-                                else:
-                                    val1 = "0"
-                                codigo += keep.addIgual(temp,val1)
-                                if apuntador2 == None:
-                                    if valor2:
-                                        val2 = "1"
-                                    else:
-                                        val2 = "0"
-                                    
-                                    codigo += "if "+temp+" == "+val2 +"{\n\t goto "+ev+";\n}\n"
-                                    codigo += "goto "+ef+";\n"
-                                    keep.addCodigo(codigo)
-                                    keep.etiquetas.append(ef)
-                                    keep.etiquetas.append(ev)
-                                    return valor and valor2
-                                else:
-                                    temp = keep.getNuevoTemporal()
-                                    codigo = keep.addIgual(temp,keep.getValStack(apuntador2))
-                                    codigo += "//*****CONDICIÓN LÓGICA AND*****\n"
-                                    codigo += "if "+val1+" == "+temp +"{\n\t goto "+ev+";\n}\n"
-                                    codigo += "goto "+ef+";\n"
-                                    keep.addCodigo(codigo)
-                                    keep.etiquetas.append(ef)
-                                    keep.etiquetas.append(ev)
-                                    return valor and valor2
-                            else:
-                                ev = keep.getNuevaEtiqueta()
-                                ef = keep.getNuevaEtiqueta()
-                                temp = keep.getNuevoTemporal()
-                                codigo = "//*****CONDICIÓN LÓGICA AND******\n"
-                                val2 =""                                
-                                codigo += keep.addIgual(temp,keep.getValStack(apuntador))
-                                if apuntador2 == None:
-                                    if valor2:
-                                        val2 = "1"
-                                    else:
-                                        val2 = "0"
-                                    
-                                    codigo += "if "+temp+" == "+val2 +"{\n\t goto "+ev+";\n}\n"
-                                    codigo += "goto "+ef+";\n"
-                                    keep.addCodigo(codigo)
-                                    keep.etiquetas.append(ef)
-                                    keep.etiquetas.append(ev)
-                                    return valor and valor2
-                                else:
-                                    temp1 = keep.getNuevoTemporal()
-                                    codigo = keep.addIgual(temp,keep.getValStack(apuntador2))
-                                    codigo += "//*****CONDICIÓN LÓGICA AND*****\n"
-                                    codigo += "if "+temp+" == "+temp1 +"{\n\t goto "+ev+";\n}\n"
-                                    codigo += "goto "+ef+";\n"
-                                    keep.addCodigo(codigo)
-                                    keep.etiquetas.append(ef)
-                                    keep.etiquetas.append(ev)
-                                    return valor and valor2
-                elif len (keep.etiquetas)== 1:
-                    codigo = "//**********EMPEZANDO IF LÓGICOS**********\n"
-                    #ETIQUETAS PARA EL OPERADOR 1
-                    etiquetaSalida = keep.getNuevaEtiqueta()
-                    keep.addCodigo("goto "+etiquetaSalida+";\n")
-                    ev = keep.etiquetas.pop()
-                    keep.addCodigo(ev+":\n")
-                    # LIMPIO LAS VARIABLES GLOBALES
-                    self.valor = None
-                    self.tipo = None 
-                    self.apuntador = None 
-                    # REALIZO LA SEGUNDA CONDICIÓN DEL OPERADOR 2
-                    resultado2= self.operador2.traducir(tree,table,keep)
-                    self.verificar(resultado2,tree,table,keep)
-                    # ASIGNO LAS VARIABLES RESULTANTES A LAS LOCALES
-                    valor2 = self.valor
-                    apuntador2 = self.apuntador
-                    tipo2 = self.tipo
-                    if apuntador2 == None:
-                        if len(keep.etiquetas) == 1:
-                            keep.addCodigo("goto "+etiquetaSalida+";\n")
-                            evv = keep.etiquetas.pop()
-                            keep.addCodigo(evv+":\n")
-                            keep.etiquetas.append(etiquetaSalida)
-                            return valor and valor2
-                        elif len(keep.etiquetas) == 0:
-                            evv = keep.getNuevaEtiqueta()
-                            if not valor2:
-                                cod = "if 1 == "+str(int(valor2))+" {goto "+evv+";}\ngoto "+etiquetaSalida+";\n"
-                                keep.addCodigo(cod)
-                                keep.addCodigo(evv+":\n")
-                            else:
-                                keep.addCodigo("goto "+etiquetaSalida+";\n")
-                                keep.addCodigo(evv+":\n")
-                    keep.etiquetas.append(etiquetaSalida)
-                    return valor and valor2 
-                    #keep.addCodigo(ef+":\n")
-                    
-                elif len(keep.etiquetas):
-                    codigo = "//**********EMPEZANDO IF LÓGICOS**********\n"
+            if isinstance(self.operador1,NodoAST):
+                resultado1= self.operador1.traducir(tree,table,keep)
+            else:
+                resultado1 = self.operador1
+            if isinstance(resultado1,dict):
+                result1 = resultado1["bool"] 
+                etiquetas1 = resultado1["etiquetas"]
+                if self.tipooperacion == Tipo_Logico.AND:
+                    keep.addCodigo(etiquetas1[0]+":\n")
+                    keep.etiquetaFalsa = etiquetas1[1]
+                    keep.etiquetaVerdadera =""
+                    resultado2 = self.operador2.traducir(tree,table,keep)
+                    if isinstance(resultado2,dict):
+                        result2 = resultado2["bool"]
+                        etiquetas2 = resultado2["etiquetas"]
+                        keep.addCodigo(etiquetas2[0]+":\n")
+                        keep.etiquetaFalsa = etiquetas2[1]
+                        keep.etiquetaVerdadera = ""
+                        return result1 and result2
+                    elif isinstance(resultado2,bool):
+                        
+                        return result1 and resultado2
+                        
+                elif self.tipooperacion == Tipo_Logico.OR:
+                    keep.addCodigo(etiquetas1[1]+":\n")
+                    keep.etiquetaVerdadera = etiquetas1[0]
+                    keep.etiquetaFalsa = ""
+                    resultado2 = self.operador2.traducir(tree,table,keep)
+                    if isinstance(resultado2,dict):
+                        result2 = resultado2["bool"]
+                        etiquetas2 = resultado2["etiquetas"]
+                        keep.addCodigo(etiquetas2[1]+":\n")
+                        keep.etiquetaVerdadera = etiquetas2[0]
+                        keep.etiquetaFalsa = ""
+                        return result1 or result2
+                    elif isinstance(resultado2,bool):
+                        return result1 or resultado2
+
+            elif isinstance(resultado1,bool):
+                if self.tipooperacion == Tipo_Logico.AND:
+                    resultado2 = self.operador2.traducir(tree,table,keep)
+                    if isinstance(resultado2,dict):
+                        result2 = resultado2["bool"]
+                        etiquetas2 = resultado2["etiquetas"]
+                        keep.addCodigo(etiquetas2[0]+":\n")
+                        keep.etiquetaFalsa = etiquetas2[1]
+                        keep.etiquetaVerdadera = ""
+                        return resultado1 and result2
+                    elif isinstance(resultado2,bool):
+                        if keep.etiquetaVerdadera != "":
+                            keep.addCodigo(keep.etiquetaVerdadera+":\n")
+                            keep.etiquetaVerdadera =""
+                        eSigue = keep.getNuevaEtiqueta()
+                        ePara = keep.getNuevaEtiqueta()
+                        if resultado1:
+                            keep.addCodigo("goto "+eSigue+";\n")
+                            keep.addCodigo(eSigue+":\n")
+                        else:
+                            keep.addCodigo("goto "+ePara+";\n")
+                            keep.etiquetaFalsa = ePara
+                            return resultado1 and resultado2
+
+                        eSigue2 = keep.getNuevaEtiqueta()
+                        if resultado2:
+                            keep.addCodigo("goto "+eSigue2+";\n")
+                            keep.addCodigo(eSigue2+":\n")
+                        else:
+                            keep.addCodigo("goto "+ePara+";\n")
+                            keep.etiquetaFalsa = ePara
+                        return resultado1 and resultado2
+                elif self.tipooperacion == Tipo_Logico.OR:
+                    resultado2 = self.operador2.traducir(tree,table,keep)
+                    if isinstance(resultado2,dict):
+                        result2 = resultado2["bool"]
+                        etiquetas2 = resultado2["etiquetas"]
+                        #keep.addCodigo(etiquetas2[1]+":\n")
+                        keep.etiquetaVerdadera = etiquetas2[0]
+                        keep.etiquetaFalsa = etiquetas2[1]
+                        return resultado1 or result2
+                    elif isinstance(resultado2,bool):
+                        if keep.etiquetaVerdadera == "" and keep.etiquetaFalsa == "":
+                            ef = keep.getNuevaEtiqueta()
+                            ev = keep.getNuevaEtiqueta()
+                        elif keep.etiquetaFalsa != "" and keep.etiquetaVerdadera == "":
+                            ev = keep.getNuevaEtiqueta()
+                            ef = keep.etiquetaFalsa
+                        elif keep.etiquetaVerdadera != "" and keep.etiquetaFalsa == "":
+                            ev = keep.etiquetaVerdadera
+                            ef = keep.getNuevaEtiqueta()
+                        elif keep.etiquetaVerdadera != "" and keep.etiquetaFalsa != "":
+                            ev = keep.etiquetaVerdadera
+                            ef = keep.etiquetaFalsa
+                        codigo = "if 1 == "+str(int(resultado1))+"{ goto "+ef+";}\ngoto "+ev+";\n"
+                        codigo += ev+":\n"
+                        nueva = keep.getNuevaEtiqueta()
+                        codigo += "if 1 =="+str(int(resultado2))+"{ goto "+ef+";}\ngoto "+nueva+";\n"
+                        codigo += nueva+":\n"
+                        keep.etiquetaVerdadera = ef
+                        keep.addCodigo(codigo)
+                        return resultado1 or resultado2
 
 
-            if self.tipooperacion == Tipo_Logico.OR:
-                print("OR")
-        if self.operador2== None and self.operador1 !=None:
-            resultado1= self.operador1.ejecutar(tree,table)
-
-            if self.tipooperacion == Tipo_Logico.DIFERENTE:
-                if not resultado1:
-                    return True
-                return False
 
     def getNodo(self):
         NuevoNodo = NodoArbol("Lógicas")
@@ -196,51 +158,3 @@ class Logica(NodoAST):
             NuevoNodo.agregarHijoNodo(self.operador1.getNodo())
 
         return NuevoNodo
-
-
-    def verificar(self,resultado,tree,table,keep):     
-            if isinstance(resultado,dict):
-                if "apuntador" in resultado:
-                    self.apuntador = int(resultado["apuntador"])
-                    self.tipo = resultado["tipo"]
-                    self.valor = resultado["valor"]
-                elif "temp" in resultado:
-                    op1 = resultado['temp']
-                    self.valor = op1 
-                elif "error" in resultado:
-                    return resultado
-            if not isinstance(resultado,dict):
-                if isinstance(resultado,NodoAST):
-                    op1 = resultado.traducir(tree,table,keep)
-                else:
-                    op1 = resultado 
-                # si es un diccionario quiere decir que es ID
-                if isinstance(op1,dict):
-                    if "apuntador" in op1:
-                        self.apuntador = int(op1["apuntador"])
-                        self.tipo = op1["tipo"]
-                        self.valor = op1["valor"]
-                    elif "temp" in op1:
-                        self.valor = int(op1['valor'])
-                        op1= op1['temp']                       
-                    elif "error" in op1:
-                        return op1
-                elif isinstance(op1,str):
-                    self.tipo = "String"
-                    self.apuntador = keep.getStack()-1
-                    self.valor = op1
-                    self.cadena = True
-                elif isinstance(op1,bool):
-                    self.valor = op1
-                    self.tipo = "Bool"
-                elif isinstance(op1,int):
-                    self.tipo = "Int64"
-                    if self.valor == "":
-                        self.valor = op1 
-                elif isinstance(op1,float):
-                    self.tipo = "Float64"
-                    if self.valor == "":
-                        self.valor = op1 
-                
-            if isinstance(resultado,Errores):
-                return Errores("Operación no permitida", "Semántico", "F", self.fila,self.columna)

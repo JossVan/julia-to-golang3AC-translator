@@ -254,6 +254,12 @@ class Asignacion(NodoAST):
                             simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"String",keep.getStack()-1)
                         elif isinstance(valor,bool):
                             simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                            if keep.etiquetaFalsa != "":
+                                keep.addCodigo(keep.etiquetaFalsa+":\n")
+                                keep.etiquetaFalsa = ""
+                            elif keep.etiquetaVerdadera != "":
+                                keep.addCodigo(keep.etiquetaVerdadera+":\n")
+                                keep.etiquetaVerdadera = ""
                             if valor: 
                                 temp = keep.getNuevoTemporal()
                                 codigo = keep.addIgual(temp,"1")
@@ -268,6 +274,7 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)
                                 keep.incrementarStack()
+                            
                         elif isinstance(valor,float):
                             temp = keep.getNuevoTemporal()
                             codigo = keep.addIgual(temp,valor)
@@ -295,6 +302,25 @@ class Asignacion(NodoAST):
                                 keep.liberarTemporales(temp)
                                 codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)
+                            elif "bool" in valor:
+                                simbolo = Simbolo(id,valor["bool"],table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                                ev = valor["etiquetas"][0]
+                                ef = valor["etiquetas"][1]
+                                nueva = keep.getNuevaEtiqueta()
+                                keep.addCodigo(ev+":\n")
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,"1")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                codigo += "goto "+nueva+";\n"
+                                keep.addCodigo(codigo)
+                                keep.addCodigo(ef+":\n")
+                                codigo = keep.addIgual(temp,"0")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                codigo += "goto "+nueva+";\n"
+                                codigo += nueva+":\n"
+                                keep.addCodigo(codigo)
                         if not isinstance(valor,str) and not isinstance(valor,bool):
                             keep.incrementarStack()
                         if self.acceso == Tipo_Acceso.GLOBAL:           
@@ -302,8 +328,7 @@ class Asignacion(NodoAST):
                         else:
                             table.actualizarSimbolo(simbolo)
                         tree.agregarTS(id,simbolo)
-                    if len(keep.etiquetas) == 1:
-                        keep.addCodigo(keep.etiquetas.pop()+":\n")
+                    
         else:
             
             if self.valor != None:
@@ -333,13 +358,58 @@ class Asignacion(NodoAST):
                     if isinstance(self.valor,NodoAST):
                         valor = self.valor.traducir(tree,table,keep)
                         if isinstance(valor, bool):
-                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack()-1)
-                            #keep.incrementarStack()
+                            simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                            if keep.etiquetaVerdadera!="":
+                                keep.addCodigo(keep.etiquetaVerdadera+":\n") 
+                            elif keep.etiquetaFalsa!="":
+                                keep.addCodigo(keep.etiquetaFalsa+":\n")
+                                
+                            if valor: 
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,"1")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                keep.addCodigo(codigo)
+                                keep.incrementarStack()
+                            else:
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,"0")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                keep.addCodigo(codigo)
+                                keep.incrementarStack()
+                            
+
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
                                 table.actualizarSimbolo(simbolo)
                             tree.agregarTS(id,simbolo)
+                        elif isinstance(valor,dict):
+                            if "bool" in valor:
+                                simbolo = Simbolo(id,valor["bool"],table.nombre,self.fila,self.columna,"Bool",keep.getStack())
+                                ev = valor["etiquetas"][0]
+                                ef = valor["etiquetas"][1]
+                                nueva = keep.getNuevaEtiqueta()
+                                keep.addCodigo(ev+":\n")
+                                temp = keep.getNuevoTemporal()
+                                codigo = keep.addIgual(temp,"1")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                codigo += "goto "+nueva+";\n"
+                                keep.addCodigo(codigo)
+                                keep.addCodigo(ef+":\n")
+                                codigo = keep.addIgual(temp,"0")
+                                codigo += keep.addIgual(keep.getValStack("SP"),temp)
+                                codigo += keep.addOperacion("SP","SP","+","1")
+                                codigo += "goto "+nueva+";\n"
+                                codigo += nueva+":\n"
+                                keep.addCodigo(codigo)
+                                if self.acceso == Tipo_Acceso.GLOBAL:
+                                    table.actualizarSimboloGlobal(simbolo)
+                                else:
+                                    table.actualizarSimbolo(simbolo)
+                                tree.agregarTS(id,simbolo)
                         else:
                             err = Errores(str(valor),"Semántico","Los tipos no coinciden", self.fila,self.columna)
                             tree.insertError(err)
