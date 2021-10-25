@@ -1,6 +1,6 @@
 from TablaSimbolos.Errores import Errores
 from Abstractas.NodoArbol import NodoArbol
-from TablaSimbolos.Tipos import Tipo_Relacional
+from TablaSimbolos.Tipos import Tipo_Logico, Tipo_Relacional
 from Abstractas.NodoAST import NodoAST
 
 class Relacional(NodoAST):
@@ -212,25 +212,37 @@ class Relacional(NodoAST):
             if isinstance(resultado1,Errores) or isinstance(resultado2,Errores):
                 return False
             if self.tipooperacion == Tipo_Relacional.MAYOR:
-                etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,">",valor2,valor,tip,tip2,temp1,temp2)
-                if valor>valor2:
-                    return {"bool":True,"etiquetas": etiquetas}
-                return {"bool":False,"etiquetas":etiquetas}
+                if tipo != "String" and tipo2 != "String":
+                    etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,">",valor2,valor,tip,tip2,temp1,temp2)
+                    if valor>valor2:
+                        return {"bool":True,"etiquetas": etiquetas}
+                    return {"bool":False,"etiquetas":etiquetas}
+                else:
+                    return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.MENOR:
-                etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"<",valor2,valor,tip,tip2,temp1,temp2)
-                if valor<valor2:
-                    return {"bool":True,"etiquetas":etiquetas}
-                return {"bool":False,"etiquetas":etiquetas}
+                if tipo != "String" and tipo2 != "String":
+                    etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"<",valor2,valor,tip,tip2,temp1,temp2)
+                    if valor<valor2:
+                        return {"bool":True,"etiquetas":etiquetas}
+                    return {"bool":False,"etiquetas":etiquetas}
+                else:
+                    return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.MENOR_IGUAL:
-                etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"<=",valor2,valor,tip,tip2,temp1,temp2)
-                if valor<= valor2:
-                    return {"bool":True,"etiquetas":etiquetas}
-                return {"bool":False,"etiquetas":etiquetas}
+                if tipo != "String" and tipo2 != "String":
+                    etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"<=",valor2,valor,tip,tip2,temp1,temp2)
+                    if valor<= valor2:
+                        return {"bool":True,"etiquetas":etiquetas}
+                    return {"bool":False,"etiquetas":etiquetas}
+                else:
+                    return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.MAYOR_IGUAL:
-                etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,">=",valor2,valor,tip,tip2,temp1,temp2)
-                if valor>= valor2:
-                    return {"bool":True,"etiquetas":etiquetas}
-                return {"bool":False,"etiquetas":etiquetas}
+                if tipo != "String" and tipo2 != "String":
+                    etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,">=",valor2,valor,tip,tip2,temp1,temp2)
+                    if valor>= valor2:
+                        return {"bool":True,"etiquetas":etiquetas}
+                    return {"bool":False,"etiquetas":etiquetas}
+                else:
+                    return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.IGUAL:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"==",valor2,valor,tip,tip2,temp1,temp2)
@@ -238,12 +250,15 @@ class Relacional(NodoAST):
                         return {"bool":True,"etiquetas": etiquetas}
                     return {"bool":False,"etiquetas":etiquetas}
                 else:
-                    return self.Igual(keep,apuntador,valor,tipo,tip,apuntador2,valor2,tipo2,tip2)
+                    return self.Igual(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.DIFERENTE:
-                etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"!=",valor2,valor,tip,tip2,temp1,temp2)
-                if valor != valor2:
-                    return {"bool":True,"etiquetas":etiquetas}
-                return {"bool":False,"etiquetas":etiquetas}
+                if tipo != "String" and tipo2 != "String":
+                    etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"!=",valor2,valor,tip,tip2,temp1,temp2)
+                    if valor != valor2:
+                        return {"bool":True,"etiquetas":etiquetas}
+                    return {"bool":False,"etiquetas":etiquetas}
+                else:
+                    return self.Igual(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
     def getNodo(self):
         NuevoNodo = NodoArbol("Lógicas")
         if self.tipooperacion == Tipo_Relacional.MAYOR:
@@ -346,7 +361,7 @@ class Relacional(NodoAST):
                 print("paso por una cadena")
         
     #Método para comparar cadenas
-    def Igual(self,keep,apuntador1,valor1,tipo1,tip1,apuntador2,valor2,tipo2,tip2):
+    def Igual(self,keep,apuntador1,valor1,apuntador2,valor2,operador):
         codigo = "//**********COMPARACIÓN DE CADENAS**********\n"
         #if tip1 and tip2:
         #OBTENGO LA PRIMERA POSICION DEL HEAP
@@ -372,7 +387,7 @@ class Relacional(NodoAST):
         codigo += ei+":\n" 
         ev = keep.getNuevaEtiqueta()
         ef = keep.getNuevaEtiqueta()
-        codigo += "if "+temp3+" == "+temp4+" {goto "+eo+";}\ngoto "+es+";\n"
+        codigo += "if "+temp3+"=="+temp4+" {goto "+eo+";}\ngoto "+es+";\n"
         codigo += eo+":\n"
         #AQUI SE HACE EL AUMENTO A LAS PILAS
         codigo += keep.addOperacion(temp,temp,"+","1")
@@ -386,7 +401,77 @@ class Relacional(NodoAST):
         codigo += "if "+temp4+" == -1" +"{goto "+ef+";}\ngoto "+ei+";\n"
 
         keep.addCodigo(codigo)
-        return {"bool":valor1 == valor2,"etiquetas":[ef,es]}
+        if operador == Tipo_Relacional.IGUAL:
+            return {"bool":valor1 == valor2,"etiquetas":[ef,es]}
+        elif operador == Tipo_Relacional.DIFERENTE:
+            return {"bool":valor1 == valor2,"etiquetas":[es,ef]}
+
+    def longitud(self,keep,apuntador1,valor1,apuntador2,valor2,operador):
+        codigo = "//**********COMPARACIÓN DE CADENAS**********\n"
+        #if tip1 and tip2:
+        #OBTENGO LA PRIMERA POSICION DEL HEAP
+        contador = keep.getNuevoTemporal()
+        temp = keep.getNuevoTemporal()
+        temp2 = keep.getNuevoTemporal()
+        codigo += keep.addIgual(contador,"0")
+        codigo += "//Obtengo del stack, la posición del heap\n"
+        codigo += keep.addIgual(temp,keep.getValStack(apuntador1))
+        codigo += "//Obtengo el valor del primer caracter del heap\n"
+        temp3 = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp3,keep.getValHeap(temp))
+        
+        #CREO UNA ETIQUETA PARA INICIAR EL CICLO 
+        ei = keep.getNuevaEtiqueta()
+        es = keep.getNuevaEtiqueta()
+        codigo += ei+":\n" 
+        ef = keep.getNuevaEtiqueta()
+        codigo += "if "+temp3+" != -1" +"{goto "+ef+";}\ngoto "+es+";\n"
+        #AQUI SE HACE EL AUMENTO A LAS PILAS
+        codigo += ef+":\n"
+        codigo += keep.addOperacion(temp,temp,"+","1")
+        codigo += keep.addIgual(temp3,keep.getValHeap(temp))
+        codigo += keep.addOperacion(contador,contador,"+","1")
+        codigo += "goto "+ei+";\n"
+        codigo += es+":\n"
+        temp2 = keep.getNuevoTemporal()
+        contador2 = keep.getNuevoTemporal()
+        codigo += keep.addIgual(contador2,"0")
+        codigo += "//Obtengo del stack, la posición del heap\n"
+        codigo += keep.addIgual(temp2,keep.getValStack(apuntador2))
+        codigo += "//Obtengo el valor del primer caracter del heap\n"
+        temp4 = keep.getNuevoTemporal()
+        codigo += keep.addIgual(temp4,keep.getValHeap(temp2))
+
+        ei2 = keep.getNuevaEtiqueta()
+        es2 = keep.getNuevaEtiqueta()
+        codigo += ei2+":\n" 
+        ef2 = keep.getNuevaEtiqueta()
+        codigo += "if "+temp4+" != -1" +"{goto "+ef2+";}\ngoto "+es2+";\n"
+        #AQUI SE HACE EL AUMENTO A LAS PILAS
+        codigo += ef2+":\n"
+        codigo += keep.addOperacion(temp2,temp2,"+","1")
+        codigo += keep.addIgual(temp4,keep.getValHeap(temp2))
+        codigo += keep.addOperacion(contador2,contador2,"+","1")
+        codigo += "goto "+ei2+";\n"
+        codigo += es2+":\n"
+
+        evv = keep.getNuevaEtiqueta()
+        eff = keep.getNuevaEtiqueta()
+        if operador == Tipo_Relacional.MAYOR:
+            codigo += "if "+contador+">"+contador2+" {goto "+evv+";}\ngoto "+eff+";\n"
+        elif operador == Tipo_Relacional.MAYOR_IGUAL:
+            codigo += "if "+contador+">="+contador2+" {goto "+evv+";}\ngoto "+eff+";\n"
+        elif operador == Tipo_Relacional.MENOR:
+            codigo += "if "+contador+"<"+contador2+" {goto "+evv+";}\ngoto "+eff+";\n"
+        elif operador == Tipo_Relacional.MENOR_IGUAL:
+            codigo += "if "+contador+"<="+contador2+" {goto "+evv+";}\ngoto "+eff+";\n"
+
+        
+
+        keep.addCodigo(codigo)
+
+        return {"bool":valor1 == valor2,"etiquetas":[evv,eff]}
+
 
 
 
