@@ -60,43 +60,48 @@ class If(NodoAST):
         if isinstance(resultado,bool):
             if keep.etiquetaVerdadera == "":
                 nuevaTabla = TablaSimbolos("If",table)
-                for instruccion in self.instrucciones_if:
-                    resp = instruccion.traducir(tree,nuevaTabla,keep)
+                if self.instrucciones_if != None:
+                    for instruccion in self.instrucciones_if:
+                        resp = instruccion.traducir(tree,nuevaTabla,keep)
             elif keep.etiquetaVerdadera != "":
                 keep.addCodigo(keep.etiquetaVerdadera+":\n")
                 keep.etiquetaVerdadera = ""
                 nuevaTabla = TablaSimbolos("If",table)
-                for instruccion in self.instrucciones_if:
-                    resp = instruccion.traducir(tree,nuevaTabla,keep)
+                if self.instrucciones_if != None:
+                    for instruccion in self.instrucciones_if:
+                        resp = instruccion.traducir(tree,nuevaTabla,keep)
             if keep.etiquetaFalsa != "":
                 keep.addCodigo(keep.etiquetaFalsa+":\n")
                 keep.etiquetaFalsa = ""
                 if self.instrucciones_elseif != None:
                     nuevaTabla = TablaSimbolos("elseif",table)
                     resp = self.instrucciones_elseif.traducir(tree,nuevaTabla,keep)
+                if self.instrucciones_else != None:
+                    nuevaTabla = TablaSimbolos("else",table)
+                    for instruccion in self.instrucciones_else:
+                        resp= instruccion.traducir(tree,nuevaTabla,keep)
             
-            if self.instrucciones_else != None:
-                nuevaTabla = TablaSimbolos("else",table)
-                for instruccion in self.instrucciones_else:
-                    resp= instruccion.traducir(tree,nuevaTabla,keep)
-            keep.etiquetaFalsa =""
-            keep.etiquetaVerdadera=""
         elif isinstance(resultado,dict):
             if "bool" in resultado:
+                salida = keep.getNuevaEtiqueta()
+
                 etiquetaVerdadera = resultado["etiquetas"][0]
                 etiquetaFalsa = resultado["etiquetas"][1]                
                 keep.addCodigo(etiquetaVerdadera+":\n")
                 nuevaTabla = TablaSimbolos("If",table)
                 for instruccion in self.instrucciones_if:
                     resp = instruccion.traducir(tree,nuevaTabla,keep)
+                keep.addCodigo("goto "+salida+";\n")
+                keep.addCodigo(etiquetaFalsa+":\n")                
                 if self.instrucciones_elseif != None:
                     nuevaTabla = TablaSimbolos("elseif",table)
                     resp = self.instrucciones_elseif.traducir(tree,nuevaTabla,keep)
-                keep.addCodigo(etiquetaFalsa+":\n")               
                 if self.instrucciones_else != None:
                     nuevaTabla = TablaSimbolos("else",table)
                     for instruccion in self.instrucciones_else:
                         resp= instruccion.traducir(tree,nuevaTabla,keep)
+                keep.addCodigo(salida+":\n")          
+                
 
 
     def getNodo(self):

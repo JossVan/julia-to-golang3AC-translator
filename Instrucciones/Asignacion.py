@@ -257,7 +257,7 @@ class Asignacion(NodoAST):
                             if keep.etiquetaFalsa != "":
                                 keep.addCodigo(keep.etiquetaFalsa+":\n")
                                 keep.etiquetaFalsa = ""
-                            elif keep.etiquetaVerdadera != "":
+                            if keep.etiquetaVerdadera != "":
                                 keep.addCodigo(keep.etiquetaVerdadera+":\n")
                                 keep.etiquetaVerdadera = ""
                             if valor: 
@@ -361,7 +361,7 @@ class Asignacion(NodoAST):
                             simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
                             if keep.etiquetaVerdadera!="":
                                 keep.addCodigo(keep.etiquetaVerdadera+":\n") 
-                            elif keep.etiquetaFalsa!="":
+                            if keep.etiquetaFalsa!="":
                                 keep.addCodigo(keep.etiquetaFalsa+":\n")
                                 
                             if valor: 
