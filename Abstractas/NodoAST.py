@@ -9,7 +9,10 @@ class NodoAST(ABC):
     @abstractmethod
     def ejecutar(self,tree, table):
         pass
-
+    
+    @abstractmethod
+    def traducir(self,tree,table, keep):
+        pass
     @abstractmethod
     def getNodo(self):
         pass

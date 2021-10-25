@@ -1,12 +1,16 @@
 class Simbolo:
 
-    def __init__(self, identificador, valor, ambito, fila, columna, tipo):
+    def __init__(self, identificador, valor, ambito, fila, columna, tipo, apuntador):
         self.identificador = identificador
         self.valor = valor
         self.ambito = ambito
         self.fila = fila
         self.columna = columna
         self.tipo = tipo
+        self.apuntador = apuntador
+    
+    def getApuntador(self):
+        return self.apuntador
     
     def getTipo(self):
         return self.tipo

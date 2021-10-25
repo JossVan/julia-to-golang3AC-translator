@@ -6,20 +6,26 @@
 
 <div class="container">
     <div style="padding-top: 5%;">
-        <h3 for="exampleFormControlTextarea1">Entrada</h3>
-       
-        <form method="POST" action="#">
-            <textarea class="codemirror-textarea form-control" name="codigo" id="entrada" cols="30" rows="10">{{entrada}}</textarea>
-            <div class="" style="text-align: center; padding-top: 2%;">
-                <button type="submit" class="btn btn-outline-secondary" style="width: 50rem;">Analizar </button>
+        <div class="row">
+            <div class="col-6">
+                <h4 class="text-muted">Entrada</h4>
+                <form method="POST" action="#">
+                    <textarea class="codemirror-textarea form-control" name="codigo" id="entrada" cols="50" rows="100">{{entrada}}</textarea>
+                    <div class="" style="text-align: center; padding-top: 2%;">
+                        <button type="submit" class="btn btn-secondary" style="width: 20rem;">Traducir</button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-    <div style="padding-top: 5%; padding-bottom: 5%;">
-        <div class="form-group">
-            <h3 for="exampleFormControlTextarea1">Salida</h3>
-            <textarea class="form-control" name="salida" id="exampleFormControlTextarea1" rows="10" style="background-color:#14011D; color:#FFFF">{{resultado}}</textarea>
-          </div>
-    </div>
+            <div class="col-6">
+                        <h4 class="text-muted">Salida</h4>
+                        <textarea class="codemirror-textarea form-control" name="salida" id="salida" cols="50" rows="100">{{salida}}</textarea>
+                        <div class="" style="text-align: center; padding-top: 2%;">
+                            <button type="submit" class="btn btn-success" style="width: 20rem;">Optimizar por mirilla </button>
+                            <button type="submit" class="btn btn-primary" style="width: 20rem;">Optimizar por bloque </button>
+                        </div>
+            </div>
+        </div>
+
+        </div>
 </div>
 {% endblock %}
