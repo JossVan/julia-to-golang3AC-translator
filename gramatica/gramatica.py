@@ -554,7 +554,7 @@ def p_expresiones_logicas(t):
 def p_expresiones_logicas_diferente(t):
     'LO : DIFERENTE LO'
     if(t[1] == '!'):
-        t[0] = Logica(t[2],None,Tipo_Relacional.DIFERENTE,t.lineno(1), t.lexpos(1))
+        t[0] = Logica(t[2],None,Tipo_Logico.DIFERENTE,t.lineno(1), t.lexpos(1))
 
 def p_expresiones_logicas_par(t):
     'LO : PARIZQ LO PARDER'

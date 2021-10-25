@@ -141,8 +141,38 @@ class Logica(NodoAST):
                         keep.addCodigo(codigo)
                         return resultado1 or resultado2
 
-
-
+        if self.operador2== None and self.operador1 !=None:
+            if isinstance(self.operador1,NodoAST):
+                resultado1= self.operador1.traducir(tree,table,keep)
+            else:
+                resultado1 = self.operador1
+            if isinstance(resultado1,dict):
+                result1 = resultado1["bool"] 
+                etiquetas1 = resultado1["etiquetas"]
+                if self.tipooperacion == Tipo_Logico.DIFERENTE:
+                    keep.addCodigo(etiquetas1[1]+":\n")
+                    keep.etiquetaFalsa = etiquetas1[0]
+                    keep.etiquetaVerdadera =""
+                    return not result1
+                else:
+                    print(self.tipooperacion)
+            elif isinstance(resultado1,bool):
+                if self.tipooperacion == Tipo_Logico.DIFERENTE:
+                    if keep.etiquetaVerdadera == "" and keep.etiquetaFalsa == "":
+                            ef = keep.getNuevaEtiqueta()
+                            ev = keep.getNuevaEtiqueta()
+                    elif keep.etiquetaFalsa != "" and keep.etiquetaVerdadera == "":
+                        ev = keep.getNuevaEtiqueta()
+                        ef = keep.etiquetaFalsa
+                    elif keep.etiquetaVerdadera != "" and keep.etiquetaFalsa == "":
+                        ev = keep.etiquetaVerdadera
+                        ef = keep.getNuevaEtiqueta()
+                    elif keep.etiquetaVerdadera != "" and keep.etiquetaFalsa != "":
+                        ev = keep.etiquetaVerdadera
+                        ef = keep.etiquetaFalsa
+                    codigo = "if 1 == "+str(int(resultado1))+"{ goto "+ev+";}\ngoto "+ef+";\n"
+                    codigo += ev+":\n"
+                    return not resultado1
     def getNodo(self):
         NuevoNodo = NodoArbol("Lógicas")
         if self.tipooperacion == Tipo_Logico.AND:
