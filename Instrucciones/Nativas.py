@@ -85,6 +85,84 @@ class Nativas_conTipo(NodoAST):
                 err = Errores(str(self.tipo),"Semántico","Solo valores tipo Int64", self.fila,self.columna)
                 tree.insertError(err)
                 return err
+    
+    def traducir(self, tree, table, keep):
+        apuntador = None
+        tipo = None 
+        val = None
+        if self.funcion == Tipo_Primitivas.PARSE:
+            if self.tipo != None:
+                valor = self.valor.traducirt(tree,table,keep)
+                if self.tipo == Tipo_Dato.BOOLEANO:
+                    try:
+                        if isinstance(valor,str):
+                            
+                            return bool(self.valor)
+                        elif isinstance(valor,dict):
+                            if "apuntador" in valor:
+                                apuntador = valor["apuntador"]
+                                tipo = tipo["tipo"]
+                                val = valor["valor"]
+                        err = Errores(str(valor),"Semántico","El parámetro debe ser una cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a booleano", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                elif self.tipo == Tipo_Dato.CADENA:
+                    try:
+                        if isinstance(valor,str):
+                            return valor
+                        err = Errores(str(valor),"Semántico","El parámetro debe ser una cadena de texto", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                elif self.tipo == Tipo_Dato.ENTERO:
+                    try:
+                        if isinstance(valor, str):
+                            return int(valor)
+                        err = Errores(str(valor),"Semántico","El segundo parámetro debe ser una cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Error al castear a Int64", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                elif self.tipo == Tipo_Dato.DECIMAL:
+                    try:
+                        if isinstance(valor, str):
+                            return float(valor)
+                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Error al intentar convertir a Float64", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                elif self.tipo == Tipo_Dato.CARACTER:
+                    try:
+                        if isinstance(valor, str):
+                            return chr(valor)
+                        err = Errores(str(valor),"Semántico","El segundo parámetro debe ser una cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a Char", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+        elif self.funcion == Tipo_Primitivas.TRUNC:
+            if self.tipo == Tipo_Dato.ENTERO:
+                self.valor = self.valor.ejecutar(tree,table)
+                return int(self.valor)
+            else:
+                err = Errores(str(self.tipo),"Semántico","Solo valores tipo Int64", self.fila,self.columna)
+                tree.insertError(err)
+                return err
+    
     def getNodo(self):
         NodoNuevo = NodoArbol("Funciones_Nativas")
 

@@ -61,6 +61,61 @@ class Rango(NodoAST):
                     tree.insertError(err)
                     return err
 
+    def traducir(self, tree, table, keep):
+        if self.id == None:
+            if self.derecho == None:
+                izquierdo =""
+                try:
+                    if isinstance(self.izquierdo, list):
+                        for izq in self.izquierdo:
+                            izquierdo = izq.traducir(tree,table,keep)
+                            arreglo = []
+                            for cont in izquierdo:
+                                if isinstance(cont, NodoAST):
+                                    valor = cont.ejecutar(tree,table)
+                                    arreglo.append(valor)
+                                else:
+                                    return Errores("Operación desconocida", "Semántico","F",self.fila,self.columna)
+                            return arreglo
+                    elif isinstance(self.izquierdo, NodoAST):
+                        izquierdo = self.izquierdo.ejecutar(tree,table)
+                        if isinstance(izquierdo, list):
+                            return izquierdo
+                        elif isinstance(izquierdo, NodoAST):
+                            izq = izquierdo.ejecutar(tree,table)
+                            return izq
+                        return izquierdo
+                except:
+                    err= Errores(izquierdo,"Semántico", "Error en el rango", self.fila,self.columna)
+                    tree.insertError(err)
+                    return err
+            elif self.derecho != None and self.izquierdo != None:             
+                try:
+                    izquierdo = self.izquierdo.traducir(tree,table,keep)
+                    derecho = self.derecho.traducir(tree,table,keep)
+                    if isinstance(izquierdo,int) and isinstance(derecho,int):
+                        return Rango(self.id,izquierdo,derecho,self.fila,self.columna)
+                    elif isinstance(izquierdo, float) and isinstance(derecho,float):
+                        return Rango(self.id,izquierdo,derecho,self.fila,self.columna)
+                    elif isinstance(izquierdo,dict) and isinstance(derecho,dict):
+                        return {"izquierdo":izquierdo,"derecho":derecho}
+                    elif isinstance(izquierdo, dict) and isinstance(derecho,int):
+                        return {"izquierdo":izquierdo,"derecho":derecho}
+                    elif isinstance(derecho,dict) and isinstance(izquierdo,int):
+                        return {"izquierdo":izquierdo,"derecho":derecho}
+                    elif isinstance(izquierdo, dict) and isinstance(derecho,float):
+                        return {"izquierdo":izquierdo,"derecho":derecho}
+                    elif isinstance(derecho,dict) and isinstance(izquierdo,float):
+                        return {"izquierdo":izquierdo,"derecho":derecho}
+                    else:
+                        err= Errores(str(izquierdo)+":"+str(derecho),"Semántico", "Error en el rango", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                except:
+                    err= Errores("rango","Semántico", "Error en el rango", self.fila,self.columna)
+                    tree.insertError(err)
+                    return err
+
     def getNodo(self):
         nodoNuevo = NodoArbol("Rango")
         if self.izquierdo != None and self.derecho != None:

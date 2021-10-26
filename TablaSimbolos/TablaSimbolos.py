@@ -37,6 +37,16 @@ class TablaSimbolos:
         self.tabla[simbolo.getID()] = simbolo
         return None
 
+    def actualizarTipo(self, nombre,tipo):
+        tablaActual = self
+        while tablaActual != None:
+            if nombre in tablaActual.tabla :
+                tablaActual.tabla[nombre].tipo = tipo
+                return None          
+            else:
+                tablaActual = tablaActual.anterior
+        return None
+
     def actualizarValorPosicion(self, valor, posicion, id):
         tablaActual = self
         while tablaActual != None:
