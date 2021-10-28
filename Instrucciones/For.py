@@ -131,16 +131,14 @@ class For(NodoAST):
             rango2 = rango.derecho
             if isinstance(rango1,int) and isinstance(rango2,int):  
                 nuevaTabla.actualizarTipo(id.lower(),"Int64")
-                inferior = keep.getNuevoTemporal()
-                superior = keep.getNuevoTemporal()
+                indice = keep.getNuevoTemporal()
                 codigo = "//**********CICLO FOR**********\n"
-                codigo +=keep.addIgual(inferior,rango1)
-                codigo += keep.addIgual(superior,rango2)
+                codigo +=keep.addIgual(indice,rango1)
                 ei = keep.getNuevaEtiqueta()
                 ev = keep.getNuevaEtiqueta()
                 ef = keep.getNuevaEtiqueta()
                 codigo += ei+":\n"
-                codigo += "if "+inferior+" <= "+superior+"{goto "+ev+";}\ngoto "+ef+";\n"
+                codigo += "if "+indice+" <= "+str(rango2)+"{goto "+ev+";}\ngoto "+ef+";\n"
                 codigo += ev+":\n"
                 #EN ESTA SECCIÓN SE ACTUALIZA LA VARIABLE DEL FOR 
                 id = id.lower()
@@ -151,7 +149,7 @@ class For(NodoAST):
                     return
                 apuntador = resultado.getApuntador()
                 #tipo = resultado.getTipo()
-                codigo += keep.addIgual(keep.getValStack(apuntador),inferior)
+                codigo += keep.addIgual(keep.getValStack(apuntador),indice)
                 keep.addCodigo(codigo)
                 for instruccion in self.instrucciones:
                     resp= instruccion.traducir(tree,nuevaTabla,keep)
@@ -161,7 +159,7 @@ class For(NodoAST):
                         return None
                     elif isinstance(resp, Return):
                         return resp
-                codigo = keep.addOperacion(inferior,inferior,"+","1")
+                codigo = keep.addOperacion(indice,indice,"+","1")
                 codigo += "goto "+ei+";\n"
                 codigo += ef+":\n"
                 keep.addCodigo(codigo)

@@ -220,7 +220,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp, "valor": (valor+valor2), "tipo":tipo}  
+                    return {"temp":temp, "valor": -1, "tipo":tipo}  
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.RESTA:                
@@ -242,7 +242,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp,"valor": (valor*valor2), "tipo":tipo} 
+                    return {"temp":temp,"valor": -1, "tipo":tipo} 
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.DIVISION:                
@@ -273,7 +273,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp, "valor": (valor/valor2), "tipo":tipo}      
+                    return {"temp":temp, "valor": -1, "tipo":tipo}      
                 else:
                     return {"error": "error"}      
             elif self.operacion == Tipo_Aritmetico.POTENCIA:
@@ -306,7 +306,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp3, "valor": (pow(valor,valor2)), "tipo":tipo}
+                    return {"temp":temp3, "valor": -1, "tipo":tipo}
             elif self.operacion == Tipo_Aritmetico.MODAL:
                 #COMPROVACION DE DIVISIÓN POR 0
                 ef = keep.getNuevaEtiqueta()
@@ -334,7 +334,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp, "valor": (valor%valor2), "tipo":tipo}      
+                    return {"temp":temp, "valor": -1, "tipo":tipo}      
                 else:
                     return {"error": "error"}  
     def getNodo(self):
@@ -371,7 +371,7 @@ class Aritmetica(NodoAST):
     
     def concatenar(self,keep,apuntador):
         codigo="//INICIO DE LA CONCATENACIÓN DE SUMA\n"
-        # CRANDO VARIABLES TEMPORALES PARA ALMACENAR EL APUNTADOR Y VALOR DEL STACK EN ESA POSICION
+        # CRANDO VARIABLES TEMPORALES PARA ALMACENAR EL APUNTADO Y VALOR DEL STACK EN ESA POSICION
         temp = keep.getNuevoTemporal()
         codigo += keep.addIgual(temp,apuntador)
         temp2 = keep.getNuevoTemporal()
@@ -409,28 +409,10 @@ class Aritmetica(NodoAST):
                 self.concatenar(keep,apuntador2)
                 codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
                 codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                keep.incrementarHeap()
-                if cadena or cadena2:
-                    keep.incrementarStack()
+                codigo += keep.addIgual(keep.getValStack(apuntador),temp)
                 keep.addCodigo(codigo)
-                return valor+valor2     
-        if tipo2 == "String":
-            temp = keep.getNuevoTemporal()
-            keep.addCodigo(temp,"HP")
-            self.concatenar(keep,apuntador2)
-            if tipo == "String":
-                self.concatenar(keep,apuntador)
-                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-                codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                if cadena or cadena2:
-                    keep.incrementarStack()
-                keep.incrementarHeap()
-                keep.addCodigo(codigo)
-                return "cadena"         
+                return {"valor":valor+valor2,"apuntador":apuntador,"tipo":tipo}     
+              
         return False        
     
     def multiplicidad(self,keep,cadena, cantidad):
@@ -454,8 +436,10 @@ class Aritmetica(NodoAST):
         codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
         keep.incrementarHeap()
         codigo += keep.addOperacion("HP","HP","+","1")
-        codigo += keep.addIgual(keep.getValStack("SP"),temp)
-        codigo += keep.addOperacion("SP","SP","+","1")
+        temp4 = keep.getNuevoTemporal()
+        codigo += keep.addOperacion(temp4,"SP","+",keep.getStack())
+        codigo += keep.addIgual(keep.getValStack(temp4),temp)
+        #codigo += keep.addOperacion("SP","SP","+","1")
         keep.incrementarStack()
         keep.addCodigo(codigo)
         keep.liberarTemporales(temp)

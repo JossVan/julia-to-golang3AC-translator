@@ -92,39 +92,125 @@ class Nativas_conTipo(NodoAST):
         val = None
         if self.funcion == Tipo_Primitivas.PARSE:
             if self.tipo != None:
-                valor = self.valor.traducirt(tree,table,keep)
-                if self.tipo == Tipo_Dato.BOOLEANO:
+                valor = self.valor.traducir(tree,table,keep)
+                if self.tipo == Tipo_Dato.ENTERO:
                     try:
                         if isinstance(valor,str):
-                            
-                            return bool(self.valor)
+                            apuntador = keep.getStack()-1
+                            codigo = "// *****MÉTODO PARSER*****\n"
+                            temp = keep.getNuevoTemporal()
+                            codigo += "// Variable que almacena el apuntador del stack\n"
+                            codigo += keep.addIgual(temp,apuntador)
+                            temp2 = keep.getNuevoTemporal()
+                            temp3 = keep.getNuevoTemporal()
+                            codigo += "// Variable que almacena el valor del stack\n"
+                            codigo += keep.addIgual(temp2,keep.getValStack(temp))
+                            codigo += "// Variable que almacena el valor del heap\n"
+                            codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
+                            ei = keep.getNuevaEtiqueta()
+                            ef = keep.getNuevaEtiqueta()
+                            contador = keep.getNuevoTemporal()
+                            unidades = keep.getNuevoTemporal()
+                            totales = keep.getNuevoTemporal()
+                            codigo += keep.addIgual(totales,"0")
+                            codigo += keep.addIgual(contador,"0")
+                            codigo += keep.addIgual(unidades,"1")
+                            codigo += ei+":\n"
+                            codigo += "if "+temp3+" == -1{goto "+ef+";}\n"
+                            codigo += keep.addOperacion(contador,contador,"+","1")
+                            codigo += "// Aumento la posición del heap\n"
+                            codigo += keep.addOperacion(temp2,temp2,"+","1")
+                            codigo += "// Variable que almacena el valor del heap\n"
+                            codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
+                            codigo += "goto "+ei+";\n"
+                            codigo += ef+":\n"
+                            codigo += "//Posición del heap del últmo valor de la cadena\n"
+                            codigo += keep.addOperacion(contador,contador,"-","1")
+                            codigo += "// Variable que almacena el valor del stack\n"
+                            codigo += keep.addIgual(temp2,keep.getValStack(temp))
+                            codigo += "// Variable que almacena el valor del heap\n"
+                            codigo += keep.addOperacion(contador,contador,"+",temp2)
+                            codigo += keep.addIgual(temp3,keep.getValHeap(contador))
+                            et = keep.getNuevaEtiqueta()
+                            temp4 = keep.getNuevoTemporal()
+                            #codigo += et+":\n"
+                            codigo += keep.addOperacion(temp4,temp3,"-","48")
+                            codigo += keep.addOperacion(temp4,temp4,"*", unidades)
+                            codigo += keep.addOperacion(totales,totales,"+",temp4)
+                            codigo += keep.addOperacion(unidades,unidades,"*",10)
+                            codigo += "if "+contador+"== 0 {goto "+et+";}\n"
+                            codigo += "goto "+ef+";\n"
+                            codigo += et+":\n"
+                            codigo += keep.addIgual(keep.getValStack(temp), totales)
+                            keep.addCodigo(codigo)
+                            keep.liberarTemporales(temp)
+                            keep.liberarTemporales(temp2)
+                            keep.liberarTemporales(temp3)
+                            keep.liberarTemporales(temp4)
+                            keep.liberarTemporales(contador)
+                            keep.liberarTemporales(totales)
+                            return {"apuntador":apuntador,"tipo":"Int64","valor": int(valor)}
                         elif isinstance(valor,dict):
                             if "apuntador" in valor:
                                 apuntador = valor["apuntador"]
-                                tipo = tipo["tipo"]
+                                tipo = valor["tipo"]
                                 val = valor["valor"]
-                        err = Errores(str(valor),"Semántico","El parámetro debe ser una cadena", self.fila,self.columna)
-                        tree.insertError(err)
-                        return err
-                    except ValueError:
-                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a booleano", self.fila,self.columna)
-                        tree.insertError(err)
-                        return err
-                elif self.tipo == Tipo_Dato.CADENA:
-                    try:
-                        if isinstance(valor,str):
-                            return valor
-                        err = Errores(str(valor),"Semántico","El parámetro debe ser una cadena de texto", self.fila,self.columna)
-                        tree.insertError(err)
-                        return err
-                    except ValueError:
-                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a cadena", self.fila,self.columna)
-                        tree.insertError(err)
-                        return err
-                elif self.tipo == Tipo_Dato.ENTERO:
-                    try:
-                        if isinstance(valor, str):
-                            return int(valor)
+                                if tipo == "String":
+                                    codigo = "// *****MÉTODO PARSER*****\n"
+                                    temp = keep.getNuevoTemporal()
+                                    codigo += "// Variable que almacena el apuntador del stack\n"
+                                    codigo += keep.addIgual(temp,apuntador)
+                                    temp2 = keep.getNuevoTemporal()
+                                    temp3 = keep.getNuevoTemporal()
+                                    codigo += "// Variable que almacena el valor del stack\n"
+                                    codigo += keep.addIgual(temp2,keep.getValStack(temp))
+                                    codigo += "// Variable que almacena el valor del heap\n"
+                                    codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
+                                    ei = keep.getNuevaEtiqueta()
+                                    ef = keep.getNuevaEtiqueta()
+                                    contador = keep.getNuevoTemporal()
+                                    unidades = keep.getNuevoTemporal()
+                                    totales = keep.getNuevoTemporal()
+                                    codigo += keep.addIgual(totales,"0")
+                                    codigo += keep.addIgual(contador,"0")
+                                    codigo += keep.addIgual(unidades,"1")
+                                    codigo += ei+":\n"
+                                    codigo += "if "+temp3+" == -1{goto "+ef+";}\n"
+                                    codigo += keep.addOperacion(contador,contador,"+","1")
+                                    codigo += "// Aumento la posición del heap\n"
+                                    codigo += keep.addOperacion(temp2,temp2,"+","1")
+                                    codigo += "// Variable que almacena el valor del heap\n"
+                                    codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
+                                    codigo += "goto "+ei+";\n"
+                                    codigo += ef+":\n"
+                                    codigo += "//Posición del heap del últmo valor de la cadena\n"
+                                    codigo += keep.addOperacion(contador,contador,"-","1")
+                                    codigo += "// Variable que almacena el valor del stack\n"
+                                    codigo += keep.addIgual(temp2,keep.getValStack(temp))
+                                    codigo += "// Variable que almacena el valor del heap\n"
+                                    codigo += keep.addOperacion(contador,contador,"+",temp2)
+                                    codigo += keep.addIgual(temp3,keep.getValHeap(contador))
+                                    et = keep.getNuevaEtiqueta()
+                                    temp4 = keep.getNuevoTemporal()
+                                    #codigo += et+":\n"
+                                    codigo += keep.addOperacion(temp4,temp3,"-","48")
+                                    codigo += keep.addOperacion(temp4,temp4,"*", unidades)
+                                    codigo += keep.addOperacion(totales,totales,"+",temp4)
+                                    codigo += keep.addOperacion(unidades,unidades,"*",10)
+                                    codigo += "if "+contador+"== 0 {goto "+et+";}\n"
+                                    codigo += "goto "+ef+";\n"
+                                    codigo += et+":\n"
+                                    codigo += keep.addIgual(keep.getValStack(temp), totales)
+                                    keep.addCodigo(codigo)
+                                    keep.liberarTemporales(temp)
+                                    keep.liberarTemporales(temp2)
+                                    keep.liberarTemporales(temp3)
+                                    keep.liberarTemporales(temp4)
+                                    keep.liberarTemporales(contador)
+                                    keep.liberarTemporales(totales)
+                                    return {"apuntador":apuntador,"tipo":"Int64","valor":int(val)}
+                                else:
+                                    print("ERROR")
                         err = Errores(str(valor),"Semántico","El segundo parámetro debe ser una cadena", self.fila,self.columna)
                         tree.insertError(err)
                         return err
