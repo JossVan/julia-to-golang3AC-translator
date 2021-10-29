@@ -78,11 +78,11 @@ class Rango(NodoAST):
                                     return Errores("Operación desconocida", "Semántico","F",self.fila,self.columna)
                             return arreglo
                     elif isinstance(self.izquierdo, NodoAST):
-                        izquierdo = self.izquierdo.ejecutar(tree,table)
+                        izquierdo = self.izquierdo.traducir(tree,table,keep)
                         if isinstance(izquierdo, list):
                             return izquierdo
                         elif isinstance(izquierdo, NodoAST):
-                            izq = izquierdo.ejecutar(tree,table)
+                            izq = izquierdo.traducir(tree,table,keep)
                             return izq
                         return izquierdo
                 except:

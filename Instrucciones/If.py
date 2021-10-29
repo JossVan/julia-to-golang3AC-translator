@@ -82,7 +82,7 @@ class If(NodoAST):
                         resp= instruccion.traducir(tree,nuevaTabla,keep)
             
         elif isinstance(resultado,dict):
-            if "bool" in resultado:
+            if "etiquetas" in resultado:
                 salida = keep.getNuevaEtiqueta()
 
                 etiquetaVerdadera = resultado["etiquetas"][0]
@@ -91,6 +91,8 @@ class If(NodoAST):
                 nuevaTabla = TablaSimbolos("If",table)
                 for instruccion in self.instrucciones_if:
                     resp = instruccion.traducir(tree,nuevaTabla,keep)
+                    keep.etiquetaFalsa = ""
+                    keep.etiquetaVerdadera = "" 
                 keep.addCodigo("goto "+salida+";\n")
                 keep.addCodigo(etiquetaFalsa+":\n")                
                 if self.instrucciones_elseif != None:
@@ -100,7 +102,11 @@ class If(NodoAST):
                     nuevaTabla = TablaSimbolos("else",table)
                     for instruccion in self.instrucciones_else:
                         resp= instruccion.traducir(tree,nuevaTabla,keep)
-                keep.addCodigo(salida+":\n")          
+                        keep.etiquetaFalsa = ""
+                        keep.etiquetaVerdadera = "" 
+                keep.addCodigo(salida+":\n")       
+                keep.etiquetaFalsa = ""
+                keep.etiquetaVerdadera = ""   
                 
 
 
