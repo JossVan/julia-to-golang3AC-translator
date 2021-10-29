@@ -115,7 +115,7 @@ class KeepData:
         nombre = "//***************FUNCIÓN IMPRIMIR***************\n"
         nombre += "\nfunc Native_PrintString() {\n"
         temp = self.getNuevoTemporal()
-        nombre += self.addOperacion(temp,"SP","-","1")
+        nombre += self.addOperacion(temp,"SP","+","0")
         temp2 = self.getNuevoTemporal()
         nombre += self.addIgual(temp2,self.getValStack(temp))
         etiquetaVerdadera = self.getNuevaEtiqueta()
@@ -143,7 +143,7 @@ class KeepData:
     
     def generarC3D_Cadenas(self,cadena):
         temp = self.getNuevoTemporal()
-        codigo = "//***************LEYENDO CADENAS***************\n"
+        codigo = "//***************ALMACENANDO CADENAS***************\n"
         
         codigo += self.addIgual(temp,"HP")
         for caracter in cadena:
@@ -156,8 +156,10 @@ class KeepData:
         codigo += self.addIgual(self.getValHeap("HP"),"-1")
         self.incrementarHeap()
         codigo += self.addOperacion("HP","HP","+","1")
-        codigo += self.addIgual(self.getValStack("SP"),temp)
-        codigo += self.addOperacion("SP","SP","+","1")
+        temporal = self.getNuevoTemporal()
+        codigo += self.addOperacion(temporal,"SP","+",self.getStack())
+        codigo += self.addIgual(self.getValStack(temporal),temp)
+        #codigo += self.addOperacion("SP","SP","+","1")
         self.incrementarStack()
         self.addCodigo(codigo)
         self.liberarTemporales(temp)
