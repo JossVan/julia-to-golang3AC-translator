@@ -10,7 +10,8 @@ class KeepData:
     listaTemporalesEnUso = []
     listaTemporalesLibres = []
     etiquetas = []
-
+    etiquetaContinue = ""
+    etiquetaBreak = ""
 
     codigo3d = None
 
@@ -139,7 +140,7 @@ class KeepData:
         if tipo == "c":
             return "fmt.Printf(\"%"+tipo+"\","+str(valor)+");\n"
         if tipo == "f":
-            return "fmt.Printf(\"%.2f\","+str(valor)+");\n"
+            return "fmt.Printf(\"%.4f\","+str(valor)+");\n"
         else:
             return "fmt.Printf(\"%d\",int("+str(valor)+"));\n"
     
@@ -199,7 +200,7 @@ class KeepData:
         codigo += es+":\n"
         self.addCodigo(codigo)
     
-    def Parse(self,tipo):
+    def Parse(self):
         codigo = "\nfunc Parse(){\n"
         codigo += "// *****MÉTODO PARSER*****\n"
         temp = self.getNuevoTemporal()
@@ -221,7 +222,7 @@ class KeepData:
         codigo += self.addIgual(contador,"0")
         codigo += self.addIgual(unidades,"1")
         codigo += ei+":\n"
-        codigo += "if "+temp3+" == "+tipo+"{goto "+ef+";}\n"
+        codigo += "if "+temp3+" == -1"+"{goto "+ef+";}\n"
         codigo += self.addOperacion(contador,contador,"+","1")
         codigo += "// Aumento la posición del heap\n"
         codigo += self.addOperacion(temp2,temp2,"+","1")
@@ -256,3 +257,118 @@ class KeepData:
         codigo += "\n}\n"
         self.codigoFuncion= codigo
         return totales
+
+    def ParseFloat(self):
+        codigo = "\nfunc ParseFloat(){\n"
+        codigo += "// *****MÉTODO PARSER*****\n"
+        #DECLARACIÓN DE TEMPORALES
+        T4 = self.getNuevoTemporal()
+        T5 = self.getNuevoTemporal()
+        T6 = self.getNuevoTemporal()
+        contador = self.getNuevoTemporal()
+        T9 = self.getNuevoTemporal()
+        T7 = self.getNuevoTemporal()
+        T8 = self.getNuevoTemporal()
+        T12 = self.getNuevoTemporal()
+        T10 = self.getNuevoTemporal()
+        T13 = self.getNuevoTemporal()
+        T14 = self.getNuevoTemporal()
+        T15 = self.getNuevoTemporal()
+        T11 = self.getNuevoTemporal()
+        #DECLARACIÓN DE ETIQUETAS
+        L0 = self.getNuevaEtiqueta()
+        L4 = self.getNuevaEtiqueta()
+        L1 = self.getNuevaEtiqueta()
+        L3 = self.getNuevaEtiqueta()
+        L5 = self.getNuevaEtiqueta()
+        L2 = self.getNuevaEtiqueta()
+        L6 = self.getNuevaEtiqueta()
+        L7 = self.getNuevaEtiqueta()
+        #*************************INICIO DEL PARSER A FLOAT *******************************
+        #codigo += "// Variable que almacena el apuntador del stack\n"
+        codigo += self.addOperacion(T4,"SP","+","0")
+        #codigo += "// Variable que almacena el valor del stack\n"
+        codigo += self.addIgual(T5,self.getValStack(T4))
+        #codigo += "// Variable que almacena el valor del heap\n"
+        codigo += self.addIgual(T6,self.getValHeap(T5))
+        
+        codigo += self.addIgual(T9,"1")
+        codigo += self.addIgual(T7,"0")
+        codigo += self.addIgual(T8,"1")
+        codigo += self.addIgual(contador,"0")
+        codigo += L0+":\n"
+        codigo += "if "+T6+" == -1"+"{goto "+L4+";}\n"
+        codigo += self.addOperacion(T7,T7,"+","1")
+        codigo += "// Aumento la posición del heap\n"
+        codigo += self.addOperacion(T5,T5,"+","1")
+        codigo += "// Variable que almacena el valor del heap\n"
+        codigo += self.addIgual(T6,self.getValHeap(T5))
+        codigo += "goto "+L0+";\n"
+        codigo += L4+":\n"
+        codigo += self.addIgual(T12,T7)
+        codigo += L1 +":\n"
+        codigo += "//Posición del heap del últmo valor de la cadena\n"
+        codigo += self.addOperacion(contador,contador,"+","1")
+        codigo += self.addOperacion(T7,T7,"-","1")
+        codigo += "// Variable que almacena el valor del stack\n"
+        codigo += self.addIgual(T5,self.getValStack(T4))
+        codigo += "// Variable que almacena el valor del heap\n"
+        codigo += self.addOperacion(T10,T7,"+",T5)
+        codigo += self.addIgual(T6,self.getValHeap(T10))
+        codigo += "if "+T6+"== 46 {goto "+L3+";}\ngoto "+L1+";\n"
+        codigo += L3+":\n"
+        codigo += self.addOperacion(contador,contador,"-","1")
+        codigo += "if "+contador+" == 0 {goto "+L5+";}\n"
+        codigo += self.addOperacion(T9,T9,"*","10")
+        codigo += "goto "+L3+";\n"
+        codigo += L5+":\n"
+        codigo += self.addOperacion(T12,T12,"-","1")
+        codigo += self.addIgual(T5,self.getValStack(T4))
+        codigo += self.addOperacion(T10,T12,"+",T5)
+        codigo += self.addIgual(T6,self.getValHeap(T10))
+        codigo += "if "+T6+" == 46 {goto "+L2+";}\ngoto "+L6+";\n"
+        codigo += L6+":\n"
+        codigo += self.addOperacion(T13,T6,"-","48")
+        codigo += self.addOperacion(T14,T13,"/", T9)
+        codigo += self.addOperacion(T15,T15,"+",T14)
+        codigo += self.addOperacion(T9,T9,"/", 10)
+        codigo += "goto "+L5+";\n"
+        codigo += L2+":\n"
+        codigo += self.addOperacion(T12,T12,"-","1")
+        codigo += self.addIgual(T5, self.getValStack(T4))
+        codigo += self.addOperacion(T10,T12,"+",T5)
+        codigo += "if "+T10+"== -1 {goto "+L7+";}\n"
+        codigo += self.addIgual(T6,self.getValHeap(T10))
+        codigo += self.addOperacion(T13,T6,"-","48")
+        codigo += self.addOperacion(T11,T13,"*",T8)
+        codigo += self.addOperacion(T15,T15,"+",T11)
+        codigo += self.addOperacion(T8,T8,"*","10")
+        codigo += "goto "+L2+";\n"
+        codigo += L7+":\n"
+        codigo += self.addIgual(self.getValStack(T4),T15)
+        self.liberarTemporales(T4)
+        self.liberarTemporales(T5)
+        self.liberarTemporales(T6)
+        self.liberarTemporales(T7)
+        self.liberarTemporales(contador)
+        self.liberarTemporales(T8)
+        self.liberarTemporales(T9)
+        self.liberarTemporales(T10)
+        self.liberarTemporales(T11)
+        self.liberarTemporales(T12)
+        self.liberarTemporales(T13)
+        self.liberarTemporales(T14)
+        self.liberarTemporales(T15)
+        codigo += "\n}\n"
+        self.codigoFuncion= codigo
+    
+    def Trunc(self):
+        T1 = self.getNuevoTemporal()
+        T2 = self.getNuevoTemporal()
+        codigo = "//*****Función TRUNC*****\n"
+        codigo += "func trunc(){\n"
+        codigo += self.addIgual(T1,"SP","+","0")
+        codigo += self.addIgual(T2, self.getValStack(T1))
+
+        codigo += "\n}\n"
+    

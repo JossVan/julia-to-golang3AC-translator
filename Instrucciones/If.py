@@ -91,6 +91,15 @@ class If(NodoAST):
                 nuevaTabla = TablaSimbolos("If",table)
                 for instruccion in self.instrucciones_if:
                     resp = instruccion.traducir(tree,nuevaTabla,keep)
+                    if isinstance(resp,dict):
+                        if "break" in resp:
+                            keep.addCodigo("//*******BREAK*******\n")
+                            keep.addCodigo(resp["cad"])
+                        elif "continue":
+                            keep.addCodigo("//*******CONTINUE*******\n")
+                            keep.addCodigo(resp["cad"])
+                        if isinstance(resp, Return):
+                            return resp
                     keep.etiquetaFalsa = ""
                     keep.etiquetaVerdadera = "" 
                 keep.addCodigo("goto "+salida+";\n")
@@ -102,6 +111,15 @@ class If(NodoAST):
                     nuevaTabla = TablaSimbolos("else",table)
                     for instruccion in self.instrucciones_else:
                         resp= instruccion.traducir(tree,nuevaTabla,keep)
+                        if isinstance(resp,dict):
+                            if "break" in resp:
+                                keep.addCodigo("//*******BREAK*******\n")
+                                keep.addCodigo(resp["cad"])
+                            elif "continue":
+                                keep.addCodigo("//*******CONTINUE*******\n")
+                                keep.addCodigo(resp["cad"])
+                            if isinstance(resp, Return):
+                                return resp
                         keep.etiquetaFalsa = ""
                         keep.etiquetaVerdadera = "" 
                 keep.addCodigo(salida+":\n")       

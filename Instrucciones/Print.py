@@ -137,8 +137,9 @@ class Print(NodoAST):
                                 result=keep.imprimir(temp,"d")
                                 keep.addCodigo(result)
                             elif tipo == "Float64":
+                                cod = "//*****IMPRESIÓN DE NÚMERO*****\n"
                                 temp = keep.getNuevoTemporal()
-                                cod = keep.addIgual(temp, keep.getValStack(puntero))
+                                cod += keep.addIgual(temp, keep.getValStack(puntero))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"f")
                                 keep.addCodigo(result)
