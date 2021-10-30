@@ -67,10 +67,13 @@ class Relacional(NodoAST):
                     tip = True
                 elif "temp" in resultado1:
                     op1 = resultado1['temp']
-                    valor = int(resultado1['valor'])
+                    if resultado1["valor"] != -1:
+                        valor = resultado1["valor"]
+                    else:
+                        valor = resultado1['temp']
                     tipo = resultado1['tipo']
-                elif "bool" in resultado1:
-                    valor = resultado1["bool"]
+                elif "etiquetas" in resultado1:
+                    valor = None
                     etiquetas = resultado1["etiquetas"]
                     tipo = "Bool"
                     et = keep.getNuevaEtiqueta()
@@ -97,11 +100,14 @@ class Relacional(NodoAST):
                         valor = op1["valor"]
                         Tip = True
                     elif "temp" in op1:
-                        valor = int(op1['valor'])
+                        if op1["valor"] != -1:
+                            valor = op1["valor"]
+                        else:
+                            valor = op1['temp']
                         op1= op1['temp']
                         tipo = "Float64"
-                    elif "bool" in op1:
-                        valor = op1["bool"]
+                    elif "etiquetas" in op1:
+                        valor = None
                         etiquetas = op1["etiquetas"]
                         tipo = "Bool"
                         et = keep.getNuevaEtiqueta()
@@ -142,10 +148,13 @@ class Relacional(NodoAST):
                     tip2 = True
                 elif "temp" in resultado2:
                     op2 = resultado2['temp']
-                    valor2 = int(resultado2['valor'])
+                    if resultado2["valor"] != -1:
+                        valor = resultado2["valor"]
+                    else:
+                        valor2 = resultado2['temp']
                     tipo2 = resultado2['tipo']
-                elif "bool" in resultado2:
-                    valor = resultado2["bool"]
+                elif "etiquetas" in resultado2:
+                    valor2 = None
                     tipo2 = "Bool"
                     etiquetas = resultado2["etiquetas"]
                     et = keep.getNuevaEtiqueta()
@@ -173,12 +182,15 @@ class Relacional(NodoAST):
                         valor2 = op2["valor"]                    
                         tip2 = True
                     elif "temp" in op2:
-                        valor2 = int(op2['valor'])
+                        if op2["valor"] != -1:
+                            valor2 = op2["valor"]
+                        else:
+                            valor2 = op2['temp']
                         op2= op2['temp']
                         tipo2 = "Float64"
-                    elif "bool" in op2:
-                        valor = op2["bool"]
-                        tipo = "Bool"
+                    elif "etiquetas" in op2:
+                        valor2 = None
+                        tipo2 = "Bool"
                         etiquetas = op2["etiquetas"]
                         et = keep.getNuevaEtiqueta()
                         codigo = etiquetas[0]+":\n"
@@ -214,49 +226,38 @@ class Relacional(NodoAST):
             if self.tipooperacion == Tipo_Relacional.MAYOR:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,">",valor2,valor,tip,tip2,temp1,temp2)
-                    if valor>valor2:
-                        return {"bool":True,"etiquetas": etiquetas}
-                    return {"bool":False,"etiquetas":etiquetas}
+                    
+                    return {"etiquetas": etiquetas}
                 else:
                     return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.MENOR:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"<",valor2,valor,tip,tip2,temp1,temp2)
-                    if valor<valor2:
-                        return {"bool":True,"etiquetas":etiquetas}
-                    return {"bool":False,"etiquetas":etiquetas}
+                    return {"etiquetas": etiquetas}
                 else:
                     return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.MENOR_IGUAL:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"<=",valor2,valor,tip,tip2,temp1,temp2)
-                    if valor<= valor2:
-                        return {"bool":True,"etiquetas":etiquetas}
-                    return {"bool":False,"etiquetas":etiquetas}
+                    return {"etiquetas": etiquetas}
                 else:
                     return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.MAYOR_IGUAL:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,">=",valor2,valor,tip,tip2,temp1,temp2)
-                    if valor>= valor2:
-                        return {"bool":True,"etiquetas":etiquetas}
-                    return {"bool":False,"etiquetas":etiquetas}
+                    return {"etiquetas": etiquetas}
                 else:
                     return self.longitud(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.IGUAL:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"==",valor2,valor,tip,tip2,temp1,temp2)
-                    if valor == valor2:
-                        return {"bool":True,"etiquetas": etiquetas}
-                    return {"bool":False,"etiquetas":etiquetas}
+                    return {"etiquetas": etiquetas}
                 else:
                     return self.Igual(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
             elif self.tipooperacion == Tipo_Relacional.DIFERENTE:
                 if tipo != "String" and tipo2 != "String":
                     etiquetas = self.revisar(keep,apuntador,tipo,apuntador2,tipo2,"!=",valor2,valor,tip,tip2,temp1,temp2)
-                    if valor != valor2:
-                        return {"bool":True,"etiquetas":etiquetas}
-                    return {"bool":False,"etiquetas":etiquetas}
+                    return {"etiquetas": etiquetas}
                 else:
                     return self.Igual(keep,apuntador,valor,apuntador2,valor2,self.tipooperacion)
     def getNodo(self):
@@ -402,9 +403,9 @@ class Relacional(NodoAST):
 
         keep.addCodigo(codigo)
         if operador == Tipo_Relacional.IGUAL:
-            return {"bool":valor1 == valor2,"etiquetas":[ef,es]}
+            return {"etiquetas":[ef,es]}
         elif operador == Tipo_Relacional.DIFERENTE:
-            return {"bool":valor1 == valor2,"etiquetas":[es,ef]}
+            return {"etiquetas":[es,ef]}
 
     def longitud(self,keep,apuntador1,valor1,apuntador2,valor2,operador):
         codigo = "//**********COMPARACIÓN DE CADENAS**********\n"

@@ -220,7 +220,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp, "valor": (valor+valor2), "tipo":tipo}  
+                    return {"temp":temp, "valor": -1, "tipo":tipo}  
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.RESTA:                
@@ -231,7 +231,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                 else:
                     tipo = "Float64"
-                return {"temp":temp , "valor": (valor-valor2),"tipo":tipo}    
+                return {"temp":temp , "valor":-1,"tipo":tipo}    
             elif self.operacion == Tipo_Aritmetico.MULTIPLICACION:  
                 result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
                 if not result:              
@@ -242,7 +242,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp,"valor": (valor*valor2), "tipo":tipo} 
+                    return {"temp":temp,"valor": -1, "tipo":tipo} 
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.DIVISION:                
@@ -273,7 +273,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp, "valor": (valor/valor2), "tipo":tipo}      
+                    return {"temp":temp, "valor": -1, "tipo":tipo}      
                 else:
                     return {"error": "error"}      
             elif self.operacion == Tipo_Aritmetico.POTENCIA:
@@ -306,7 +306,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp3, "valor": (pow(valor,valor2)), "tipo":tipo}
+                    return {"temp":temp3, "valor": -1, "tipo":tipo}
             elif self.operacion == Tipo_Aritmetico.MODAL:
                 #COMPROVACION DE DIVISIÓN POR 0
                 ef = keep.getNuevaEtiqueta()
@@ -334,7 +334,7 @@ class Aritmetica(NodoAST):
                         tipo = "Int64"
                     else:
                         tipo = "Float64"
-                    return {"temp":temp, "valor": (valor%valor2), "tipo":tipo}      
+                    return {"temp":temp, "valor": -1, "tipo":tipo}      
                 else:
                     return {"error": "error"}  
     def getNodo(self):
@@ -398,24 +398,7 @@ class Aritmetica(NodoAST):
         keep.liberarTemporales(temp2)
         keep.liberarTemporales(temp3)
     
-    def concatenarNumerosVariables(self,keep,posicion):
-        codigo = "//CONCATENAR EL NÚMERO DE VARIABLE\n"
-        temp = keep.getNuevoTemporal()
-        codigo += keep.addIgual(temp,keep.getValStack(posicion))
-        codigo += keep.addIgual(keep.getValHeap("HP"),temp)
-        codigo += keep.addOperacion("HP","HP","+","1")
-        keep.incrementarHeap()
-        keep.addCodigo(codigo)
-    
-    def concatenarNumeros(self,keep,numero):
-        codigo = "//CONCATENAR EL NÚMERO\n"
-        temp = keep.getNuevoTemporal()
-        codigo += keep.addIgual(temp,numero)
-        codigo += keep.addIgual(keep.getValHeap("HP"),temp)
-        codigo += keep.addOperacion("HP","HP","+","1")
-        keep.incrementarHeap()
-        keep.addCodigo(codigo)
-
+ 
     def Concatenacion(self, keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2):
         codigo = ""
         if tipo == "String":
@@ -426,72 +409,10 @@ class Aritmetica(NodoAST):
                 self.concatenar(keep,apuntador2)
                 codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
                 codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                keep.incrementarHeap()
-                if cadena or cadena2:
-                    keep.incrementarStack()
+                codigo += keep.addIgual(keep.getValStack(apuntador),temp)
                 keep.addCodigo(codigo)
-                return valor+valor2
-            elif tipo2 == "Int64" or tipo2 == "Float64":
-                self.concatenarNumerosVariables(keep,apuntador2)
-                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-                codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                if cadena or cadena2:
-                    keep.incrementarStack()
-                keep.incrementarHeap()
-                keep.addCodigo(codigo)
-                return valor+valor2
-            else:
-                self.concatenarNumeros(keep,apuntador2)
-                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-                codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                if cadena or cadena2:
-                    keep.incrementarStack()
-                keep.incrementarHeap()
-                keep.addCodigo(codigo)
-                return "cadena"      
-        if tipo2 == "String":
-            temp = keep.getNuevoTemporal()
-            keep.addCodigo(temp,"HP")
-            self.concatenar(keep,apuntador2)
-            if tipo == "String":
-                self.concatenar(keep,apuntador)
-                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-                codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                if cadena or cadena2:
-                    keep.incrementarStack()
-                keep.incrementarHeap()
-                keep.addCodigo(codigo)
-                return "cadena"
-            elif tipo == "Int64" or tipo == "Float64":
-                self.concatenarNumerosVariables(keep,apuntador)
-                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-                codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                if cadena or cadena2:
-                    keep.incrementarStack()
-                keep.incrementarHeap()
-                keep.addCodigo(codigo)
-                return "cadena"
-            else:
-                self.concatenarNumeros(keep,apuntador)
-                codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
-                codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack("SP"),temp)
-                codigo += keep.addOperacion("SP","SP","+","1")
-                if cadena or cadena2:
-                    keep.incrementarStack()
-                keep.incrementarHeap()
-                keep.addCodigo(codigo)
-                return "cadena"            
+                return {"valor":valor+valor2,"apuntador":apuntador,"tipo":tipo}     
+              
         return False        
     
     def multiplicidad(self,keep,cadena, cantidad):
@@ -515,8 +436,10 @@ class Aritmetica(NodoAST):
         codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
         keep.incrementarHeap()
         codigo += keep.addOperacion("HP","HP","+","1")
-        codigo += keep.addIgual(keep.getValStack("SP"),temp)
-        codigo += keep.addOperacion("SP","SP","+","1")
+        temp4 = keep.getNuevoTemporal()
+        codigo += keep.addOperacion(temp4,"SP","+",keep.getStack())
+        codigo += keep.addIgual(keep.getValStack(temp4),temp)
+        #codigo += keep.addOperacion("SP","SP","+","1")
         keep.incrementarStack()
         keep.addCodigo(codigo)
         keep.liberarTemporales(temp)

@@ -85,6 +85,157 @@ class Nativas_conTipo(NodoAST):
                 err = Errores(str(self.tipo),"Semántico","Solo valores tipo Int64", self.fila,self.columna)
                 tree.insertError(err)
                 return err
+    
+    def traducir(self, tree, table, keep):
+        apuntador = None
+        tipo = None 
+        val = None
+        if self.funcion == Tipo_Primitivas.PARSE:
+            if self.tipo != None:
+                valor = self.valor.traducir(tree,table,keep)
+                if self.tipo == Tipo_Dato.ENTERO:
+                    try:
+                        if isinstance(valor,str):
+                            apuntador = keep.getStack()-1
+                            
+                            #Hacemos una copia del puntero que queremos parsear
+                            temp = keep.getNuevoTemporal()
+                            temp2 = keep.getNuevoTemporal()
+                            codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                            codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
+                            codigo += keep.addIgual(keep.getValStack(temp2),temp)
+                            codigo += keep.addOperacion("SP","SP","+",keep.getStack())
+                            codigo += "Parse();\n"
+                            totales = keep.Parse("-1") 
+                            temp3 = keep.getNuevoTemporal()
+                            codigo += keep.addIgual(temp3,keep.getValStack("SP"))
+                            codigo += keep.addIgual(keep.getValStack(apuntador),temp3)
+                            codigo += keep.addOperacion("SP","SP","-",keep.getStack())
+                            if not "Parse" in keep.listaFuncion:
+                                keep.listaFuncion["Parse"] = keep.codigoFuncion  
+                                keep.codigoFuncion = ""  
+                            keep.addCodigo(codigo)            
+                            keep.liberarTemporales(temp)
+                            keep.liberarTemporales(temp2)
+                            keep.liberarTemporales(temp3)
+                                            
+                            return {"apuntador":apuntador,"tipo":"Int64","valor": int(valor)}
+                        elif isinstance(valor,dict):
+                            if "apuntador" in valor:
+                                apuntador = valor["apuntador"]
+                                tipo = valor["tipo"]
+                                val = valor["valor"]
+                                if tipo == "String":  
+                                    #Hacemos una copia del puntero que queremos parsear
+                                    temp = keep.getNuevoTemporal()
+                                    temp2 = keep.getNuevoTemporal()
+                                    codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                                    codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(temp2),temp)
+                                    codigo += keep.addOperacion("SP","SP","+",keep.getStack())
+                                    codigo += "Parse();\n"
+                                    totales = keep.Parse("-1") 
+                                    temp3 = keep.getNuevoTemporal()
+                                    codigo += keep.addIgual(temp3,keep.getValStack("SP"))
+                                    codigo += keep.addIgual(keep.getValStack(apuntador),temp3)
+                                    codigo += keep.addOperacion("SP","SP","-",keep.getStack())
+                                    if not "Parse" in keep.listaFuncion:
+                                        keep.listaFuncion["Parse"] = keep.codigoFuncion
+                                        keep.codigoFuncion = ""    
+                                    keep.addCodigo(codigo)            
+                                    keep.liberarTemporales(temp)
+                                    keep.liberarTemporales(temp2)
+                                    keep.liberarTemporales(temp3)  
+                                    return {"apuntador":apuntador,"tipo":"Int64","valor":int(val)}
+                                else:
+                                    print("ERROR")
+                        err = Errores(str(valor),"Semántico","El segundo parámetro debe ser una cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Error al castear a Int64", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                elif self.tipo == Tipo_Dato.DECIMAL:
+                    try:
+                        if isinstance(valor, str):
+                            apuntador = keep.getStack()-1
+                            
+                            #Hacemos una copia del puntero que queremos parsear
+                            temp = keep.getNuevoTemporal()
+                            temp2 = keep.getNuevoTemporal()
+                            codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                            codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
+                            codigo += keep.addIgual(keep.getValStack(temp2),temp)
+                            codigo += keep.addOperacion("SP","SP","+",keep.getStack())
+                            codigo += "ParseFloat();\n"
+                            keep.ParseFloat() 
+                            temp3 = keep.getNuevoTemporal()
+                            codigo += keep.addIgual(temp3,keep.getValStack("SP"))
+                            codigo += keep.addIgual(keep.getValStack(apuntador),temp3)
+                            codigo += keep.addOperacion("SP","SP","-",keep.getStack())
+                            if not "ParseFloat" in keep.listaFuncion:
+                                keep.listaFuncion["ParseFloat"] = keep.codigoFuncion   
+                                keep.codigoFuncion = ""
+                            keep.addCodigo(codigo)             
+                            keep.liberarTemporales(temp)
+                            keep.liberarTemporales(temp2)
+                            keep.liberarTemporales(temp3)
+                            try:
+                                return {"apuntador":apuntador,"tipo":"Float64","valor":float(valor)}
+                            except:
+                                return {"apuntador":apuntador,"tipo":"Float64","valor":None}
+                        elif isinstance(valor,dict):
+                           if "apuntador" in valor:
+                                apuntador = valor["apuntador"]
+                                tipo = valor["tipo"]
+                                val = valor["valor"]
+                                if tipo == "String":  
+                                    #Hacemos una copia del puntero que queremos parsear
+                                    temp = keep.getNuevoTemporal()
+                                    temp2 = keep.getNuevoTemporal()
+                                    codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                                    codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(temp2),temp)
+                                    codigo += keep.addOperacion("SP","SP","+",keep.getStack())
+                                    codigo += "ParseFloat();\n"
+                                    keep.ParseFloat() 
+                                    temp3 = keep.getNuevoTemporal()
+                                    codigo += keep.addIgual(temp3,keep.getValStack("SP"))
+                                    codigo += keep.addIgual(keep.getValStack(apuntador),temp3)
+                                    codigo += keep.addOperacion("SP","SP","-",keep.getStack())
+                                    if not "ParseFloat" in keep.listaFuncion:
+                                        keep.listaFuncion["ParseFloat"] = keep.codigoFuncion   
+                                        keep.codigoFuncion = ""
+                                    keep.addCodigo(codigo)             
+                                    keep.liberarTemporales(temp)
+                                    keep.liberarTemporales(temp2)
+                                    keep.liberarTemporales(temp3)
+                                    try:
+                                        return {"apuntador":apuntador,"tipo":"Float64","valor":float(valor)}
+                                    except:
+                                        return {"apuntador":apuntador,"tipo":"Float64","valor":None}
+                        err = Errores(str(valor),"Semántico","Se ha producido un error al castear a cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                    except ValueError:
+                        err = Errores(str(valor),"Semántico","Error al intentar convertir a Float64", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err
+                
+        elif self.funcion == Tipo_Primitivas.TRUNC:
+            if self.tipo == Tipo_Dato.ENTERO:
+                valor = self.valor.traducir(tree,table,keep)
+                if isinstance(valor,float):
+                    
+
+
+                    return int(valor)
+            else:
+                err = Errores(str(self.tipo),"Semántico","Solo valores tipo Int64", self.fila,self.columna)
+                tree.insertError(err)
+                return err
+    
     def getNodo(self):
         NodoNuevo = NodoArbol("Funciones_Nativas")
 
