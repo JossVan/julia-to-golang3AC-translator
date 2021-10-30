@@ -313,12 +313,14 @@ class Asignacion(NodoAST):
                             elif isinstance(valor,dict):
                                 if "temp" in valor:
                                     val = valor["valor"]
+                                    tipo = valor["tipo"]
                                     temp = keep.getNuevoTemporal()
                                     temp2 = keep.getNuevoTemporal()
                                     codigo = keep.addIgual(temp,valor["temp"])
                                     codigo += keep.addOperacion(temp2,"SP","+",simbolo.apuntador)
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
-                                    simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,"Float64",simbolo.apuntador)
+                                
+                                    simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,tipo,simbolo.apuntador)
                                     keep.liberarTemporales(temp)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     keep.addCodigo(codigo)
@@ -422,12 +424,13 @@ class Asignacion(NodoAST):
                             elif isinstance(valor,dict):
                                 if "temp" in valor:
                                     val = valor["valor"]
+                                    tipo = valor["tipo"]
                                     temp = keep.getNuevoTemporal()
                                     codigo = keep.addIgual(temp,valor["temp"])
                                     temp2 = keep.getNuevoTemporal()
                                     codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
-                                    simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,"Float64",keep.getStack())
+                                    simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,tipo,keep.getStack())
                                     keep.liberarTemporales(temp)
                                     keep.liberarTemporales(temp2)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
