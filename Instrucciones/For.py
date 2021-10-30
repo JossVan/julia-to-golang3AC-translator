@@ -163,7 +163,6 @@ class For(NodoAST):
                 codigo += "goto "+ei+";\n"
                 codigo += ef+":\n"
                 keep.addCodigo(codigo)
-                keep.liberarTemporales(indice)
             elif isinstance(rango1,float) and isinstance(rango2,float):
                 total = int(rango2-rango1)+1
                 if total >0:
@@ -202,8 +201,6 @@ class For(NodoAST):
                     codigo += "goto "+ei+";\n"
                     codigo += ef+":\n"
                     keep.addCodigo(codigo)
-                    keep.liberarTemporales(inferior)
-                    keep.liberarTemporales(superior)
         else:
             if isinstance(rango,dict):
                 if "izquierdo" in rango and "derecho" in rango:
@@ -336,7 +333,6 @@ class For(NodoAST):
                     keep.liberarTemporales(temp4)
                     keep.liberarTemporales(temp5)
             else:
-                #try:
                 if isinstance(rango, str):
                     nuevaTabla.actualizarTipo(id.lower(),"String")
                     puntero = keep.getStack()-1
@@ -397,7 +393,7 @@ class For(NodoAST):
                 '''except:
                     err = Errores("For","Semántico","Valor no permitido, debe ser una cadena", self.fila,self.columna)
                     tree.insertError(err)
-                    return err   '''
+                    return err   ''' 
     
     def getNodo(self):
         
@@ -410,6 +406,6 @@ class For(NodoAST):
         NodoNuevo.agregarHijoNodo(NodoInst)
         NodoNuevo.agregarHijo("end")
         NodoNuevo.agregarHijo(";")
-        return NodoNuevo                
+        return NodoNuevo
 
         
