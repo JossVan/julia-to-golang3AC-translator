@@ -292,7 +292,7 @@ class For(NodoAST):
                     codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
                     codigo += "//*****INICIO DEL FOR CON CADENA*****\n"
                     codigo += ei+":\n"
-                    codigo += "if "+ temp3 +"!= -1"+"{goto "+ev+";}\ngoto "+ef+"\n"
+                    codigo += "if "+ temp3 +"!= -1"+"{goto "+ev+";}\ngoto "+ef+";\n"
                     codigo += ev+":\n"
                     #BUSCO LA VARIABLE INDICE EN LA TABLA DE SIMBOLOS
                     id = id.lower()
@@ -351,7 +351,7 @@ class For(NodoAST):
                     codigo += keep.addIgual(temp3,keep.getValHeap(temp2))
                     codigo += "//*****INICIO DEL FOR CON CADENA*****\n"
                     codigo += ei+":\n"
-                    codigo += "if "+ temp3 +"!= -1"+"{goto "+ev+";}\ngoto "+ef+"\n"
+                    codigo += "if "+ temp3 +"!= -1"+"{goto "+ev+";}\ngoto "+ef+";\n"
                     codigo += ev+":\n"
                     #BUSCO LA VARIABLE INDICE EN LA TABLA DE SIMBOLOS
                     id = id.lower()

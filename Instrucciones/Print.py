@@ -130,8 +130,9 @@ class Print(NodoAST):
                                 result += keep.addOperacion("SP","SP","-",keep.getStack())
                                 keep.addCodigo(result)
                             elif tipo == "Int64":
+                                cod = "//*****IMPRESIÓN DE NÚMERO*****\n"
                                 temp = keep.getNuevoTemporal()
-                                cod = keep.addIgual(temp, keep.getValStack(puntero))
+                                cod += keep.addIgual(temp, keep.getValStack(puntero))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"d")
                                 keep.addCodigo(result)

@@ -62,9 +62,7 @@ class Logica(NodoAST):
                             return {"etiquetas":[e1,e2]}
                         else:
                             keep.addCodigo("goto "+e2+";\n")
-                            return {"etiquetas":[e1,e2]}
-
-                        
+                            return {"etiquetas":[e1,e2]}                     
                 elif self.tipooperacion == Tipo_Logico.OR:
                     keep.addCodigo(etiquetas1[1]+":\n")
                     keep.etiquetaVerdadera = etiquetas1[0]
@@ -72,7 +70,7 @@ class Logica(NodoAST):
                     resultado2 = self.operador2.traducir(tree,table,keep)
                     if isinstance(resultado2,dict):
                         etiquetas2 = resultado2["etiquetas"]
-                        return {"etiquetas":[etiquetas2[1],etiquetas2[0]]}
+                        return {"etiquetas":etiquetas2}
                     elif(resultado2,bool):
                         e1 = etiquetas1[1]
                         e2 = keep.getNuevaEtiqueta()

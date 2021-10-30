@@ -28,6 +28,25 @@ class While(NodoAST):
                         return resp
             else:
                 break
+    def traducir(self, tree, table, keep):
+        nuevaTabla = TablaSimbolos("While",table)
+        ev = keep.getNuevaEtiqueta()
+        #ef = keep.getNuevaEtiqueta()
+        keep.addCodigo(ev+":\n")
+        condicion = self.condicion.traducir(tree,nuevaTabla,keep)
+        if isinstance(condicion,dict):
+            keep.addCodigo(condicion["etiquetas"][0]+":\n")
+            for instruccion in self.instrucciones:
+                    resp = instruccion.traducir(tree,nuevaTabla,keep)
+                    if isinstance(resp, Break):
+                        return None
+                    if isinstance(resp, Continue):
+                        break
+                    if isinstance(resp, Return):
+                        return resp
+            keep.addCodigo("goto "+ev+";\n")
+            keep.addCodigo(condicion["etiquetas"][1]+":\n")
+
     def getNodo(self):
         NodoNuevo = NodoArbol("While")
         NodoNuevo.agregarHijoNodo(self.condicion.getNodo())

@@ -33,7 +33,9 @@ class KeepData:
         self.etiquetaFalsa = ""
         self.etiquetaVerdadera = ""
         self.codigo3d = None
-
+        self.codigoFuncion = ""
+        self.listaFuncion =  {}
+        
 
     def getObject(self):
         return self.codigo3d
@@ -176,6 +178,7 @@ class KeepData:
         self.addCodigo(codigo)
         
     def comparar(self,temp):
+
         codigo="//***** IMPRIMIENDO VARIABLE BOOLEANA*****\n"
         ev = self.getNuevaEtiqueta()
         ef = self.getNuevaEtiqueta()
@@ -195,3 +198,61 @@ class KeepData:
             codigo +=self.imprimir(caracter,"c")
         codigo += es+":\n"
         self.addCodigo(codigo)
+    
+    def Parse(self,tipo):
+        codigo = "\nfunc Parse(){\n"
+        codigo += "// *****MÉTODO PARSER*****\n"
+        temp = self.getNuevoTemporal()
+        codigo += "// Variable que almacena el apuntador del stack\n"
+        codigo += self.addOperacion(temp,"SP","+","0")
+        temp2 = self.getNuevoTemporal()
+        temp3 = self.getNuevoTemporal()
+        codigo += "// Variable que almacena el valor del stack\n"
+        codigo += self.addIgual(temp2,self.getValStack(temp))
+        codigo += "// Variable que almacena el valor del heap\n"
+        codigo += self.addIgual(temp3,self.getValHeap(temp2))
+        ei = self.getNuevaEtiqueta()
+        ef = self.getNuevaEtiqueta()
+        contador = self.getNuevoTemporal()
+        unidades = self.getNuevoTemporal()
+        totales = self.getNuevoTemporal()
+        temporal = self.getNuevoTemporal()
+        codigo += self.addIgual(totales,"0")
+        codigo += self.addIgual(contador,"0")
+        codigo += self.addIgual(unidades,"1")
+        codigo += ei+":\n"
+        codigo += "if "+temp3+" == "+tipo+"{goto "+ef+";}\n"
+        codigo += self.addOperacion(contador,contador,"+","1")
+        codigo += "// Aumento la posición del heap\n"
+        codigo += self.addOperacion(temp2,temp2,"+","1")
+        codigo += "// Variable que almacena el valor del heap\n"
+        codigo += self.addIgual(temp3,self.getValHeap(temp2))
+        codigo += "goto "+ei+";\n"
+        codigo += ef+":\n"
+        codigo += "//Posición del heap del últmo valor de la cadena\n"
+        codigo += self.addOperacion(contador,contador,"-","1")
+        codigo += "// Variable que almacena el valor del stack\n"
+        codigo += self.addIgual(temp2,self.getValStack(temp))
+        codigo += "// Variable que almacena el valor del heap\n"
+        codigo += self.addOperacion(temporal,contador,"+",temp2)
+        codigo += self.addIgual(temp3,self.getValHeap(temporal))
+        et = self.getNuevaEtiqueta()
+        temp4 = self.getNuevoTemporal()
+        #codigo += et+":\n"
+        codigo += self.addOperacion(temp4,temp3,"-","48")
+        codigo += self.addOperacion(temp4,temp4,"*", unidades)
+        codigo += self.addOperacion(totales,totales,"+",temp4)
+        codigo += self.addOperacion(unidades,unidades,"*",10)
+        codigo += "if "+contador+"== 0 {goto "+et+";}\n"
+        codigo += "goto "+ef+";\n"
+        codigo += et+":\n"
+        codigo += self.addIgual(self.getValStack(temp), totales)
+        self.liberarTemporales(temp)
+        self.liberarTemporales(temp2)
+        self.liberarTemporales(temp3)
+        self.liberarTemporales(temp4)
+        self.liberarTemporales(contador)
+        self.liberarTemporales(totales)
+        codigo += "\n}\n"
+        self.codigoFuncion= codigo
+        return totales
