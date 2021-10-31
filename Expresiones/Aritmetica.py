@@ -113,12 +113,15 @@ class Aritmetica(NodoAST):
                     valor = self.operador1["valor"]
                     if tipo == "Float64" or tipo =="Int64":
                         temp = keep.getNuevoTemporal()
-                        codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                        temp2 = keep.getNuevoTemporal()
+                        codigo = keep.addOperacion(temp2,"SP","+",apuntador)
+                        codigo += keep.addIgual(temp,keep.getValStack(temp2))
                         keep.addCodigo(codigo)
                         op1 = temp
                 elif "temp" in self.operador1:
                     op1 = self.operador1['temp']
                     valor = op1
+                    tipo = self.operador1['tipo']
                 elif "error" in self.operador1:
                     return self.operador1
             if isinstance(self.operador2,dict):
@@ -128,11 +131,14 @@ class Aritmetica(NodoAST):
                     valor2 = self.operador2["valor"]
                     if tipo2 == "Float64" or tipo2 =="Int64":
                         temp = keep.getNuevoTemporal()
-                        codigo = keep.addIgual(temp,keep.getValStack(apuntador2))
+                        temp2 = keep.getNuevoTemporal()
+                        codigo = keep.addOperacion(temp2,"SP","+",apuntador2)
+                        codigo += keep.addIgual(temp,keep.getValStack(temp2))
                         keep.addCodigo(codigo)
                         op2 = temp
                 elif "temp" in self.operador2:
                     op2 = self.operador2['temp']
+                    tipo2 = self.operador2['tipo']
                     valor2 = op2
                 elif "error" in self.operador2:
                     return self.operador2
@@ -147,13 +153,15 @@ class Aritmetica(NodoAST):
                         valor = op1["valor"]
                         if tipo == "Float64" or tipo =="Int64":
                             temp = keep.getNuevoTemporal()
-                            codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                            temp2 = keep.getNuevoTemporal()
+                            codigo = keep.addOperacion(temp2,"SP","+",apuntador)
+                            codigo += keep.addIgual(temp,keep.getValStack(temp2))
                             keep.addCodigo(codigo)
                             op1 = temp
                     elif "temp" in op1:
                         valor = int(op1['valor'])
+                        tipo = op1['tipo']
                         op1= op1['temp']
-                        
                     elif "error" in op1:
                         return op1
                 elif isinstance(op1,str):
@@ -184,13 +192,15 @@ class Aritmetica(NodoAST):
                         valor2 = op2["valor"]
                         if tipo2 == "Float64" or tipo2 =="Int64":
                             temp = keep.getNuevoTemporal()
-                            codigo = keep.addIgual(temp,keep.getValStack(apuntador2))
+                            temp2 = keep.getNuevoTemporal()
+                            codigo = keep.addOperacion(temp2,"SP","+",apuntador2)
+                            codigo += keep.addIgual(temp,keep.getValStack(temp2))
                             keep.addCodigo(codigo)
                             op2 = temp
                     elif "temp" in op2:
                         valor2 = int(op2['valor'])
+                        tipo2 = op2['tipo']
                         op2= op2['temp']
-                        
                     elif "error" in op2:
                         return op2       
                 elif isinstance(op2,str):
@@ -373,7 +383,7 @@ class Aritmetica(NodoAST):
         codigo="//INICIO DE LA CONCATENACIÓN DE SUMA\n"
         # CRANDO VARIABLES TEMPORALES PARA ALMACENAR EL APUNTADO Y VALOR DEL STACK EN ESA POSICION
         temp = keep.getNuevoTemporal()
-        codigo += keep.addIgual(temp,apuntador)
+        codigo += keep.addOperacion(temp,"SP","+",apuntador)
         temp2 = keep.getNuevoTemporal()
         codigo += keep.addIgual(temp2,keep.getValStack(temp))
         # AQUÍ EMPIEZA EL ACCESO AL HEAP
@@ -409,7 +419,9 @@ class Aritmetica(NodoAST):
                 self.concatenar(keep,apuntador2)
                 codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
                 codigo += keep.addOperacion("HP","HP","+","1")
-                codigo += keep.addIgual(keep.getValStack(apuntador),temp)
+                temp2 = keep.getNuevoTemporal()
+                codigo = keep.addOperacion(temp2,"SP","+",apuntador)
+                codigo += keep.addIgual(keep.getValStack(temp2),temp)
                 keep.addCodigo(codigo)
                 return {"valor":valor+valor2,"apuntador":apuntador,"tipo":tipo}     
               

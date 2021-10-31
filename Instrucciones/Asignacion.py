@@ -354,12 +354,26 @@ class Asignacion(NodoAST):
                                     keep.etiquetaFalsa = ""
                                     keep.etiquetaVerdadera=""
                                 elif "apuntador" in valor:
-                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],valor["apuntador"])
+                                    codigo = "//ASIGNANDO VALOR A UNA VARIABLE\n"
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    T3 = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                                    codigo += keep.addOperacion(T3,"SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(T3),T2)
+                                    
+                                    keep.addCodigo(codigo)
+                                    keep.liberarTemporales(T1)
+                                    keep.liberarTemporales(T2)
+                                    keep.liberarTemporales(T3)
+                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
                                     else:
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
+                                    keep.incrementarStack()
                                     return 
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
@@ -473,12 +487,26 @@ class Asignacion(NodoAST):
                                     tree.agregarTS(id,simbolo)
                                     return 
                                 elif "apuntador" in valor:
-                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],valor["apuntador"])
+                                    codigo = "//ASIGNANDO VALOR A UNA VARIABLE\n"
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    T3 = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                                    codigo += keep.addOperacion(T3,"SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(T3),T2)
+                                    
+                                    keep.addCodigo(codigo)
+                                    keep.liberarTemporales(T1)
+                                    keep.liberarTemporales(T2)
+                                    keep.liberarTemporales(T3)
+                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
                                     else:
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
+                                    keep.incrementarStack()
                                     return 
                             if not isinstance(valor,str) and not isinstance(valor,bool):
                                 keep.incrementarStack()
@@ -580,12 +608,26 @@ class Asignacion(NodoAST):
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
                                 elif "apuntador" in valor:
-                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],valor["apuntador"])
+                                    codigo = "//ASIGNANDO VALOR A UNA VARIABLE\n"
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    T3 = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                                    codigo += keep.addOperacion(T3,"SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(T3),T2)
+                                    
+                                    keep.addCodigo(codigo)
+                                    keep.liberarTemporales(T1)
+                                    keep.liberarTemporales(T2)
+                                    keep.liberarTemporales(T3)
+                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
                                     else:
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
+                                    keep.incrementarStack()
                                     return  
                             else:
                                 err = Errores(str(valor),"Semántico","Los tipos no coinciden", self.fila,self.columna)
@@ -795,12 +837,26 @@ class Asignacion(NodoAST):
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
                                 elif "apuntador" in valor:
-                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],valor["apuntador"])
+                                    codigo = "//ASIGNANDO VALOR A UNA VARIABLE\n"
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    T3 = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                                    codigo += keep.addOperacion(T3,"SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(T3),T2)
+                                    
+                                    keep.addCodigo(codigo)
+                                    keep.liberarTemporales(T1)
+                                    keep.liberarTemporales(T2)
+                                    keep.liberarTemporales(T3)
+                                    simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
                                     else:
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
+                                    keep.incrementarStack()
                                     return  
                             else:
                                 err = Errores(str(valor),"Semántico","Los tipos no coinciden", self.fila,self.columna)

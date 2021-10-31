@@ -22,6 +22,27 @@ class Funciones(NodoAST):
                 return resp
             if isinstance(resp, Return):
                 return resp
+    
+    def traducir(self, tree, table, keep):
+        #CAMBIO DE ENTORNO, SE LIMPIA LA VARIABLE QUE CONCATENA EL CÓDIGO
+        cod = keep.codigo
+        keep.codigo = ""
+        keep.addCodigo("\nfunc "+self.nombre+"(){\n")
+        nuevaTabla = TablaSimbolos("Funcion",table) 
+        for instruccion in self.instrucciones:
+            resp = instruccion.traducir(tree,nuevaTabla,keep)
+            if isinstance(resp, Errores):
+                return resp
+            if isinstance(resp, Return):
+                keep.addCodigo("}\n")
+                if not self.nombre in keep.listaFuncion:
+                    keep.listaFuncion[self.nombre]= keep.codigo
+                keep.codigo = cod
+                return resp
+        keep.addCodigo("}\n")
+        if not self.nombre in keep.listaFuncion:
+            keep.listaFuncion[self.nombre]= keep.codigo
+        keep.codigo = cod
     def getNodo(self):
         
         NodoNuevo = NodoArbol("Función")

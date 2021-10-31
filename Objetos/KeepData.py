@@ -140,7 +140,7 @@ class KeepData:
         if tipo == "c":
             return "fmt.Printf(\"%"+tipo+"\","+str(valor)+");\n"
         if tipo == "f":
-            return "fmt.Printf(\"%.4f\","+str(valor)+");\n"
+            return "fmt.Printf(\"%.3f\","+str(valor)+");\n"
         else:
             return "fmt.Printf(\"%d\",int("+str(valor)+"));\n"
     
