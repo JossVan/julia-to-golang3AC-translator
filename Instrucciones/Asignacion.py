@@ -208,7 +208,8 @@ class Asignacion(NodoAST):
         if isinstance(self.id,Identificador):
             id = self.id.id
         elif isinstance(self.id, Array):
-            resultado = self.id.traducir(self.valor,tree,table)
+            resultado = self.id.actualizar(self.valor,tree,table,keep)
+            return
         else:
             id = self.id 
         
