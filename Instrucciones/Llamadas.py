@@ -191,9 +191,9 @@ class Llamadas(NodoAST):
                     if isinstance(resultado,Return):
                         if isinstance(resultado.valor,dict):
                             if "apuntador" in resultado.valor:
-                                simbolo = Simbolo("return",valor,self.id,self.fila,self.columna,resultado.valor["tipo"],T0)
-                                table.addSimboloLocal(simbolo)
-                                tree.agregarTS(self.id,simbolo)
+                                #simbolo = Simbolo("return",valor,self.id,self.fila,self.columna,resultado.valor["tipo"],T0)
+                                #table.addSimboloLocal(simbolo)
+                                #tree.agregarTS(self.id,simbolo)
                                 return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
                             elif "temp" in resultado.valor:
                                 return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}

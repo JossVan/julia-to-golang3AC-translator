@@ -54,7 +54,6 @@ class Relacional(NodoAST):
             valor = ""
             valor2 = ""
             etiquetas = []
-            etiquetas2 = []
             temp1 = None
             temp2 = None
             tip = False
@@ -67,7 +66,7 @@ class Relacional(NodoAST):
                     tip = True
                 elif "temp" in resultado1:
                     op1 = resultado1['temp']
-                    if resultado1["valor"] != -1:
+                    if resultado1["valor"] != -1 and resultado1["valor"] != None:
                         valor = resultado1["valor"]
                     else:
                         valor = resultado1['temp']
@@ -100,7 +99,7 @@ class Relacional(NodoAST):
                         valor = op1["valor"]
                         Tip = True
                     elif "temp" in op1:
-                        if op1["valor"] != -1:
+                        if op1["valor"] != -1 and op1["valor"] != None:
                             valor = op1["valor"]
                         else:
                             valor = op1['temp']
@@ -148,7 +147,7 @@ class Relacional(NodoAST):
                     tip2 = True
                 elif "temp" in resultado2:
                     op2 = resultado2['temp']
-                    if resultado2["valor"] != -1:
+                    if resultado2["valor"] != -1 and resultado2["valor"] != None:
                         valor = resultado2["valor"]
                     else:
                         valor2 = resultado2['temp']
@@ -182,7 +181,7 @@ class Relacional(NodoAST):
                         valor2 = op2["valor"]                    
                         tip2 = True
                     elif "temp" in op2:
-                        if op2["valor"] != -1:
+                        if op2["valor"] != -1 and op2["valor"] != None:
                             valor2 = op2["valor"]
                         else:
                             valor2 = op2['temp']

@@ -2,6 +2,7 @@ from Abstractas.NodoAST import NodoAST
 from Abstractas.NodoArbol import NodoArbol
 from TablaSimbolos.Errores import Errores
 from Expresiones.Arreglos import Arreglos
+
 class Array(NodoAST):
 
     def __init__(self, id, posicion, fila, columna):
@@ -98,6 +99,41 @@ class Array(NodoAST):
                 tree.insertError(err)
                 return err
 
+    def traducir(self, tree, table, keep):    
+        id = self.id
+        self.id = self.id.lower()
+        resultado = table.BuscarIdentificador(self.id)
+        if resultado == None:
+            tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
+            return
+        apuntador = resultado.getApuntador()
+        tipo = resultado.getTipo()
+        T1 = keep.getNuevoTemporal()
+        T2 = keep.getNuevoTemporal()
+        T3 = keep.getNuevoTemporal()
+        T4 = keep.getNuevoTemporal()
+        T5 = keep.getNuevoTemporal()
+        T6 = keep.getNuevoTemporal()
+        T7 = keep.getNuevoTemporal()
+        T8 = keep.getNuevoTemporal()
+        cod = "//***** INICIANDO ACCESO A LA POSICIÓN DEL ARREGLO*****\n"
+        cod += keep.addOperacion(T1,"SP","+",apuntador)
+        cod += keep.addIgual(T2,keep.getValStack(T1))
+        cod += keep.addOperacion(T3,T2,"+","1")
+        #accediendo al límite inferior
+        cod += keep.addIgual(T4,keep.getValHeap(T3))
+        # ACCEDER AL PARÁMETRO SOLICITADO
+        if isinstance(self.posicion,list):
+            for pos in self.posicion:
+                if isinstance(pos,NodoAST):
+                    valor = pos.traducir(tree,table,keep)
+                    if isinstance(valor,int):
+                        cod += keep.addOperacion(T5,(valor-1),"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA
+                        cod += keep.addOperacion(T6,T2,"+","3") #PRIMERA POSICIÓN DEL ARREGLO
+                        cod += keep.addOperacion(T7,T6,"+",T5) #POSICIÓN REAL DEL HEAP
+                        cod += keep.addIgual(T8,keep.getValHeap(T7))
+                        keep.addCodigo(cod)
+                        return {"temp": T8, "valor":None, "tipo":"Int64"}
     def actualizar(self, valor, tree, table):
         id = self.id
         self.id = self.id.lower()
@@ -155,10 +191,7 @@ class Array(NodoAST):
                 traerValor.valor = h
                 table.actualizarValor(self.id,traerValor.valor)
             return traerValor.valor
-        
 
-
-        
     def getNodo(self):
         nodoPadre = NodoArbol("Array")
         nodoId = NodoArbol("Identificador")

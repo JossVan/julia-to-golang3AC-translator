@@ -207,6 +207,8 @@ class Asignacion(NodoAST):
         id = ""
         if isinstance(self.id,Identificador):
             id = self.id.id
+        elif isinstance(self.id, Array):
+            resultado = self.id.traducir(self.valor,tree,table)
         else:
             id = self.id 
         
@@ -243,10 +245,11 @@ class Asignacion(NodoAST):
                 if isinstance(self.valor,list):
                     for val in self.valor :
                         if isinstance(val, Arreglos):
-                            valor = val.ejecutar(tree,table)
+                            valor = val.traducir(tree,table,keep)
                             if isinstance(valor,Errores):
                                 return valor
-                            simbolo = Simbolo(id, valor, self.acceso,self.fila,self.columna,"Arreglo")
+                            simbolo = Simbolo(id, valor, self.acceso,self.fila,self.columna,"Array",keep.getStack())
+                            keep.incrementarStack()
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
@@ -374,7 +377,7 @@ class Asignacion(NodoAST):
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
                                     keep.incrementarStack()
-                                    return 
+                                    return                                  
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
