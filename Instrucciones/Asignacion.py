@@ -619,7 +619,7 @@ class Asignacion(NodoAST):
                                     codigo += keep.addIgual(T2,keep.getValStack(T1))
                                     codigo += keep.addOperacion(T3,"SP","+",keep.getStack())
                                     codigo += keep.addIgual(keep.getValStack(T3),T2)
-                                    
+                                    codigo += "//******************************\n"
                                     keep.addCodigo(codigo)
                                     keep.liberarTemporales(T1)
                                     keep.liberarTemporales(T2)

@@ -414,7 +414,7 @@ class Aritmetica(NodoAST):
                 codigo += keep.addIgual(keep.getValHeap("HP"),"-1")
                 codigo += keep.addOperacion("HP","HP","+","1")
                 temp2 = keep.getNuevoTemporal()
-                codigo = keep.addOperacion(temp2,"SP","+",apuntador)
+                codigo += keep.addOperacion(temp2,"SP","+",apuntador)
                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                 keep.addCodigo(codigo)
                 return {"valor":valor+valor2,"apuntador":apuntador,"tipo":tipo}     
