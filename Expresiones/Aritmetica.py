@@ -159,7 +159,7 @@ class Aritmetica(NodoAST):
                             keep.addCodigo(codigo)
                             op1 = temp
                     elif "temp" in op1:
-                        valor = int(op1['valor'])
+                        valor = op1['temp']
                         tipo = op1['tipo']
                         op1= op1['temp']
                     elif "error" in op1:
@@ -198,7 +198,7 @@ class Aritmetica(NodoAST):
                             keep.addCodigo(codigo)
                             op2 = temp
                     elif "temp" in op2:
-                        valor2 = int(op2['valor'])
+                        valor2 = op2['temp']
                         tipo2 = op2['tipo']
                         op2= op2['temp']
                     elif "error" in op2:
@@ -248,11 +248,8 @@ class Aritmetica(NodoAST):
                     temp = keep.getNuevoTemporal()
                     codigo = keep.addOperacion(temp,op1,"*",op2)
                     keep.addCodigo(codigo)
-                    if tipo == "Int64" and tipo2 == "Int64":
-                        tipo = "Int64"
-                    else:
-                        tipo = "Float64"
-                    return {"temp":temp,"valor": -1, "tipo":tipo} 
+                    
+                    return {"temp":temp,"valor": -1, "tipo":"Float64"} 
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.DIVISION:                
@@ -279,11 +276,8 @@ class Aritmetica(NodoAST):
                 codigo += es+":\n"
                 keep.addCodigo(codigo)
                 if aux2 != 0:
-                    if tipo == "Int64" and tipo2 == "Int64":
-                        tipo = "Int64"
-                    else:
-                        tipo = "Float64"
-                    return {"temp":temp, "valor": -1, "tipo":tipo}      
+                    
+                    return {"temp":temp, "valor": -1, "tipo":"Float64"}      
                 else:
                     return {"error": "error"}      
             elif self.operacion == Tipo_Aritmetico.POTENCIA:
