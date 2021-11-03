@@ -98,8 +98,7 @@ class If(NodoAST):
                         elif "continue":
                             keep.addCodigo("//*******CONTINUE*******\n")
                             keep.addCodigo(resp["cad"])
-                        if isinstance(resp, Return):
-                            return resp
+                        
                     keep.etiquetaFalsa = ""
                     keep.etiquetaVerdadera = "" 
                 keep.addCodigo("goto "+salida+";\n")

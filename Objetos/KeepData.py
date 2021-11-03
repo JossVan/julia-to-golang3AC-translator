@@ -140,7 +140,7 @@ class KeepData:
         if tipo == "c":
             return "fmt.Printf(\"%"+tipo+"\","+str(valor)+");\n"
         if tipo == "f":
-            return "fmt.Printf(\"%.4f\","+str(valor)+");\n"
+            return "fmt.Printf(\"%.3f\","+str(valor)+");\n"
         else:
             return "fmt.Printf(\"%d\",int("+str(valor)+"));\n"
     
@@ -372,3 +372,20 @@ class KeepData:
 
         codigo += "\n}\n"
     
+    def errorDimension(self):
+
+        codigo = "fmt.Printf(\"%c\", 66) //B\n"
+        codigo += "fmt.Printf(\"%c\", 111) //o\n"
+        codigo += "fmt.Printf(\"%c\", 117) //u\n"
+        codigo += "fmt.Printf(\"%c\", 110) //n\n"
+        codigo += "fmt.Printf(\"%c\", 100) //d\n"
+        codigo += "fmt.Printf(\"%c\", 115) //s\n"
+        codigo += "fmt.Printf(\"%c\", 69) //E\n"
+        codigo += "fmt.Printf(\"%c\", 114) //r\n"
+        codigo += "fmt.Printf(\"%c\", 114) //r\n"
+        codigo += "fmt.Printf(\"%c\", 111) //o\n"
+        codigo += "fmt.Printf(\"%c\", 114) //r\n"
+        codigo += "fmt.Printf(\"%c\", 10) //r\n"
+        codigo += "// No continúa con la instrucción\n"
+   
+        self.addCodigo(codigo)

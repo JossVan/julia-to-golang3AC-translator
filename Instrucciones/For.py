@@ -187,7 +187,9 @@ class For(NodoAST):
                         return
                     apuntador = resultado.getApuntador()
                     #tipo = resultado.getTipo()
-                    codigo += keep.addIgual(keep.getValStack(apuntador),inferior)
+                    T1 = keep.getNuevoTemporal()
+                    codigo += keep.addOperacion(T1,"SP","+",apuntador)
+                    codigo += keep.addIgual(keep.getValStack(T1),inferior)
                     keep.addCodigo(codigo)
                     for instruccion in self.instrucciones:
                         resp= instruccion.traducir(tree,nuevaTabla,keep)
@@ -214,7 +216,9 @@ class For(NodoAST):
                             apuntador = izquierdo["apuntador"]
                             tipo = izquierdo["tipo"]
                             temp = keep.getNuevoTemporal()
-                            codigo = keep.addIgual(temp,keep.getValStack(apuntador))
+                            T1 = keep.getNuevoTemporal()
+                            codigo = keep.addOperacion(T1,"SP","+",apuntador)
+                            codigo += keep.addIgual(temp,keep.getValStack(T1))
                             keep.addCodigo(codigo)
                         else:
                             print ("ERROR")
@@ -230,7 +234,9 @@ class For(NodoAST):
                             apuntador2 = derecho["apuntador"]
                             tipo2 = derecho["tipo"]
                             temp2 = keep.getNuevoTemporal()
-                            codigo = keep.addIgual(temp2,keep.getValStack(apuntador2))
+                            T1 = keep.getNuevoTemporal()
+                            codigo = keep.addOperacion(T1,"SP","+",apuntador2)
+                            codigo += keep.addIgual(temp2,keep.getValStack(T1))
                             keep.addCodigo(codigo)
                         else:
                             print ("ERROR")
@@ -260,7 +266,9 @@ class For(NodoAST):
                         return
                     apuntador = resultado.getApuntador()
                     #tipo = resultado.getTipo()
-                    codigo += keep.addIgual(keep.getValStack(apuntador),inferior)
+                    T1 = keep.getNuevoTemporal()
+                    codigo += keep.addOperacion(T1,"SP","+",apuntador)
+                    codigo += keep.addIgual(keep.getValStack(T1),inferior)
                     keep.addCodigo(codigo)
                     for instruccion in self.instrucciones:
                         resp= instruccion.traducir(tree,nuevaTabla,keep)

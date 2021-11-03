@@ -103,7 +103,9 @@ class Print(NodoAST):
                         #CAMBIO FORMAL DE ENTORNO
                         temp = keep.getNuevoTemporal()
                         temp2 = keep.getNuevoTemporal()
-                        result = keep.addIgual(temp,keep.getValStack(keep.getStack()-1))
+                        temp3 = keep.getNuevoTemporal()
+                        result = keep.addOperacion(temp3,"SP","+",keep.getStack()-1)
+                        result += keep.addIgual(temp,keep.getValStack(temp3))
                         result += keep.addOperacion(temp2,"SP","+",keep.getStack())
                         result += keep.addIgual(keep.getValStack(temp2),temp)
                         result += keep.addOperacion("SP","SP","+",keep.getStack())
@@ -123,8 +125,12 @@ class Print(NodoAST):
                                 #CAMBIO FORMAL DE ENTORNO
                                 temp = keep.getNuevoTemporal()
                                 temp2 = keep.getNuevoTemporal()
-                                result = keep.addIgual(temp,keep.getValStack(puntero))
-                                result += keep.addIgual(keep.getValStack(keep.getStack()),temp)
+                                temp3 = keep.getNuevoTemporal()
+                                result = keep.addOperacion(temp3,"SP","+",puntero)
+                                result += keep.addIgual(temp,keep.getValStack(temp3))
+                                temp4 = keep.getNuevoTemporal()
+                                result += keep.addOperacion(temp4,"SP","+",keep.getStack())
+                                result += keep.addIgual(keep.getValStack(temp4),temp)
                                 result += keep.addOperacion("SP","SP","+",keep.getStack())
                                 result += keep.llamada("Native_PrintString")
                                 result += keep.addOperacion("SP","SP","-",keep.getStack())
@@ -132,20 +138,26 @@ class Print(NodoAST):
                             elif tipo == "Int64":
                                 cod = "//*****IMPRESIÓN DE NÚMERO*****\n"
                                 temp = keep.getNuevoTemporal()
-                                cod += keep.addIgual(temp, keep.getValStack(puntero))
+                                temp3 = keep.getNuevoTemporal()
+                                cod += keep.addOperacion(temp3,"SP","+",puntero)
+                                cod += keep.addIgual(temp, keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"d")
                                 keep.addCodigo(result)
                             elif tipo == "Float64":
                                 cod = "//*****IMPRESIÓN DE NÚMERO*****\n"
                                 temp = keep.getNuevoTemporal()
-                                cod += keep.addIgual(temp, keep.getValStack(puntero))
+                                temp3 = keep.getNuevoTemporal()
+                                cod += keep.addOperacion(temp3,"SP","+",puntero)
+                                cod += keep.addIgual(temp, keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"f")
                                 keep.addCodigo(result)
                             elif tipo == "Bool":
                                 temp = keep.getNuevoTemporal()
-                                cod = keep.addIgual(temp,keep.getValStack(puntero))
+                                temp3 = keep.getNuevoTemporal()
+                                cod = keep.addOperacion(temp3,"SP","+",puntero)
+                                cod += keep.addIgual(temp,keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 keep.comparar(temp)
                                 return
@@ -168,13 +180,12 @@ class Print(NodoAST):
                             keep.addCodigo(e1+":\n")
                             keep.etiquetaFalsa = ""
                             keep.etiquetaVerdadera=""
-
+                    
                 
         if self.tipo == Tipo_Print.PRINTLN:
             if self.contenido != "":
                 for instrucciones in self.contenido:
                     resultado = instrucciones.traducir(tree,table,keep)
-                    print(type(resultado))
                     if isinstance(resultado, float):
                         result=keep.imprimir(resultado,"f")
                         keep.addCodigo(result)
@@ -193,13 +204,14 @@ class Print(NodoAST):
                             keep.addCodigo(es+":\n")                       
                     elif isinstance(resultado,int):
                         result=keep.imprimir(resultado,"d")
-                        keep.addCodigo(result)
-                        
+                        keep.addCodigo(result)                       
                     elif isinstance(resultado,str):
                         #CAMBIO FORMAL DE ENTORNO
                         temp = keep.getNuevoTemporal()
                         temp2 = keep.getNuevoTemporal()
-                        result = keep.addIgual(temp,keep.getValStack(keep.getStack()-1))
+                        temp3 = keep.getNuevoTemporal()
+                        result = keep.addOperacion(temp3,"SP","+",keep.getStack()-1)
+                        result += keep.addIgual(temp,keep.getValStack(temp3))
                         result += keep.addOperacion(temp2,"SP","+",keep.getStack())
                         result += keep.addIgual(keep.getValStack(temp2),temp)
                         result += keep.addOperacion("SP","SP","+",keep.getStack())
@@ -220,27 +232,37 @@ class Print(NodoAST):
                                 #CAMBIO FORMAL DE ENTORNO
                                 temp = keep.getNuevoTemporal()
                                 temp2 = keep.getNuevoTemporal()
-                                result = keep.addIgual(temp,keep.getValStack(puntero))
-                                result += keep.addIgual(keep.getValStack(keep.getStack()),temp)
+                                temp3 = keep.getNuevoTemporal()
+                                result = keep.addOperacion(temp3,"SP","+",puntero)
+                                result += keep.addIgual(temp,keep.getValStack(temp3))
+                                temp4 = keep.getNuevoTemporal()
+                                result += keep.addOperacion(temp4,"SP","+",keep.getStack())
+                                result += keep.addIgual(keep.getValStack(temp4),temp)
                                 result += keep.addOperacion("SP","SP","+",keep.getStack())
                                 result += keep.llamada("Native_PrintString")
                                 result += keep.addOperacion("SP","SP","-",keep.getStack())
                                 keep.addCodigo(result)
                             elif tipo == "Bool":
                                 temp = keep.getNuevoTemporal()
-                                cod = keep.addIgual(temp,keep.getValStack(puntero))
+                                temp3 = keep.getNuevoTemporal()
+                                cod = keep.addOperacion(temp3,"SP","+",puntero)
+                                cod += keep.addIgual(temp,keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 keep.comparar(temp)
                             elif tipo == "Int64":
                                 temp = keep.getNuevoTemporal()
-                                cod = keep.addIgual(temp, keep.getValStack(puntero))
+                                temp3 = keep.getNuevoTemporal()
+                                cod = keep.addOperacion(temp3,"SP","+",puntero)
+                                cod += keep.addIgual(temp, keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"d")
                                 keep.addCodigo(result)
                                 
                             elif tipo == "Float64":
                                 temp = keep.getNuevoTemporal()
-                                cod = keep.addIgual(temp, keep.getValStack(puntero))
+                                temp3 = keep.getNuevoTemporal()
+                                cod = keep.addOperacion(temp3,"SP","+",puntero)
+                                cod += keep.addIgual(temp, keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"f")
                                 keep.addCodigo(result)

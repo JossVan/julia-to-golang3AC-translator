@@ -54,7 +54,6 @@ class Relacional(NodoAST):
             valor = ""
             valor2 = ""
             etiquetas = []
-            etiquetas2 = []
             temp1 = None
             temp2 = None
             tip = False
@@ -67,7 +66,7 @@ class Relacional(NodoAST):
                     tip = True
                 elif "temp" in resultado1:
                     op1 = resultado1['temp']
-                    if resultado1["valor"] != -1:
+                    if resultado1["valor"] != -1 and resultado1["valor"] != None:
                         valor = resultado1["valor"]
                     else:
                         valor = resultado1['temp']
@@ -100,7 +99,7 @@ class Relacional(NodoAST):
                         valor = op1["valor"]
                         Tip = True
                     elif "temp" in op1:
-                        if op1["valor"] != -1:
+                        if op1["valor"] != -1 and op1["valor"] != None:
                             valor = op1["valor"]
                         else:
                             valor = op1['temp']
@@ -148,7 +147,7 @@ class Relacional(NodoAST):
                     tip2 = True
                 elif "temp" in resultado2:
                     op2 = resultado2['temp']
-                    if resultado2["valor"] != -1:
+                    if resultado2["valor"] != -1 and resultado2["valor"] != None:
                         valor = resultado2["valor"]
                     else:
                         valor2 = resultado2['temp']
@@ -182,7 +181,7 @@ class Relacional(NodoAST):
                         valor2 = op2["valor"]                    
                         tip2 = True
                     elif "temp" in op2:
-                        if op2["valor"] != -1:
+                        if op2["valor"] != -1 and op2["valor"] != None:
                             valor2 = op2["valor"]
                         else:
                             valor2 = op2['temp']
@@ -310,8 +309,12 @@ class Relacional(NodoAST):
             codigo = "//OPERACIÓN RELACIONAL\n"
             temp = keep.getNuevoTemporal()
             temp2 = keep.getNuevoTemporal()
-            codigo += keep.addIgual(temp,keep.getValStack(puntero))
-            codigo += keep.addIgual(temp2,keep.getValStack(puntero2))
+            temp3 = keep.getNuevoTemporal()
+            temp4 = keep.getNuevoTemporal()
+            codigo += keep.addOperacion(temp3,"SP","+",puntero)
+            codigo += keep.addIgual(temp,keep.getValStack(temp3))
+            codigo += keep.addOperacion(temp4,"SP","+",puntero2)
+            codigo += keep.addIgual(temp2,keep.getValStack(temp4))
             if (tipo == "Int64" or tipo == "Float64") and (tipo2 == "Int64" or tipo2=="Float64"):
                 codigo += "if "+temp+operador+temp2+" {goto "+ev +";}\ngoto "+ef+";\n"
                 keep.addCodigo(codigo)
@@ -322,7 +325,9 @@ class Relacional(NodoAST):
             codigo = "//OPERACIÓN RELACIONAL\n"
             temp = keep.getNuevoTemporal()
             temp2 = keep.getNuevoTemporal()
-            codigo += keep.addIgual(temp,keep.getValStack(puntero))
+            temp3 = keep.getNuevoTemporal()
+            codigo += keep.addOperacion(temp3,"SP","+",puntero)
+            codigo += keep.addIgual(temp,keep.getValStack(temp3))
             codigo += keep.addIgual(temp2,valor2)
 
             if (tipo == "Int64" or tipo == "Float64") and (tipo2 == "Int64" or tipo2=="Float64"):
@@ -336,6 +341,8 @@ class Relacional(NodoAST):
             temp = keep.getNuevoTemporal()
             temp2 = keep.getNuevoTemporal()
             codigo += keep.addIgual(temp,valor)
+            temp3 = keep.getNuevoTemporal()
+            codigo += keep.addOperacion(temp3,"SP","+",puntero)
             codigo += keep.addIgual(temp2,keep.getValStack(puntero2))
 
             if (tipo == "Int64" or tipo == "Float64") and (tipo2 == "Int64" or tipo2=="Float64"):
@@ -369,13 +376,17 @@ class Relacional(NodoAST):
         temp = keep.getNuevoTemporal()
         temp2 = keep.getNuevoTemporal()
         codigo += "//Obtengo del stack, la posición del heap\n"
-        codigo += keep.addIgual(temp,keep.getValStack(apuntador1))
+        temp5 = keep.getNuevoTemporal()
+        codigo += keep.addOperacion(temp5,"SP","+",apuntador1)
+        codigo += keep.addIgual(temp,keep.getValStack(temp5))
         codigo += "//Obtengo el valor del primer caracter del heap\n"
         temp3 = keep.getNuevoTemporal()
         #codigo += keep.addIgual(tempIndice,temp)
         codigo += keep.addIgual(temp3,keep.getValHeap(temp))
         codigo += "//Obtengo del stack, la posición del heap\n"
-        codigo += keep.addIgual(temp2,keep.getValStack(apuntador2))
+        temp6 = keep.getNuevoTemporal()
+        codigo += keep.addOperacion(temp6,"SP","+",apuntador2)
+        codigo += keep.addIgual(temp2,keep.getValStack(temp6))
         codigo += "//Obtengo el valor del primer caracter del heap\n"
         temp4 = keep.getNuevoTemporal()
         #codigo += keep.addIgual(tempIndice2,temp2)
@@ -458,6 +469,10 @@ class Relacional(NodoAST):
 
         evv = keep.getNuevaEtiqueta()
         eff = keep.getNuevaEtiqueta()
+        keep.liberarTemporales(temp)
+        keep.liberarTemporales(temp2)
+        keep.liberarTemporales(temp3)
+        keep.liberarTemporales(temp4)
         if operador == Tipo_Relacional.MAYOR:
             codigo += "if "+contador+">"+contador2+" {goto "+evv+";}\ngoto "+eff+";\n"
         elif operador == Tipo_Relacional.MAYOR_IGUAL:
