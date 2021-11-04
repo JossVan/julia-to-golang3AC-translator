@@ -389,3 +389,44 @@ class KeepData:
         codigo += "// No continúa con la instrucción\n"
    
         self.addCodigo(codigo)
+    
+    def Length(self):
+        T1 = self.getNuevoTemporal()
+        T2 = self.getNuevoTemporal()
+        T3 = self.getNuevoTemporal()
+        T4 = self.getNuevoTemporal()
+        T5 = self.getNuevoTemporal()
+        L1 = self.getNuevaEtiqueta()
+        L2 = self.getNuevaEtiqueta()
+        L3 = self.getNuevaEtiqueta()
+        L4 = self.getNuevaEtiqueta()
+        codigo = "// ********** FUNCIÓN LENGTH **********\n"
+        codigo += "func length(){\n"
+        codigo += self.addOperacion(T1,"SP","+","0")
+        # OBTENGO EL INICIO DEL ARREGLO
+        codigo += self.addIgual(T2,self.getValStack(T1))
+        codigo += self.addIgual(T5,self.getValHeap(T2))
+        codigo += "if "+T5+" == 1{goto "+L1+";}\n"
+        codigo += "goto "+L2+";\n"
+        codigo += L1+":\n"
+        codigo += self.addOperacion(T3,T2,"+","2")
+        codigo += self.addIgual(T4,self.getValHeap(T3))    
+        codigo += self.addOperacion(T4,T4,"+","1") 
+        codigo += self.addIgual(self.getValStack(T1),T4)
+        codigo += "return;\n"
+        codigo += L2+":\n"
+        codigo += "if "+T5+" == 2{goto "+L3+";}\n"
+        codigo += "goto "+L4+";\n"
+        codigo += L3+":\n"
+        codigo += self.addOperacion(T3,T2,"+","5")
+        codigo += self.addIgual(T4,self.getValHeap(T3))    
+        codigo += self.addIgual(self.getValStack(T1),T4)
+        codigo += "return;\n"
+        codigo += L4+":\n}"
+        self.addCodigo(codigo)
+        self.liberarTemporales(T1)
+        self.liberarTemporales(T2)
+        self.liberarTemporales(T3)
+        self.liberarTemporales(T4)
+
+

@@ -72,13 +72,13 @@ class Llamadas(NodoAST):
             return
         elif funcion != None and struct == None:
             NuevaTabla = TablaSimbolos(self.id,table)
+            contador = 0
+            cont2 = 0
+            T0 = keep.getNuevoTemporal()
+            keep.addCodigo(keep.addIgual(T0,keep.getStack()))
+            stack = keep.getStack()
             if self.parametros != None:
                 if len(funcion.parametros) == len(self.parametros):
-                    contador = 0
-                    cont2 = 0
-                    T0 = keep.getNuevoTemporal()
-                    keep.addCodigo(keep.addIgual(T0,keep.getStack()))
-                    stack = keep.getStack()
                     for parametro in self.parametros:
                         # VERIFICO QUE TIPO DE PARÁMETRO PUEDA SER 
                         valor = parametro.traducir(tree,table,keep)
@@ -206,9 +206,26 @@ class Llamadas(NodoAST):
                     err = Errores(self.id, "Semántico", "No coinciden los parámetros de llamada", self.fila,self.columna)
                     tree.insertError(err)
             else:
-                resultado = funcion.ejecutar(tree,NuevaTabla)
+                keep.addCodigo(keep.addOperacion("SP","SP","+",T0))
+                keep.addCodigo(self.id+"();\n")
+                keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
+                keep.PS = cont2
+                resultado = funcion.traducir(tree,NuevaTabla,keep)
+                keep.PS = stack
                 if isinstance(resultado,Return):
-                    return resultado.valor
+                        if isinstance(resultado.valor,dict):
+                            if "apuntador" in resultado.valor:
+                                #simbolo = Simbolo("return",valor,self.id,self.fila,self.columna,resultado.valor["tipo"],T0)
+                                #table.addSimboloLocal(simbolo)
+                                #tree.agregarTS(self.id,simbolo)
+                                return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
+                            elif "temp" in resultado.valor:
+                                return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
+                            return resultado.valor
+                        elif isinstance(resultado, Errores):
+                            return resultado
+                        else:
+                            return resultado
         elif struct != None:
             #HAY UNA ASIGNACION DE TIPO STRUCT
             elementos = struct.ejecutar(tree,table)
