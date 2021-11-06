@@ -42,7 +42,7 @@ class KeepData:
         return self.codigo3d
     
     def addOperacion(self,var,op1,op,op2):
-        return  var+" = "+str(op1)+op+str(op2)+";\n"
+        return  var+ " = "+str(op1)+op+str(op2)+";\n"
     
     def addCodigo(self,codigo):
         self.codigo += codigo
@@ -373,21 +373,21 @@ class KeepData:
         codigo += "\n}\n"
     
     def errorDimension(self):
-
-        codigo = "fmt.Printf(\"%c\", 66) //B\n"
-        codigo += "fmt.Printf(\"%c\", 111) //o\n"
-        codigo += "fmt.Printf(\"%c\", 117) //u\n"
-        codigo += "fmt.Printf(\"%c\", 110) //n\n"
-        codigo += "fmt.Printf(\"%c\", 100) //d\n"
-        codigo += "fmt.Printf(\"%c\", 115) //s\n"
-        codigo += "fmt.Printf(\"%c\", 69) //E\n"
-        codigo += "fmt.Printf(\"%c\", 114) //r\n"
-        codigo += "fmt.Printf(\"%c\", 114) //r\n"
-        codigo += "fmt.Printf(\"%c\", 111) //o\n"
-        codigo += "fmt.Printf(\"%c\", 114) //r\n"
-        codigo += "fmt.Printf(\"%c\", 10) //r\n"
+        codigo = "\nfunc boundserror(){\n"
+        codigo += "fmt.Printf(\"%c\", 66); //B\n"
+        codigo += "fmt.Printf(\"%c\", 111); //o\n"
+        codigo += "fmt.Printf(\"%c\", 117); //u\n"
+        codigo += "fmt.Printf(\"%c\", 110); //n\n"
+        codigo += "fmt.Printf(\"%c\", 100); //d\n"
+        codigo += "fmt.Printf(\"%c\", 115); //s\n"
+        codigo += "fmt.Printf(\"%c\", 69); //E\n"
+        codigo += "fmt.Printf(\"%c\", 114); //r\n"
+        codigo += "fmt.Printf(\"%c\", 114); //r\n"
+        codigo += "fmt.Printf(\"%c\", 111); //o\n"
+        codigo += "fmt.Printf(\"%c\", 114); //r\n"
+        codigo += "fmt.Printf(\"%c\", 10); //r\n"
         codigo += "// No continúa con la instrucción\n"
-   
+        codigo += "}\n"
         self.addCodigo(codigo)
     
     def Length(self):
