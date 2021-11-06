@@ -26,6 +26,10 @@ class Arreglos(NodoAST):
                 for j in i:
                     if isinstance(j,list):
                         cont = cont+1
+                        for k in j:
+                            if isinstance(k,list):
+                                cont = cont+1
+                                break
                         break
                 break
         if cont == 0:
@@ -124,7 +128,68 @@ class Arreglos(NodoAST):
             codigo += keep.addIgual(keep.getValStack(temp),T1)
             keep.liberarTemporales(temp)
             keep.liberarTemporales(T1)
+            keep.addCodigo(codigo)  
+        elif cont == 2:
+            dim = 3
+            # ASIGNANDO ESPACIOS EN EL HEAP
+            T1 = keep.getNuevoTemporal()
+            codigo = "// ***** ASIGNANDO ESPACIO EN EL HEAP PARA ARRAY 2D ******\n"
+            codigo += keep.addIgual(T1,"HP")
+            #ALMACENANDO DIMENSIÓN EN EL HEAP
+            codigo += keep.addIgual(keep.getValHeap("HP"),dim)
+            codigo += keep.addOperacion("HP","HP","+","1")
+            #ALMACENANDO EL VALOR INFERIOR DE LA DIMENSIÓN
+            codigo += keep.addIgual(keep.getValHeap("HP"),0)
+            codigo += keep.addOperacion("HP","HP","+","1")
+            primerosuperior = len(arreglo)
+            #ALMACENANDO EL VALOR SUPERIOR DE LA DIMENSIÓN
+            codigo += keep.addIgual(keep.getValHeap("HP"),primerosuperior-1)
+            codigo += keep.addOperacion("HP","HP","+","1")
+            #ALMACENANDO EL VALOR INFERIOR DE LA DIMENSIÓN
+            codigo += keep.addIgual(keep.getValHeap("HP"),0)
+            codigo += keep.addOperacion("HP","HP","+","1")
+            for dim in arreglo:
+                if isinstance(dim,list):
+                    superior = 0
+                    for valor in dim:
+                        superior = superior+1
+                    #ALMACENANDO EL VALOR SUPERIOR DE LA DIMENSIÓN
+                    codigo += keep.addIgual(keep.getValHeap("HP"),superior)
+                    codigo += keep.addOperacion("HP","HP","+","1")
+                    
+                    break
+            codigo += keep.addIgual(keep.getValHeap("HP"),len(arreglo))
+            codigo += keep.addOperacion("HP","HP","+","1")
+            for dim in arreglo:
+                if isinstance(dim,list):
+                    for valor in dim:
+                        if isinstance(valor,NodoAST):
+                            resultado = valor.traducir(tree,table,keep)
+                            if isinstance(resultado,int) or isinstance(resultado,float):
+                                #ALMACENANDO EL VALOR SUPERIOR DE LA DIMENSIÓN
+                                codigo += keep.addIgual(keep.getValHeap("HP"),resultado)
+                                codigo += keep.addOperacion("HP","HP","+","1")
+                            elif isinstance(resultado,dict):
+                                if "apuntador" in resultado:
+                                    T2 = keep.getNuevoTemporal()
+                                    T3 = keep.getNuevoTemporal()
+                                    codigo+= keep.addOperacion(T2,"SP","+",resultado["apuntador"])
+                                    codigo += keep.addIgual(T3,keep.getValStack(T2))
+                                    codigo += keep.addIgual(keep.getValHeap("HP"),T3)
+                                    codigo += keep.addOperacion("HP","HP","+","1")
+                                    keep.liberarTemporales(T2)
+                                    keep.liberarTemporales(T3)
+                                elif "temp" in resultado:
+                                    codigo += keep.addIgual(keep.getValHeap("HP"),resultado["temp"])
+                                    codigo += keep.addOperacion("HP","HP","+","1")
+            temp = keep.getNuevoTemporal()
+            codigo += keep.addOperacion(temp,"SP","+",keep.getStack())
+            codigo += keep.addIgual(keep.getValStack(temp),T1)
+            keep.liberarTemporales(temp)
+            keep.liberarTemporales(T1)
             keep.addCodigo(codigo)
+            print("DIMENSIÓN 3")
+        
         return arreglo
 
 
