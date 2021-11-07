@@ -1,4 +1,5 @@
 from Expresiones.Acceso import Acceso
+from Instrucciones.Funciones import Funciones
 from Objetos.KeepData import KeepData
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
 from Abstractas.NodoArbol import NodoArbol
@@ -301,7 +302,7 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",simbolo.apuntador)
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Float64",simbolo.apuntador)
-                                keep.liberarTemporales(temp)
+                                #keep.liberarTemporales(temp)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)
                             elif isinstance(valor,int):
@@ -311,10 +312,20 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",simbolo.apuntador)
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Int64",simbolo.apuntador)
-                                keep.liberarTemporales(temp)
+                                #keep.liberarTemporales(temp)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)                      
-                            elif isinstance(valor,dict):
+                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
+                                if isinstance(valor,Funciones):
+                                    idfuncion = valor.nombre
+                                    res = table.BuscarIdentificador("return-"+idfuncion)
+                                    if res == None:
+                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                                        return
+                                    apuntador2 = res.getApuntador()
+                                    tipo2 = res.getTipo()
+                                    valor2 =res.getValor()  
+                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                                 if "temp" in valor:
                                     val = valor["valor"]
                                     tipo = valor["tipo"]
@@ -325,7 +336,7 @@ class Asignacion(NodoAST):
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 
                                     simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,tipo,simbolo.apuntador)
-                                    keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     keep.addCodigo(codigo)
                                 elif "etiquetas" in valor:
@@ -340,8 +351,8 @@ class Asignacion(NodoAST):
                                     codigo += keep.addOperacion(temp2,"SP","+",simbolo.apuntador)
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                     codigo += "goto "+nueva+";\n"
                                     keep.addCodigo(codigo)
                                     keep.addCodigo(ef+":\n")
@@ -353,8 +364,8 @@ class Asignacion(NodoAST):
                                     codigo += "goto "+nueva+";\n"
                                     codigo += nueva+":\n"
                                     keep.addCodigo(codigo)
-                                    keep.liberarTemporales(temp3)
-                                    keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp3)
+                                    #keep.liberarTemporales(temp)
                                     keep.etiquetaFalsa = ""
                                     keep.etiquetaVerdadera=""
                                 elif "apuntador" in valor:
@@ -368,9 +379,9 @@ class Asignacion(NodoAST):
                                     codigo += keep.addIgual(keep.getValStack(T3),T2)
                                     
                                     keep.addCodigo(codigo)
-                                    keep.liberarTemporales(T1)
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T1)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
                                     simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
@@ -378,7 +389,7 @@ class Asignacion(NodoAST):
                                         table.actualizarSimbolo(simbolo)
                                     tree.agregarTS(id,simbolo)
                                     keep.incrementarStack()
-                                    return                                  
+                                    return                                 
                             if self.acceso == Tipo_Acceso.GLOBAL:
                                 table.actualizarSimboloGlobal(simbolo)
                             else:
@@ -404,8 +415,8 @@ class Asignacion(NodoAST):
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     keep.addCodigo(codigo)
                                     keep.incrementarStack()
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                 else:
                                     temp = keep.getNuevoTemporal()
                                     codigo = keep.addIgual(temp,"0")
@@ -415,8 +426,8 @@ class Asignacion(NodoAST):
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     keep.addCodigo(codigo)
                                     keep.incrementarStack()  
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)                   
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)                   
                             elif isinstance(valor,float):
                                 temp = keep.getNuevoTemporal()
                                 codigo = keep.addIgual(temp,valor)
@@ -424,8 +435,8 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Float64",keep.getStack())
-                                keep.liberarTemporales(temp)
-                                keep.liberarTemporales(temp2)
+                                #keep.liberarTemporales(temp)
+                                #keep.liberarTemporales(temp2)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)
                             elif isinstance(valor,int):
@@ -435,11 +446,21 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,table.nombre,self.fila,self.columna,"Int64",keep.getStack())
-                                keep.liberarTemporales(temp)
-                                keep.liberarTemporales(temp2)
+                                #keep.liberarTemporales(temp)
+                                #keep.liberarTemporales(temp2)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)                      
-                            elif isinstance(valor,dict):
+                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
+                                if isinstance(valor,Funciones):
+                                    idfuncion = valor.nombre
+                                    res = table.BuscarIdentificador("return-"+idfuncion)
+                                    if res == None:
+                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                                        return
+                                    apuntador2 = res.getApuntador()
+                                    tipo2 = res.getTipo()
+                                    valor2 =res.getValor()  
+                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                                 if "temp" in valor:
                                     val = valor["valor"]
                                     tipo = valor["tipo"]
@@ -449,8 +470,8 @@ class Asignacion(NodoAST):
                                     codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                     simbolo = Simbolo(id,val,table.nombre,self.fila,self.columna,tipo,keep.getStack())
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     keep.addCodigo(codigo)
                                 elif "etiquetas" in valor:
@@ -465,8 +486,8 @@ class Asignacion(NodoAST):
                                     codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                     keep.incrementarStack()
                                     codigo += "goto "+nueva+";\n"
                                     keep.addCodigo(codigo)
@@ -478,8 +499,8 @@ class Asignacion(NodoAST):
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     codigo += "goto "+nueva+";\n"
                                     codigo += nueva+":\n"
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                     keep.incrementarStack()
                                     keep.addCodigo(codigo)
                                     keep.etiquetaFalsa = ""
@@ -501,9 +522,9 @@ class Asignacion(NodoAST):
                                     codigo += keep.addIgual(keep.getValStack(T3),T2)
                                     
                                     keep.addCodigo(codigo)
-                                    keep.liberarTemporales(T1)
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T1)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
                                     simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
@@ -578,7 +599,17 @@ class Asignacion(NodoAST):
                                 else:
                                     table.actualizarSimbolo(simbolo)
                                 tree.agregarTS(id,simbolo)
-                            elif isinstance(valor,dict):
+                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
+                                if isinstance(valor,Funciones):
+                                    idfuncion = valor.nombre
+                                    res = table.BuscarIdentificador("return-"+idfuncion)
+                                    if res == None:
+                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                                        return
+                                    apuntador2 = res.getApuntador()
+                                    tipo2 = res.getTipo()
+                                    valor2 =res.getValor()  
+                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                                 if "etiquetas" in valor:
                                     simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,"Bool",simbolo.apuntador)
                                     ev = valor["etiquetas"][0]
@@ -590,8 +621,8 @@ class Asignacion(NodoAST):
                                     temp2 = keep.getNuevoTemporal()
                                     codigo += keep.addOperacion(temp2,"SP","+",simbolo.apuntador)
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     codigo += "goto "+nueva+";\n"
                                     keep.addCodigo(codigo)
@@ -622,9 +653,9 @@ class Asignacion(NodoAST):
                                     codigo += keep.addIgual(keep.getValStack(T3),T2)
                                     codigo += "//******************************\n"
                                     keep.addCodigo(codigo)
-                                    keep.liberarTemporales(T1)
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T1)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
                                     simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
@@ -676,8 +707,8 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Float64",keep.getStack())
-                                keep.liberarTemporales(temp) 
-                                keep.liberarTemporales(temp2)    
+                                #keep.liberarTemporales(temp) 
+                                #keep.liberarTemporales(temp2)    
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.incrementarStack()
                                 keep.addCodigo(codigo)
@@ -707,8 +738,8 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Int64",keep.getStack())
-                                keep.liberarTemporales(temp)    
-                                keep.liberarTemporales(temp2)    
+                                #keep.liberarTemporales(temp)    
+                                #keep.liberarTemporales(temp2)    
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.incrementarStack()
                                 keep.addCodigo(codigo)
@@ -806,7 +837,17 @@ class Asignacion(NodoAST):
                                 else:
                                     table.actualizarSimbolo(simbolo)
                                 tree.agregarTS(id,simbolo)
-                            elif isinstance(valor,dict):
+                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
+                                if isinstance(valor,Funciones):
+                                    idfuncion = valor.nombre
+                                    res = table.BuscarIdentificador("return-"+idfuncion)
+                                    if res == None:
+                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                                        return
+                                    apuntador2 = res.getApuntador()
+                                    tipo2 = res.getTipo()
+                                    valor2 =res.getValor()  
+                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                                 if "etiquetas" in valor:
                                     simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
                                     ev = valor["etiquetas"][0]
@@ -818,8 +859,8 @@ class Asignacion(NodoAST):
                                     codigo = keep.addIgual(temp,"1")
                                     codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                     codigo += keep.addIgual(keep.getValStack(temp2),temp)
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
                                     #codigo += keep.addIgual(keep.getValStack("SP"),temp)
                                     #codigo += keep.addOperacion("SP","SP","+","1")
                                     codigo += "goto "+nueva+";\n"
@@ -851,9 +892,9 @@ class Asignacion(NodoAST):
                                     codigo += keep.addIgual(keep.getValStack(T3),T2)
                                     
                                     keep.addCodigo(codigo)
-                                    keep.liberarTemporales(T1)
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T1)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
                                     simbolo = Simbolo(id,valor["valor"],table.nombre,self.fila,self.columna,valor["tipo"],keep.getStack())
                                     if self.acceso == Tipo_Acceso.GLOBAL:           
                                         table.actualizarSimboloGlobal(simbolo)
@@ -905,8 +946,8 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Float64",keep.getStack())
-                                keep.liberarTemporales(temp)    
-                                keep.liberarTemporales(temp2)    
+                                #keep.liberarTemporales(temp)    
+                                #keep.liberarTemporales(temp2)    
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.incrementarStack()
                                 keep.addCodigo(codigo)
@@ -936,8 +977,8 @@ class Asignacion(NodoAST):
                                 codigo += keep.addOperacion(temp2,"SP","+",keep.getStack())
                                 codigo += keep.addIgual(keep.getValStack(temp2),temp)
                                 simbolo = Simbolo(id,valor,self.acceso,self.fila,self.columna, "Int64",keep.getStack())
-                                keep.liberarTemporales(temp)    
-                                keep.liberarTemporales(temp2)
+                                #keep.liberarTemporales(temp)    
+                                #keep.liberarTemporales(temp2)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.incrementarStack()
                                 keep.addCodigo(codigo)

@@ -12,7 +12,11 @@ class KeepData:
     etiquetas = []
     etiquetaContinue = ""
     etiquetaBreak = ""
-
+    HayReturn = False
+    stackreturn = {}
+    listFunction = {}
+    nombrefuncion = ""
+    nombrefunciones ={}
     codigo3d = None
 
     def __init__(self) -> None:

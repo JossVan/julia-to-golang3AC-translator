@@ -1,4 +1,5 @@
 
+from Instrucciones.Funciones import Funciones
 from TablaSimbolos.Errores import Errores
 from TablaSimbolos.Tipos import Tipo_Aritmetico
 from Abstractas.NodoArbol import NodoArbol
@@ -181,6 +182,21 @@ class Aritmetica(NodoAST):
                     if valor == "":
                         valor = op1 
                     tipo = "Float64"
+                elif isinstance(op1,Funciones):
+                    id = op1.nombre
+                    res = table.BuscarIdentificador("return-"+id)
+                    if res == None:
+                        tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
+                        return
+                    apuntador = res.getApuntador()
+                    tipo = res.getTipo()
+                    valor =res.getValor()
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+", apuntador)
+                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                    keep.addCodigo(codigo)
+                    op1 = T2
             if not isinstance(self.operador2,dict):
                 if isinstance(self.operador2,NodoAST):
                     op2 = self.operador2.traducir(tree,table,keep)
@@ -220,6 +236,21 @@ class Aritmetica(NodoAST):
                     if valor2 == "":
                         valor2 = op2
                     tipo2 = "Float64"
+                elif isinstance(op2,Funciones):
+                    id = op2.nombre
+                    res = table.BuscarIdentificador("return-"+id)
+                    if res == None:
+                        tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
+                        return
+                    apuntador2 = res.getApuntador()
+                    tipo2 = res.getTipo()
+                    valor2 =res.getValor()
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+", apuntador)
+                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                    keep.addCodigo(codigo)
+                    op2 = T2
             if self.operacion == Tipo_Aritmetico.SUMA:    
                 result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
                 if not result:
@@ -303,9 +334,9 @@ class Aritmetica(NodoAST):
                     codigo += "goto "+ei+";\n"
                     codigo += es +":\n"
                     keep.addCodigo(codigo)
-                    keep.liberarTemporales(temp0)
-                    keep.liberarTemporales(temp1)
-                    keep.liberarTemporales(temp2)
+                    #keep.liberarTemporales(temp0)
+                    #keep.liberarTemporales(temp1)
+                    #keep.liberarTemporales(temp2)
                     if tipo == "Int64" and tipo2 == "Int64":
                         tipo = "Int64"
                     else:
@@ -398,9 +429,9 @@ class Aritmetica(NodoAST):
         #incrementamos el valor del stack para la siguiente entrada
         #keep.incrementarStack()
         keep.addCodigo(codigo)
-        keep.liberarTemporales(temp)
-        keep.liberarTemporales(temp2)
-        keep.liberarTemporales(temp3)
+        #keep.liberarTemporales(temp)
+        #keep.liberarTemporales(temp2)
+        #keep.liberarTemporales(temp3)
     
  
     def Concatenacion(self, keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2):
@@ -448,9 +479,9 @@ class Aritmetica(NodoAST):
         #codigo += keep.addOperacion("SP","SP","+","1")
         keep.incrementarStack()
         keep.addCodigo(codigo)
-        keep.liberarTemporales(temp)
-        keep.liberarTemporales(temp2)
-        keep.liberarTemporales(temp3)
+        #keep.liberarTemporales(temp)
+        #keep.liberarTemporales(temp2)
+        #keep.liberarTemporales(temp3)
         cad  =""
         for i in range(cantidad):
             cad+=cadena

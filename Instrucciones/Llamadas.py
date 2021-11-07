@@ -76,6 +76,7 @@ class Llamadas(NodoAST):
             cont2 = 0
             T0 = keep.getNuevoTemporal()
             keep.addCodigo(keep.addIgual(T0,keep.getStack()))
+            #keep.stackreturn = T0
             stack = keep.getStack()
             if self.parametros != None:
                 if len(funcion.parametros) == len(self.parametros):
@@ -142,11 +143,11 @@ class Llamadas(NodoAST):
                                     cod += keep.addIgual(keep.getValStack(T5),T3)
                                     keep.addCodigo(cod)
                                     keep.incrementarStack()
-                                    keep.liberarTemporales(T1)
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
-                                    keep.liberarTemporales(T4)
-                                    keep.liberarTemporales(T5)
+                                    #keep.liberarTemporales(T1)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T4)
+                                    #keep.liberarTemporales(T5)
                                     variable = funcion.parametros[contador].id
                                     simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,"String",cont2)
                                 elif valor["tipo"] == "Int64" or valor["tipo"] == "Float64":
@@ -159,9 +160,9 @@ class Llamadas(NodoAST):
                                     cod += keep.addOperacion(T3,"SP","+",keep.getStack())
                                     cod += keep.addIgual(keep.getValStack(T3),T2)
                                     keep.addCodigo(cod)
-                                    keep.liberarTemporales(T1)
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T1)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
                                     keep.incrementarStack()
                                     variable = funcion.parametros[contador].id
                                     simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
@@ -174,7 +175,7 @@ class Llamadas(NodoAST):
                                     cod += keep.addOperacion(T3,"SP","+",keep.getStack())
                                     cod += keep.addIgual(keep.getValStack(T3),valor["temp"])
                                     keep.addCodigo(cod)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T3)
                                     keep.incrementarStack()
                                     variable = funcion.parametros[contador].id
                                 simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
@@ -183,49 +184,21 @@ class Llamadas(NodoAST):
                         contador = contador+1
                         cont2 = cont2+1
                     keep.addCodigo(keep.addOperacion("SP","SP","+",T0))
-                    keep.addCodigo(self.id+"();\n")
-                    keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
                     keep.PS = cont2
-                    resultado = funcion.traducir(tree,NuevaTabla,keep)
+                    funcion.traducir(tree,NuevaTabla,keep)
                     keep.PS = stack
-                    if isinstance(resultado,Return):
-                        if isinstance(resultado.valor,dict):
-                            if "apuntador" in resultado.valor:
-                                #simbolo = Simbolo("return",valor,self.id,self.fila,self.columna,resultado.valor["tipo"],T0)
-                                #table.addSimboloLocal(simbolo)
-                                #tree.agregarTS(self.id,simbolo)
-                                return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
-                            elif "temp" in resultado.valor:
-                                return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
-                        return resultado.valor
-                    elif isinstance(resultado, Errores):
-                        return resultado
-                    else:
-                        return resultado
+                    keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
+                    return funcion
                 else :
                     err = Errores(self.id, "Semántico", "No coinciden los parámetros de llamada", self.fila,self.columna)
                     tree.insertError(err)
             else:
                 keep.addCodigo(keep.addOperacion("SP","SP","+",T0))
-                keep.addCodigo(self.id+"();\n")
-                keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
                 keep.PS = cont2
-                resultado = funcion.traducir(tree,NuevaTabla,keep)
+                funcion.traducir(tree,NuevaTabla,keep)
                 keep.PS = stack
-                if isinstance(resultado,Return):
-                        if isinstance(resultado.valor,dict):
-                            if "apuntador" in resultado.valor:
-                                #simbolo = Simbolo("return",valor,self.id,self.fila,self.columna,resultado.valor["tipo"],T0)
-                                #table.addSimboloLocal(simbolo)
-                                #tree.agregarTS(self.id,simbolo)
-                                return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
-                            elif "temp" in resultado.valor:
-                                return {"apuntador":T0, "tipo":resultado.valor["tipo"],"valor":None}
-                            return resultado.valor
-                        elif isinstance(resultado, Errores):
-                            return resultado
-                        else:
-                            return resultado
+                keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
+                return funcion
         elif struct != None:
             #HAY UNA ASIGNACION DE TIPO STRUCT
             elementos = struct.ejecutar(tree,table)

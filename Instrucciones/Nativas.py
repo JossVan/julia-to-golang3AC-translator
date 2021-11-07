@@ -115,9 +115,9 @@ class Nativas_conTipo(NodoAST):
                                 keep.listaFuncion["Parse"] = keep.codigoFuncion  
                                 keep.codigoFuncion = ""  
                             keep.addCodigo(codigo)            
-                            keep.liberarTemporales(temp)
-                            keep.liberarTemporales(temp2)
-                            keep.liberarTemporales(temp3)
+                            #keep.liberarTemporales(temp)
+                            #keep.liberarTemporales(temp2)
+                            #keep.liberarTemporales(temp3)
                                             
                             return {"apuntador":apuntador,"tipo":"Int64","valor": int(valor)}
                         elif isinstance(valor,dict):
@@ -143,9 +143,9 @@ class Nativas_conTipo(NodoAST):
                                         keep.listaFuncion["Parse"] = keep.codigoFuncion
                                         keep.codigoFuncion = ""    
                                     keep.addCodigo(codigo)            
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
-                                    keep.liberarTemporales(temp3)  
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp3)  
                                     return {"apuntador":apuntador,"tipo":"Int64","valor":int(val)}
                                 else:
                                     print("ERROR")
@@ -178,9 +178,9 @@ class Nativas_conTipo(NodoAST):
                                 keep.listaFuncion["ParseFloat"] = keep.codigoFuncion   
                                 keep.codigoFuncion = ""
                             keep.addCodigo(codigo)             
-                            keep.liberarTemporales(temp)
-                            keep.liberarTemporales(temp2)
-                            keep.liberarTemporales(temp3)
+                            #keep.liberarTemporales(temp)
+                            #keep.liberarTemporales(temp2)
+                            #keep.liberarTemporales(temp3)
                             try:
                                 return {"apuntador":apuntador,"tipo":"Float64","valor":float(valor)}
                             except:
@@ -208,9 +208,9 @@ class Nativas_conTipo(NodoAST):
                                         keep.listaFuncion["ParseFloat"] = keep.codigoFuncion   
                                         keep.codigoFuncion = ""
                                     keep.addCodigo(codigo)             
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
-                                    keep.liberarTemporales(temp3)
+                                    #keep.liberarTemporales(temp)
+                                    #eep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp3)
                                     try:
                                         return {"apuntador":apuntador,"tipo":"Float64","valor":float(valor)}
                                     except:

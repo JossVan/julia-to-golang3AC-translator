@@ -64,12 +64,12 @@ class Arreglos(NodoAST):
                             cod += keep.addOperacion(T4,keep.getValStack(T3))
                             cod += keep.addIgual(keep.getValHeap("HP"),T4)
                             cod += keep.addOperacion("HP","HP","+","1")
-                            keep.liberarTemporales(T3)
-                            keep.liberarTemporales(T4)
+                            #keep.liberarTemporales(T3)
+                            #keep.liberarTemporales(T4)
             cod += keep.addIgual(keep.getValStack(T1),T2)
             keep.addCodigo(cod)
-            keep.liberarTemporales(T1)
-            keep.liberarTemporales(T2)
+            #keep.liberarTemporales(T1)
+            #keep.liberarTemporales(T2)
             return arreglo
         elif cont == 1:
             dim = 2
@@ -118,16 +118,16 @@ class Arreglos(NodoAST):
                                     codigo += keep.addIgual(T3,keep.getValStack(T2))
                                     codigo += keep.addIgual(keep.getValHeap("HP"),T3)
                                     codigo += keep.addOperacion("HP","HP","+","1")
-                                    keep.liberarTemporales(T2)
-                                    keep.liberarTemporales(T3)
+                                    #keep.liberarTemporales(T2)
+                                    #keep.liberarTemporales(T3)
                                 elif "temp" in resultado:
                                     codigo += keep.addIgual(keep.getValHeap("HP"),resultado["temp"])
                                     codigo += keep.addOperacion("HP","HP","+","1")
             temp = keep.getNuevoTemporal()
             codigo += keep.addOperacion(temp,"SP","+",keep.getStack())
             codigo += keep.addIgual(keep.getValStack(temp),T1)
-            keep.liberarTemporales(temp)
-            keep.liberarTemporales(T1)
+            #keep.liberarTemporales(temp)
+            #keep.liberarTemporales(T1)
             keep.addCodigo(codigo)  
         elif cont == 2:
             dim = 3
@@ -186,16 +186,16 @@ class Arreglos(NodoAST):
                                         codigo += keep.addIgual(T3,keep.getValStack(T2))
                                         codigo += keep.addIgual(keep.getValHeap("HP"),T3)
                                         codigo += keep.addOperacion("HP","HP","+","1")
-                                        keep.liberarTemporales(T2)
-                                        keep.liberarTemporales(T3)
+                                        #keep.liberarTemporales(T2)
+                                        #keep.liberarTemporales(T3)
                                     elif "temp" in resultado:
                                         codigo += keep.addIgual(keep.getValHeap("HP"),resultado["temp"])
                                         codigo += keep.addOperacion("HP","HP","+","1")
             temp = keep.getNuevoTemporal()
             codigo += keep.addOperacion(temp,"SP","+",keep.getStack())
             codigo += keep.addIgual(keep.getValStack(temp),T1)
-            keep.liberarTemporales(temp)
-            keep.liberarTemporales(T1)
+            #keep.liberarTemporales(temp)
+            #keep.liberarTemporales(T1)
             keep.addCodigo(codigo)
             print("DIMENSIÓN 3")
         
