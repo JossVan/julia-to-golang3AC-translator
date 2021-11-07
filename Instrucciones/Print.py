@@ -256,8 +256,7 @@ class Print(NodoAST):
                                 cod += keep.addIgual(temp, keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"d")
-                                keep.addCodigo(result)
-                                
+                                keep.addCodigo(result)                                
                             elif tipo == "Float64":
                                 temp = keep.getNuevoTemporal()
                                 temp3 = keep.getNuevoTemporal()
