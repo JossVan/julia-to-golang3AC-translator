@@ -1,5 +1,6 @@
 from Expresiones.Arreglos import Arreglos
 from Abstractas.NodoArbol import NodoArbol
+from Instrucciones.Funciones import Funciones
 from Instrucciones.Return import Return
 from TablaSimbolos.Simbolo import Simbolo
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
@@ -76,6 +77,7 @@ class Llamadas(NodoAST):
             cont2 = 0
             T0 = keep.getNuevoTemporal()
             keep.addCodigo(keep.addIgual(T0,keep.getStack()))
+            keep.apuntador_return = T0
             #keep.stackreturn = T0
             stack = keep.getStack()
             if self.parametros != None:
@@ -110,7 +112,17 @@ class Llamadas(NodoAST):
                             tree.agregarTS(self.id,simbolo)
                             keep.incrementarStack()
                             keep.addCodigo(cod)
-                        elif isinstance(valor,dict):
+                        elif isinstance(valor,dict) or isinstance(valor,Funciones):
+                            if isinstance(valor,Funciones):
+                                idfuncion = valor.nombre
+                                res = table.BuscarIdentificador("return-"+idfuncion)
+                                if res == None:
+                                    tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                                    return
+                                apuntador2 = res.getApuntador()
+                                tipo2 = res.getTipo()
+                                valor2 =res.getValor() 
+                                valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                             if "apuntador" in valor:
                                 puntero = valor["apuntador"]
                                 if valor["tipo"] == "String":
@@ -195,6 +207,7 @@ class Llamadas(NodoAST):
             else:
                 keep.addCodigo(keep.addOperacion("SP","SP","+",T0))
                 keep.PS = cont2
+                keep.apuntador_return = T0
                 funcion.traducir(tree,NuevaTabla,keep)
                 keep.PS = stack
                 keep.addCodigo(keep.addOperacion("SP","SP","-",T0))

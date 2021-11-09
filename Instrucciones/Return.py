@@ -1,7 +1,8 @@
-from sys import flags
 from Abstractas.NodoArbol import NodoArbol
 from Abstractas.NodoAST import NodoAST
+from Instrucciones.Funciones import Funciones
 from TablaSimbolos.Simbolo import Simbolo
+from TablaSimbolos.Errores import Errores
 
 class Return(NodoAST):
 
@@ -19,7 +20,17 @@ class Return(NodoAST):
     def traducir(self, tree, table, keep):
         if isinstance(self.valor, NodoAST):
             valor = self.valor.traducir(tree,table,keep)
-            if isinstance(valor,dict):
+            if isinstance(valor,dict) or isinstance(valor,Funciones):
+                if isinstance(valor,Funciones):
+                    idfuncion = valor.nombre
+                    res = table.BuscarIdentificador("return-"+idfuncion)
+                    if res == None:
+                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                        return
+                    apuntador2 = res.getApuntador()
+                    tipo2 = res.getTipo()
+                    valor2 =res.getValor()  
+                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                 if "apuntador" in valor:
                     self.AsignandoReturn(keep,valor["apuntador"])
                     #ss = Simbolo("return-"+keep.nombrefuncion,"return",,1,2,"",0)
@@ -40,6 +51,7 @@ class Return(NodoAST):
                     tipo = "Float64"
                 elif isinstance(valor,str):
                     tipo = "String"
+                
                 keep.stackreturn = self.AsignandoReturn2(keep,valor,tipo)
                 simbolo = Simbolo("return-"+keep.nombrefuncion,"return",table.nombre,self.fila,self.columna,keep.stackreturn["tipo"],0)
                 table.actualizarSimboloGlobal(simbolo)

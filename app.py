@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
-from gramatica.gramatica import parse, traduce
+from gramatica.gramatica import traduce
+from gramatica.optimizacion import parse
 app = Flask(__name__)
 import logging
 import sys
@@ -13,12 +14,20 @@ def index():
 @app.route('/principal',methods=["GET", "POST"])
 def principal():
     if request.method == "POST":
-        inpt = request.form['codigo']
-        global tmp_val
-        tmp_val=inpt  
-        global result
-        result =  traduce(tmp_val+"\n")
-        return render_template('principal.html', salida=result[0], entrada = inpt)
+        if request.form['nombre'] == 'traducir':
+            inpt = request.form['codigo']
+            global tmp_val
+            tmp_val=inpt  
+            global result
+            result =  traduce(tmp_val+"\n")
+            return render_template('principal.html', salida=result[0], entrada = inpt)
+        elif request.form['nombre'] == 'om':
+            inpt = request.form['salida']
+            global tmp_val2
+            tmp_val2=inpt  
+            global result2
+            result2 =  parse(tmp_val2+"\n")
+            return render_template('principal.html', entrada = inpt, salida = result2)
 
     else:
         return render_template('principal.html')
@@ -44,6 +53,7 @@ def tabla():
 
 @app.route('/Errores')
 def errores():
-    return render_template('errores.html', '''tabla = result[3]''')
+    return render_template('errores.html', tabla = result[3])
+
 if __name__ == '__main__':
     app.run(debug = True)

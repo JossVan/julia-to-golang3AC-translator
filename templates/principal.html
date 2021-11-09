@@ -12,17 +12,19 @@
                 <form method="POST" action="#">
                     <textarea class="codemirror-textarea form-control" name="codigo" id="entrada" cols="50" rows="100">{{entrada}}</textarea>
                     <div class="" style="text-align: center; padding-top: 2%;">
-                        <button type="submit" class="btn btn-secondary" style="width: 20rem;">Traducir</button>
+                        <button type="submit" class="btn btn-secondary" style="width: 20rem;" name = "nombre" value ="traducir">Traducir</button>
                     </div>
                 </form>
             </div>
             <div class="col-6">
                         <h4 class="text-muted">Salida</h4>
+                        <form method= "POST" action ="#">
                         <textarea class="codemirror-textarea form-control" name="salida" id="salida" cols="50" rows="100">{{salida}}</textarea>
                         <div class="" style="text-align: center; padding-top: 2%;">
-                            <button type="submit" class="btn btn-success" style="width: 20rem;">Optimizar por mirilla </button>
-                            <button type="submit" class="btn btn-primary" style="width: 20rem;">Optimizar por bloque </button>
+                            <button type="submit" class="btn btn-success" style="width: 20rem;" name = "nombre" value = "om">Optimizar por mirilla </button>
+                            <button type="submit" class="btn btn-primary" style="width: 20rem;" name = "nombre" value = "ob" >Optimizar por bloque </button>
                         </div>
+                    </form>
             </div>
         </div>
 

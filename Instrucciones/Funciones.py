@@ -1,6 +1,5 @@
 from Abstractas.NodoArbol import NodoArbol
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
-from Instrucciones.Return import Return
 from TablaSimbolos.Errores import Errores
 from Abstractas.NodoAST import NodoAST
 
@@ -20,8 +19,7 @@ class Funciones(NodoAST):
             resp = instruccion.ejecutar(tree,nuevaTabla)
             if isinstance(resp, Errores):
                 return resp
-            if isinstance(resp, Return):
-                return resp
+
     
     def traducir(self, tree, table, keep):
         keep.addCodigo(self.nombre+"();\n")

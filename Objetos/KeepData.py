@@ -18,6 +18,7 @@ class KeepData:
     nombrefuncion = ""
     nombrefunciones ={}
     codigo3d = None
+    apuntador_return = ""
 
     def __init__(self) -> None:
         
@@ -69,8 +70,8 @@ class KeepData:
     def init(self):
         self.header = "//**********IMPORTACIÓN DE LIBRERÍAS Y DECLARACIÓN DE VARIABLES**********\n"
         self.header += "package main;\nimport (\"fmt\";\"math\");\n"
-        self.header += "var HEAP[10000000]float64;\n"
-        self.header += "var STACK[10000000]float64;\n"
+        self.header += "var heap[10000000]float64;\n"
+        self.header += "var stack[10000000]float64;\n"
         self.header += "var SP,HP float64;\n"
        
     
@@ -107,10 +108,10 @@ class KeepData:
         return self.PS
 
     def getValStack(self, valor):
-        return "STACK[int("+str(valor)+")]"
+        return "stack[int("+str(valor)+")]"
 
     def getValHeap(self,valor):
-        return "HEAP[int("+str(valor)+")]"
+        return "heap[int("+str(valor)+")]"
     
     def endFuncion(self):
         return "}"

@@ -193,7 +193,7 @@ class Aritmetica(NodoAST):
                     valor =res.getValor()
                     T1 = keep.getNuevoTemporal()
                     T2 = keep.getNuevoTemporal()
-                    codigo = keep.addOperacion(T1,"SP","+", apuntador)
+                    codigo = keep.addOperacion(T1,"SP","+", keep.apuntador_return)
                     codigo += keep.addIgual(T2,keep.getValStack(T1))
                     keep.addCodigo(codigo)
                     op1 = T2
@@ -247,7 +247,7 @@ class Aritmetica(NodoAST):
                     valor2 =res.getValor()
                     T1 = keep.getNuevoTemporal()
                     T2 = keep.getNuevoTemporal()
-                    codigo = keep.addOperacion(T1,"SP","+", apuntador)
+                    codigo = keep.addOperacion(T1,"SP","+", keep.apuntador_return)
                     codigo += keep.addIgual(T2,keep.getValStack(T1))
                     keep.addCodigo(codigo)
                     op2 = T2
