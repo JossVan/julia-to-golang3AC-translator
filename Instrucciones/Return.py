@@ -1,7 +1,8 @@
-from sys import flags
 from Abstractas.NodoArbol import NodoArbol
 from Abstractas.NodoAST import NodoAST
+from Instrucciones.Funciones import Funciones
 from TablaSimbolos.Simbolo import Simbolo
+from TablaSimbolos.Errores import Errores
 
 class Return(NodoAST):
 
@@ -19,13 +20,30 @@ class Return(NodoAST):
     def traducir(self, tree, table, keep):
         if isinstance(self.valor, NodoAST):
             valor = self.valor.traducir(tree,table,keep)
-            if isinstance(valor,dict):
+            if isinstance(valor,dict) or isinstance(valor,Funciones):
+                if isinstance(valor,Funciones):
+                    idfuncion = valor.nombre
+                    res = table.BuscarIdentificador("return-"+idfuncion)
+                    if res == None:
+                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
+                        return
+                    apuntador2 = res.getApuntador()
+                    tipo2 = res.getTipo()
+                    valor2 =res.getValor()  
+                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
                 if "apuntador" in valor:
                     self.AsignandoReturn(keep,valor["apuntador"])
-                    return Return(valor,self.fila,self.columna)
+                    #ss = Simbolo("return-"+keep.nombrefuncion,"return",,1,2,"",0)
+                    simbolo = Simbolo("return-"+keep.nombrefuncion,"return",table.nombre,self.fila,self.columna,valor["tipo"],0)
+                    table.actualizarSimboloGlobal(simbolo)
+                    tree.agregarTS("return-"+keep.nombrefuncion,simbolo)
+                    keep.HayReturn =True
                 elif "temp" in valor:
-                    self.AsignandoReturn2(keep,valor["temp"],valor["tipo"])
-                    return Return(valor,self.fila,self.columna)
+                    keep.stackreturn = self.AsignandoReturn2(keep,valor["temp"],valor["tipo"])
+                    simbolo = Simbolo("return-"+keep.nombrefuncion,"return",table.nombre,self.fila,self.columna,keep.stackreturn["tipo"],0)
+                    table.actualizarSimboloGlobal(simbolo)
+                    tree.agregarTS("return-"+keep.nombrefuncion,simbolo)
+                    keep.HayReturn =True
             else:
                 if isinstance(valor,int):
                     tipo = "Int64"
@@ -33,9 +51,13 @@ class Return(NodoAST):
                     tipo = "Float64"
                 elif isinstance(valor,str):
                     tipo = "String"
-                res = self.AsignandoReturn2(keep,valor,tipo)
+                
+                keep.stackreturn = self.AsignandoReturn2(keep,valor,tipo)
+                simbolo = Simbolo("return-"+keep.nombrefuncion,"return",table.nombre,self.fila,self.columna,keep.stackreturn["tipo"],0)
+                table.actualizarSimboloGlobal(simbolo)
+                tree.agregarTS("return-"+keep.nombrefuncion,simbolo)
                 keep.incrementarStack()
-                return Return(res,self.fila,self.columna)
+                keep.HayReturn =True
         else:
             return self
     def getNodo(self):
@@ -57,9 +79,10 @@ class Return(NodoAST):
         codigo += keep.addIgual(keep.getValStack(T3),T2)
         keep.addCodigo(codigo)
         keep.addCodigo("return;\n")
-        keep.liberarTemporales(T1)
-        keep.liberarTemporales(T2)
-        keep.liberarTemporales(T3)
+        #keep.liberarTemporales(T1)
+        #keep.liberarTemporales(T2)
+        #keep.liberarTemporales(T3)
+        
 
     def AsignandoReturn2(self,keep,valor,tipo):
         
@@ -69,6 +92,6 @@ class Return(NodoAST):
         codigo += keep.addIgual(keep.getValStack(T1),valor)
         keep.addCodigo(codigo)
         keep.addCodigo("return;\n")
-        keep.liberarTemporales(T1)
+        #keep.liberarTemporales(T1)
         return {"apuntador": 0, "tipo":tipo,"valor":valor}
     

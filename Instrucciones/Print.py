@@ -1,4 +1,5 @@
 from Expresiones.Constante import Constante
+from Instrucciones.Funciones import Funciones
 from Objetos.Primitivos import Primitivo
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
 from TablaSimbolos.Errores import Errores
@@ -80,6 +81,7 @@ class Print(NodoAST):
             if self.contenido != "":
                 for instrucciones in self.contenido:
                     resultado = instrucciones.traducir(tree,table,keep)
+
                     if isinstance(resultado,bool):
                         if len(keep.etiquetas) == 0:
                             keep.booleanos(resultado)
@@ -112,7 +114,16 @@ class Print(NodoAST):
                         result += keep.llamada("Native_PrintString")
                         result += keep.addOperacion("SP","SP","-",keep.getStack())
                         keep.addCodigo(result)
-                    elif isinstance(resultado, dict):
+                    elif isinstance(resultado, dict) or isinstance(resultado,Funciones):
+                        if isinstance(resultado,Funciones):
+                            id = resultado.nombre
+                            res = table.BuscarIdentificador("return-"+id)
+                            if res == None:
+                                tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
+                                return
+                            apuntador = res.getApuntador()
+                            tipo = res.getTipo()
+                            resultado = {"apuntador":apuntador, "tipo":tipo, "valor":res.getValor()}
                         if "apuntador" in resultado:
                             #guardo el valor actual del stack
                             actual = keep.getStack()
@@ -162,7 +173,7 @@ class Print(NodoAST):
                                 keep.comparar(temp)
                                 return
                             #keep.addCodigo(keep.addIgual("SP",actual))
-                            keep.liberarTemporales(temp)
+                            #keep.liberarTemporales(temp)
                             #keep.PS = actual
                         elif "temp" in resultado:
                             result=keep.imprimir(resultado['temp'],"f")
@@ -219,7 +230,16 @@ class Print(NodoAST):
                         result += keep.addOperacion("SP","SP","-",keep.getStack())
                         keep.addCodigo(result)
                        
-                    elif isinstance(resultado, dict):
+                    elif isinstance(resultado, dict)or isinstance(resultado,Funciones):
+                        if isinstance(resultado,Funciones):
+                            id = resultado.nombre
+                            res = table.BuscarIdentificador("return-"+id)
+                            if res == None:
+                                tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
+                                return
+                            apuntador = res.getApuntador()
+                            tipo = res.getTipo()
+                            resultado = {"apuntador":apuntador, "tipo":tipo, "valor":res.getValor()}
                         if "apuntador" in resultado:
                             #guardo el valor actual del stack
                             actual = keep.getStack()
@@ -256,8 +276,7 @@ class Print(NodoAST):
                                 cod += keep.addIgual(temp, keep.getValStack(temp3))
                                 keep.addCodigo(cod)
                                 result=keep.imprimir(temp,"d")
-                                keep.addCodigo(result)
-                                
+                                keep.addCodigo(result)                                
                             elif tipo == "Float64":
                                 temp = keep.getNuevoTemporal()
                                 temp3 = keep.getNuevoTemporal()

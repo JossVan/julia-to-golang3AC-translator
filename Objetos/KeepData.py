@@ -12,8 +12,13 @@ class KeepData:
     etiquetas = []
     etiquetaContinue = ""
     etiquetaBreak = ""
-
+    HayReturn = False
+    stackreturn = {}
+    listFunction = {}
+    nombrefuncion = ""
+    nombrefunciones ={}
     codigo3d = None
+    apuntador_return = ""
 
     def __init__(self) -> None:
         
@@ -42,7 +47,7 @@ class KeepData:
         return self.codigo3d
     
     def addOperacion(self,var,op1,op,op2):
-        return  var+" = "+str(op1)+op+str(op2)+";\n"
+        return  var+ " = "+str(op1)+op+str(op2)+";\n"
     
     def addCodigo(self,codigo):
         self.codigo += codigo
@@ -65,8 +70,8 @@ class KeepData:
     def init(self):
         self.header = "//**********IMPORTACIÓN DE LIBRERÍAS Y DECLARACIÓN DE VARIABLES**********\n"
         self.header += "package main;\nimport (\"fmt\";\"math\");\n"
-        self.header += "var HEAP[10000000]float64;\n"
-        self.header += "var STACK[10000000]float64;\n"
+        self.header += "var heap[10000000]float64;\n"
+        self.header += "var stack[10000000]float64;\n"
         self.header += "var SP,HP float64;\n"
        
     
@@ -103,10 +108,10 @@ class KeepData:
         return self.PS
 
     def getValStack(self, valor):
-        return "STACK[int("+str(valor)+")]"
+        return "stack[int("+str(valor)+")]"
 
     def getValHeap(self,valor):
-        return "HEAP[int("+str(valor)+")]"
+        return "heap[int("+str(valor)+")]"
     
     def endFuncion(self):
         return "}"
@@ -373,19 +378,60 @@ class KeepData:
         codigo += "\n}\n"
     
     def errorDimension(self):
-
-        codigo = "fmt.Printf(\"%c\", 66) //B\n"
-        codigo += "fmt.Printf(\"%c\", 111) //o\n"
-        codigo += "fmt.Printf(\"%c\", 117) //u\n"
-        codigo += "fmt.Printf(\"%c\", 110) //n\n"
-        codigo += "fmt.Printf(\"%c\", 100) //d\n"
-        codigo += "fmt.Printf(\"%c\", 115) //s\n"
-        codigo += "fmt.Printf(\"%c\", 69) //E\n"
-        codigo += "fmt.Printf(\"%c\", 114) //r\n"
-        codigo += "fmt.Printf(\"%c\", 114) //r\n"
-        codigo += "fmt.Printf(\"%c\", 111) //o\n"
-        codigo += "fmt.Printf(\"%c\", 114) //r\n"
-        codigo += "fmt.Printf(\"%c\", 10) //r\n"
+        codigo = "\nfunc boundserror(){\n"
+        codigo += "fmt.Printf(\"%c\", 66); //B\n"
+        codigo += "fmt.Printf(\"%c\", 111); //o\n"
+        codigo += "fmt.Printf(\"%c\", 117); //u\n"
+        codigo += "fmt.Printf(\"%c\", 110); //n\n"
+        codigo += "fmt.Printf(\"%c\", 100); //d\n"
+        codigo += "fmt.Printf(\"%c\", 115); //s\n"
+        codigo += "fmt.Printf(\"%c\", 69); //E\n"
+        codigo += "fmt.Printf(\"%c\", 114); //r\n"
+        codigo += "fmt.Printf(\"%c\", 114); //r\n"
+        codigo += "fmt.Printf(\"%c\", 111); //o\n"
+        codigo += "fmt.Printf(\"%c\", 114); //r\n"
+        codigo += "fmt.Printf(\"%c\", 10); //r\n"
         codigo += "// No continúa con la instrucción\n"
-   
+        codigo += "}\n"
         self.addCodigo(codigo)
+    
+    def Length(self):
+        T1 = self.getNuevoTemporal()
+        T2 = self.getNuevoTemporal()
+        T3 = self.getNuevoTemporal()
+        T4 = self.getNuevoTemporal()
+        T5 = self.getNuevoTemporal()
+        L1 = self.getNuevaEtiqueta()
+        L2 = self.getNuevaEtiqueta()
+        L3 = self.getNuevaEtiqueta()
+        L4 = self.getNuevaEtiqueta()
+        codigo = "// ********** FUNCIÓN LENGTH **********\n"
+        codigo += "func length(){\n"
+        codigo += self.addOperacion(T1,"SP","+","0")
+        # OBTENGO EL INICIO DEL ARREGLO
+        codigo += self.addIgual(T2,self.getValStack(T1))
+        codigo += self.addIgual(T5,self.getValHeap(T2))
+        codigo += "if "+T5+" == 1{goto "+L1+";}\n"
+        codigo += "goto "+L2+";\n"
+        codigo += L1+":\n"
+        codigo += self.addOperacion(T3,T2,"+","2")
+        codigo += self.addIgual(T4,self.getValHeap(T3))    
+        codigo += self.addOperacion(T4,T4,"+","1") 
+        codigo += self.addIgual(self.getValStack(T1),T4)
+        codigo += "return;\n"
+        codigo += L2+":\n"
+        codigo += "if "+T5+" == 2{goto "+L3+";}\n"
+        codigo += "goto "+L4+";\n"
+        codigo += L3+":\n"
+        codigo += self.addOperacion(T3,T2,"+","5")
+        codigo += self.addIgual(T4,self.getValHeap(T3))    
+        codigo += self.addIgual(self.getValStack(T1),T4)
+        codigo += "return;\n"
+        codigo += L4+":\n}"
+        self.addCodigo(codigo)
+        self.liberarTemporales(T1)
+        self.liberarTemporales(T2)
+        self.liberarTemporales(T3)
+        self.liberarTemporales(T4)
+
+

@@ -889,6 +889,9 @@ def traduce(input):
     codigo += keep.endFuncion()
     for valor in keep.listaFuncion:
         codigo += keep.listaFuncion[valor]
+    
+
+
     retorno.append(codigo)
     tab = AST.htmlTablaSimbolos()
     retorno.append(tab)

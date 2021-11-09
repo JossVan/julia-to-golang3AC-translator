@@ -335,11 +335,11 @@ class For(NodoAST):
                     codigo += "goto "+ei+";\n"
                     codigo += ef+":\n"
                     keep.addCodigo(codigo)
-                    keep.liberarTemporales(temp)
-                    keep.liberarTemporales(temp2)
-                    keep.liberarTemporales(temp3)
-                    keep.liberarTemporales(temp4)
-                    keep.liberarTemporales(temp5)
+                    #keep.liberarTemporales(temp)
+                    #keep.liberarTemporales(temp2)
+                    #keep.liberarTemporales(temp3)
+                    #keep.liberarTemporales(temp4)
+                    #keep.liberarTemporales(temp5)
             else:
                 if isinstance(rango, str):
                     nuevaTabla.actualizarTipo(id.lower(),"String")
@@ -393,11 +393,11 @@ class For(NodoAST):
                     codigo += "goto "+ei+";\n"
                     codigo += ef+":\n"
                     keep.addCodigo(codigo)    
-                    keep.liberarTemporales(temp)
-                    keep.liberarTemporales(temp2)
-                    keep.liberarTemporales(temp3)
-                    keep.liberarTemporales(temp4)
-                    keep.liberarTemporales(temp5)  
+                    #keep.liberarTemporales(temp)
+                    #keep.liberarTemporales(temp2)
+                    #keep.liberarTemporales(temp3)
+                    #keep.liberarTemporales(temp4)
+                    #keep.liberarTemporales(temp5)  
                 '''except:
                     err = Errores("For","Semántico","Valor no permitido, debe ser una cadena", self.fila,self.columna)
                     tree.insertError(err)

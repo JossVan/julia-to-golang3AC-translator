@@ -1,6 +1,5 @@
 from Abstractas.NodoArbol import NodoArbol
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
-from Instrucciones.Return import Return
 from TablaSimbolos.Errores import Errores
 from Abstractas.NodoAST import NodoAST
 
@@ -20,29 +19,47 @@ class Funciones(NodoAST):
             resp = instruccion.ejecutar(tree,nuevaTabla)
             if isinstance(resp, Errores):
                 return resp
-            if isinstance(resp, Return):
-                return resp
+
     
     def traducir(self, tree, table, keep):
+        keep.addCodigo(self.nombre+"();\n")
+
         #CAMBIO DE ENTORNO, SE LIMPIA LA VARIABLE QUE CONCATENA EL CÓDIGO
-        cod = keep.codigo
-        keep.codigo = ""
-        keep.addCodigo("\nfunc "+self.nombre+"(){\n")
-        nuevaTabla = TablaSimbolos("Funcion",table) 
-        for instruccion in self.instrucciones:
-            resp = instruccion.traducir(tree,nuevaTabla,keep)
-            if isinstance(resp, Errores):
-                return resp
-            if isinstance(resp, Return):
-                keep.addCodigo("}\n")
-                if not self.nombre in keep.listaFuncion:
-                    keep.listaFuncion[self.nombre]= keep.codigo
-                keep.codigo = cod
-                return resp
-        keep.addCodigo("}\n")
-        if not self.nombre in keep.listaFuncion:
+        if not self.nombre in keep.nombrefunciones:
+            keep.nombrefunciones[self.nombre] = ""
+            cod = keep.codigo
+            keep.codigo = ""
+            keep.addCodigo("\nfunc "+self.nombre+"(){\n")
+            nuevaTabla = TablaSimbolos("Funcion",table) 
+            keep.nombrefuncion = self.nombre
+            for instruccion in self.instrucciones:
+                instruccion.traducir(tree,nuevaTabla,keep)
+            keep.addCodigo("}\n")
             keep.listaFuncion[self.nombre]= keep.codigo
-        keep.codigo = cod
+            keep.codigo = cod
+            return
+    def getNodo(self):
+        
+        NodoNuevo = NodoArbol("Función")
+        NodoNuevo.agregarHijo(self.nombre)
+        Nodopar = NodoArbol("Parámetros")
+        Nodoinst = NodoArbol("Instrucciones")
+        if self.parametros != None:
+            for parametro in self.parametros:
+                Nodopar.agregarHijoNodo(parametro.getNodo())
+        for instruccion in self.instrucciones:
+            Nodoinst.agregarHijoNodo(instruccion.getNodo())
+        
+        if self.parametros != None:
+            NodoNuevo.agregarHijoNodo(Nodopar)
+        if self.instrucciones != None :
+            NodoNuevo.agregarHijoNodo(Nodoinst)
+        
+        NodoNuevo.agregarHijo("end")
+        NodoNuevo.agregarHijo(";")
+        return NodoNuevo
+    
+
     def getNodo(self):
         
         NodoNuevo = NodoArbol("Función")

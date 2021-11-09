@@ -469,10 +469,10 @@ class Relacional(NodoAST):
 
         evv = keep.getNuevaEtiqueta()
         eff = keep.getNuevaEtiqueta()
-        keep.liberarTemporales(temp)
-        keep.liberarTemporales(temp2)
-        keep.liberarTemporales(temp3)
-        keep.liberarTemporales(temp4)
+        #keep.liberarTemporales(temp)
+        #keep.liberarTemporales(temp2)
+        #keep.liberarTemporales(temp3)
+        #keep.liberarTemporales(temp4)
         if operador == Tipo_Relacional.MAYOR:
             codigo += "if "+contador+">"+contador2+" {goto "+evv+";}\ngoto "+eff+";\n"
         elif operador == Tipo_Relacional.MAYOR_IGUAL:

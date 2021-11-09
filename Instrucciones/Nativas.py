@@ -115,9 +115,9 @@ class Nativas_conTipo(NodoAST):
                                 keep.listaFuncion["Parse"] = keep.codigoFuncion  
                                 keep.codigoFuncion = ""  
                             keep.addCodigo(codigo)            
-                            keep.liberarTemporales(temp)
-                            keep.liberarTemporales(temp2)
-                            keep.liberarTemporales(temp3)
+                            #keep.liberarTemporales(temp)
+                            #keep.liberarTemporales(temp2)
+                            #keep.liberarTemporales(temp3)
                                             
                             return {"apuntador":apuntador,"tipo":"Int64","valor": int(valor)}
                         elif isinstance(valor,dict):
@@ -143,9 +143,9 @@ class Nativas_conTipo(NodoAST):
                                         keep.listaFuncion["Parse"] = keep.codigoFuncion
                                         keep.codigoFuncion = ""    
                                     keep.addCodigo(codigo)            
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
-                                    keep.liberarTemporales(temp3)  
+                                    #keep.liberarTemporales(temp)
+                                    #keep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp3)  
                                     return {"apuntador":apuntador,"tipo":"Int64","valor":int(val)}
                                 else:
                                     print("ERROR")
@@ -178,9 +178,9 @@ class Nativas_conTipo(NodoAST):
                                 keep.listaFuncion["ParseFloat"] = keep.codigoFuncion   
                                 keep.codigoFuncion = ""
                             keep.addCodigo(codigo)             
-                            keep.liberarTemporales(temp)
-                            keep.liberarTemporales(temp2)
-                            keep.liberarTemporales(temp3)
+                            #keep.liberarTemporales(temp)
+                            #keep.liberarTemporales(temp2)
+                            #keep.liberarTemporales(temp3)
                             try:
                                 return {"apuntador":apuntador,"tipo":"Float64","valor":float(valor)}
                             except:
@@ -208,9 +208,9 @@ class Nativas_conTipo(NodoAST):
                                         keep.listaFuncion["ParseFloat"] = keep.codigoFuncion   
                                         keep.codigoFuncion = ""
                                     keep.addCodigo(codigo)             
-                                    keep.liberarTemporales(temp)
-                                    keep.liberarTemporales(temp2)
-                                    keep.liberarTemporales(temp3)
+                                    #keep.liberarTemporales(temp)
+                                    #eep.liberarTemporales(temp2)
+                                    #keep.liberarTemporales(temp3)
                                     try:
                                         return {"apuntador":apuntador,"tipo":"Float64","valor":float(valor)}
                                     except:
@@ -353,6 +353,66 @@ class Pilas(NodoAST):
                     table.actualizarValor(self.id.id,result)
 
                 return retorno
+
+    def traducir(self, tree, table, keep):
+        if self.funcion == Tipo_Primitivas.LENGTH:
+            if isinstance(self.valor, NodoAST):
+                val = self.valor.traducir(tree,table,keep)
+                if isinstance(val,dict):   
+                    if "tipo" in val:
+                        if val["tipo"] == "Array":
+                            T1= keep.getNuevoTemporal()
+                            T2= keep.getNuevoTemporal()
+                            stack = keep.getStack()
+                            codigo = keep.addOperacion(T1,"SP","+",val["apuntador"])
+                            codigo += keep.addIgual(T2, keep.getValStack(T1))
+                            codigo += keep.addOperacion(T1,"SP","+",stack)
+                            codigo += keep.addIgual(keep.getValStack(T1),T2)
+                            codigo += keep.addOperacion("SP","SP","+",stack)
+                            codigo += "length();\n"
+
+                            if not "length" in keep.listaFuncion:
+                                cod = keep.codigo
+                                keep.codigo = ""
+                                keep.Length()
+                                keep.listaFuncion["length"] = keep.codigo
+                                keep.codigo = cod
+                            codigo += keep.addOperacion("SP","SP","-",stack)
+                            codigo += keep.addOperacion(T1,"SP","+",stack)
+                            codigo += keep.addIgual(T2,keep.getValStack(T1))
+                            keep.addCodigo(codigo)
+                            keep.PS = stack
+                            keep.incrementarStack()
+                            return {"temp":T2, "tipo": "Int64", "valor":T2}
+        elif self.funcion == Tipo_Primitivas.PUSH:
+            if not isinstance(self.id, Array):
+                val = self.id.ejecutar(tree,table)
+            else:
+                val = self.id.insertar(self.valor,tree,table)
+                return val
+            if isinstance(val,list):
+                if len(self.valor) == 1:
+                    if isinstance(self.valor[0],Arreglos):
+                        t = self.valor[0].ejecutar(tree,table)
+                        val.append(t)
+                        return val
+
+                val.append(self.valor)
+
+            return val
+        elif self.funcion == Tipo_Primitivas.POP:
+            result = self.id.ejecutar(tree,table)
+            retorno = []
+            if result != None:
+                if isinstance(result,list):
+
+                    tam = int(len(result)-1)
+                    retorno = result[tam]
+                    result.pop(tam)
+                    table.actualizarValor(self.id.id,result)
+
+                return retorno
+    
                 
     def getNodo(self):
         NodoNuevo = NodoArbol("Funciones_Arreglos")
