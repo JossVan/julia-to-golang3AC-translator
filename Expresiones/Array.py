@@ -908,7 +908,7 @@ class Array(NodoAST):
                 codigo += keep.addOperacion(T3,T2,"+","1") # SE OBTIENE LA POSICIÓN DONDE SE ALMANCENA EL VALOR INFERIOR DEL ARRAY
                 codigo += keep.addIgual(T4,keep.getValHeap(T3)) #SE OBTIENE EL VALOR INFERIOR DEL ARREGLO
                 codigo += keep.addOperacion(temp,T2,"+","2")
-                codigo += keep.addIgual(temp2,keep.getValStack(temp))
+                codigo += keep.addIgual(temp2,keep.getValHeap(temp))
                 codigo += keep.addOperacion(temp2,temp2,"+","1")
                 if isinstance(posi,int):      
                     L1 = keep.getNuevaEtiqueta()
@@ -997,7 +997,7 @@ class Array(NodoAST):
                     if "apuntador" in val:
                         T8 = keep.getNuevoTemporal()
                         T9 = keep.getNuevoTemporal()
-                        codigo += keep.addIOperacion(T8,"SP","+",val["apuntador"])
+                        codigo += keep.addOperacion(T8,"SP","+",val["apuntador"])
                         codigo += keep.addIgual(T9, keep.getValStack(T8))
                         codigo += keep.addIgual(keep.getValHeap(T7),T9) #se actualiza el valor
                         keep.addCodigo(codigo)

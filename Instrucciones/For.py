@@ -398,11 +398,12 @@ class For(NodoAST):
                     #keep.liberarTemporales(temp3)
                     #keep.liberarTemporales(temp4)
                     #keep.liberarTemporales(temp5)  
-                '''except:
-                    err = Errores("For","Semántico","Valor no permitido, debe ser una cadena", self.fila,self.columna)
-                    tree.insertError(err)
-                    return err   ''' 
-    
+                    '''except:
+                        err = Errores("For","Semántico","Valor no permitido, debe ser una cadena", self.fila,self.columna)
+                        tree.insertError(err)
+                        return err   ''' 
+                elif isinstance(rango,list):
+                    print("ES UN ARREGLO")
     def getNodo(self):
         
         NodoNuevo = NodoArbol("For")

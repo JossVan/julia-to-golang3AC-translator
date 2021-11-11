@@ -177,6 +177,18 @@ class Llamadas(NodoAST):
                                     variable = funcion.parametros[contador].id
                                     simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
                                     keep.incrementarStack()
+                                
+                                elif valor["tipo"] == "Array":
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    codigo = "// INGRESANDO AL STACK LA INFO DEL ARREGLO\n"
+                                    codigo += keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                                    codigo += keep.addIgual(keep.getValStack(cont2),T2)
+                                    variable = funcion.parametros[contador].id
+                                    simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
+                                    keep.incrementarStack()
+                                    keep.addCodigo(codigo)
                                 NuevaTabla.addSimboloLocal(simbolo)
                                 tree.agregarTS(self.id,simbolo)
                             elif "temp" in valor:
