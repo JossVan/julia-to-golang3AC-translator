@@ -14,6 +14,7 @@ class KeepData:
     etiquetaBreak = ""
     HayReturn = False
     stackreturn = {}
+    stacksustituto = None
     listFunction = {}
     nombrefuncion = ""
     nombrefunciones ={}
@@ -171,6 +172,27 @@ class KeepData:
         self.incrementarStack()
         self.addCodigo(codigo)
         self.liberarTemporales(temp)
+
+
+    def generarC3D_CadenasCopia(self,cadena,posicion):
+        temp = self.getNuevoTemporal()
+        codigo = "//***************ALMACENANDO CADENAS***************\n"
+        
+        codigo += self.addIgual(temp,"HP")
+        for caracter in cadena:
+            codigoascii = ord(caracter)
+            valor = self.addIgual(self.getValHeap("HP"),codigoascii)
+            valor += self.addOperacion("HP","HP","+","1")
+            codigo+=valor
+
+        codigo += self.addIgual(self.getValHeap("HP"),"-1")
+        codigo += self.addOperacion("HP","HP","+","1")
+        temporal = self.getNuevoTemporal()
+        codigo += self.addOperacion(temporal,"SP","+", posicion)
+        codigo += self.addIgual(self.getValStack(temporal),temp)
+        #codigo += self.addOperacion("SP","SP","+","1")
+        self.addCodigo(codigo)
+        #self.liberarTemporales(temp)
         
     def booleanos(self,valor):
         codigo = "//*****IMPRIMIENDO UN BOOLEANO*****\n"

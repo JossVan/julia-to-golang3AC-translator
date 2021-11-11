@@ -74,12 +74,11 @@ class Llamadas(NodoAST):
         elif funcion != None and struct == None:
             NuevaTabla = TablaSimbolos(self.id,table)
             contador = 0
-            cont2 = 0
-            T0 = keep.getNuevoTemporal()
-            keep.addCodigo(keep.addIgual(T0,keep.getStack()))
-            keep.apuntador_return = T0
-            #keep.stackreturn = T0
             stack = keep.getStack()
+            keep.incrementarStack()
+            cont2 = keep.getStack()            
+            #************************** LA PRIMERA POSICIÓN ESTA RESERVADA AL RETURN *******************
+            
             if self.parametros != None:
                 if len(funcion.parametros) == len(self.parametros):
                     for parametro in self.parametros:
@@ -88,15 +87,13 @@ class Llamadas(NodoAST):
                         # SI ES UN PRIMITIVO 
                         if isinstance(valor,str):
                             # VALOR DEL ULTIMO PUNTERO LIBRE 
-                            #punteroSiguiente = keep.getStack()
-                            #puntero = keep.getStack()-1
                             variable = funcion.parametros[contador].id
                             simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,"String",cont2)
+                            keep.incrementarStack()
                             NuevaTabla.addSimboloLocal(simbolo)
                             tree.agregarTS(self.id,simbolo)
                         elif isinstance(valor,int) or isinstance(valor,float):
-                            puntero = keep.getStack()
-                            #T1 = keep.getNuevoTemporal()
+                            puntero = cont2
                             T2 = keep.getNuevoTemporal()
                             cod = "//******INGRESO DE PARÁMETROS AL NUEVO ENTORNO*******\n"
                             # ALMACENO EL VALOR DEL STACK EN UNA VARIABLE TEMPORAL 
@@ -112,18 +109,19 @@ class Llamadas(NodoAST):
                             tree.agregarTS(self.id,simbolo)
                             keep.incrementarStack()
                             keep.addCodigo(cod)
-                        elif isinstance(valor,dict) or isinstance(valor,Funciones):
-                            if isinstance(valor,Funciones):
-                                idfuncion = valor.nombre
-                                res = table.BuscarIdentificador("return-"+idfuncion)
-                                if res == None:
-                                    tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
-                                    return
-                                apuntador2 = res.getApuntador()
-                                tipo2 = res.getTipo()
-                                valor2 =res.getValor() 
-                                valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
-                            if "apuntador" in valor:
+                        elif isinstance(valor,dict):
+                            if "llamada" in valor:
+                                T1 = keep.getNuevoTemporal()
+                                T2 = keep.getNuevoTemporal()
+                                codigo = keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                codigo += keep.addIgual(T2, keep.getValStack(T1))
+                                keep.HayReturn = True
+                                keep.addCodigo(codigo)
+                                simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
+                                keep.incrementarStack()
+                                NuevaTabla.addSimboloLocal(simbolo)
+                                tree.agregarTS(self.id,simbolo)
+                            elif "apuntador" in valor:
                                 puntero = valor["apuntador"]
                                 if valor["tipo"] == "String":
                                     # VALOR DEL ULTIMO PUNTERO LIBRE 
@@ -151,10 +149,9 @@ class Llamadas(NodoAST):
                                     cod += L2+":\n"
                                     cod += keep.addIgual(keep.getValHeap("HP"), "-1")
                                     cod += keep.addOperacion("HP","HP","+","1")
-                                    cod += keep.addOperacion(T5,"SP","+",keep.getStack())
+                                    cod += keep.addOperacion(T5,"SP","+",cont2)
                                     cod += keep.addIgual(keep.getValStack(T5),T3)
                                     keep.addCodigo(cod)
-                                    keep.incrementarStack()
                                     #keep.liberarTemporales(T1)
                                     #keep.liberarTemporales(T2)
                                     #keep.liberarTemporales(T3)
@@ -162,6 +159,7 @@ class Llamadas(NodoAST):
                                     #keep.liberarTemporales(T5)
                                     variable = funcion.parametros[contador].id
                                     simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,"String",cont2)
+                                    keep.incrementarStack()
                                 elif valor["tipo"] == "Int64" or valor["tipo"] == "Float64":
                                     T1 = keep.getNuevoTemporal()
                                     T2 = keep.getNuevoTemporal()
@@ -169,48 +167,73 @@ class Llamadas(NodoAST):
                                     cod = "//*****ENVIANDO PARÁMETROS AL ENTORNO*****\n"
                                     cod += keep.addOperacion(T1,"SP","+",puntero)
                                     cod += keep.addIgual(T2, keep.getValStack(T1))
-                                    cod += keep.addOperacion(T3,"SP","+",keep.getStack())
+                                    cod += keep.addOperacion(T3,"SP","+",cont2)
                                     cod += keep.addIgual(keep.getValStack(T3),T2)
                                     keep.addCodigo(cod)
                                     #keep.liberarTemporales(T1)
                                     #keep.liberarTemporales(T2)
                                     #keep.liberarTemporales(T3)
-                                    keep.incrementarStack()
+                                    
                                     variable = funcion.parametros[contador].id
                                     simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
+                                    keep.incrementarStack()
                                 NuevaTabla.addSimboloLocal(simbolo)
                                 tree.agregarTS(self.id,simbolo)
                             elif "temp" in valor:
                                 if valor["tipo"] == "Int64" or valor["tipo"] == "Float64":
                                     T3 = keep.getNuevoTemporal()
                                     cod = "//*****ENVIANDO PARÁMETROS AL ENTORNO*****\n"
-                                    cod += keep.addOperacion(T3,"SP","+",keep.getStack())
+                                    cod += keep.addOperacion(T3,"SP","+",cont2)
                                     cod += keep.addIgual(keep.getValStack(T3),valor["temp"])
                                     keep.addCodigo(cod)
                                     #keep.liberarTemporales(T3)
-                                    keep.incrementarStack()
+                                    
                                     variable = funcion.parametros[contador].id
                                 simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
+                                keep.incrementarStack()
                                 NuevaTabla.addSimboloLocal(simbolo)
                                 tree.agregarTS(self.id,simbolo)
+                            
                         contador = contador+1
                         cont2 = cont2+1
-                    keep.addCodigo(keep.addOperacion("SP","SP","+",T0))
-                    keep.PS = cont2
+                    keep.addCodigo(keep.addOperacion("SP","SP","+",stack))
+                    #keep.PS = cont2
                     funcion.traducir(tree,NuevaTabla,keep)
-                    keep.PS = stack
-                    keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
-                    return funcion
+                    #keep.PS = stack
+                    if keep.HayReturn:
+                        T1 = keep.getNuevoTemporal()
+                        T2 = keep.getNuevoTemporal()
+                        #codigo = keep.addOperacion(T1,"SP","+",0)
+                        codigo = keep.addIgual(T1,keep.getValStack("SP"))
+                        keep.addCodigo(codigo)
+                        keep.HayReturn = False
+                        keep.addCodigo(keep.addOperacion("SP","SP","-",stack))
+                        keep.addCodigo(keep.addOperacion(T2,"SP","+", stack))
+                        keep.addCodigo(keep.addIgual(keep.getValStack(T2), T1))
+                        return {"llamada": True, "apuntador": stack, "valor": keep.stackreturn["valor"], "tipo": keep.stackreturn["tipo"]}
+                    keep.addCodigo(keep.addOperacion("SP","SP","-",stack))
                 else :
                     err = Errores(self.id, "Semántico", "No coinciden los parámetros de llamada", self.fila,self.columna)
                     tree.insertError(err)
             else:
-                keep.addCodigo(keep.addOperacion("SP","SP","+",T0))
-                keep.PS = cont2
-                keep.apuntador_return = T0
+                keep.addCodigo(keep.addOperacion("SP","SP","+",stack))
+                #keep.PS = cont2
+                #keep.apuntador_return = stack
                 funcion.traducir(tree,NuevaTabla,keep)
-                keep.PS = stack
-                keep.addCodigo(keep.addOperacion("SP","SP","-",T0))
+                #keep.PS = stack
+                if keep.HayReturn:
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    #codigo = keep.addOperacion(T1,"SP","+",0)
+                    codigo = keep.addIgual(T1,keep.getValStack("SP"))
+                    keep.addCodigo(codigo)
+                    keep.HayReturn = False
+                    keep.addCodigo(keep.addOperacion("SP","SP","-",stack))
+                    keep.addCodigo(keep.addOperacion(T2,"SP","+", stack))
+                    keep.addCodigo(keep.addIgual(keep.getValStack(T2), T1))
+                    return {"llamada": True, "apuntador": stack, "valor": keep.stackreturn["valor"], "tipo": keep.stackreturn["tipo"]}
+                keep.addCodigo(keep.addOperacion("SP","SP","-",stack))
+
                 return funcion
         elif struct != None:
             #HAY UNA ASIGNACION DE TIPO STRUCT

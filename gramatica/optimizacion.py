@@ -1,5 +1,7 @@
 import re
 import sys
+from Abstractas.Objeto import TipoObjeto
+from optimizacion.Variable import Variable
 sys.setrecursionlimit(5000)
 
 
@@ -143,6 +145,15 @@ precedence = (
     ('right','UMENOS'),
     )
 
+from optimizacion.Aritmetica import Aritmetica
+from optimizacion.Asignacion import Asignacion
+from optimizacion.Etiqueta import Etiqueta
+from optimizacion.Funcion import Funcion
+from optimizacion.If import If
+from optimizacion.Salto import Salto
+from TablaSimbolos.Tipos import Tipo_Aritmetico, Tipo_Relacional, Tipo_Dato
+from optimizacion.Primitivo import Primitivo
+from optimizacion.Constante import Constante
 # Definición de la gramática
 
 def p_inicio(t):
@@ -227,24 +238,40 @@ def p_saltos (t):
 def p_asignacion(t):
     '''ASIGNACION : ID IGUAL E PTCOMA
                     | ARREGLOS IGUAL E PTCOMA'''
+                    
 def p_expresiones(t):
     '''E : E MAS E
         | E MENOS E
         | E POR E
         | E DIVIDIDO E'''
+    if t[2] == '+':
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.SUMA, t[2],t.lineno(0), t.lexpos(0))
+    elif t[2] ==  '-':
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.RESTA, t[2],t.lineno(0), t.lexpos(0))
+    elif t[2] == '*':
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.MULTIPLICACION, t[2],t.lineno(0), t.lexpos(0))
+    elif t[2] == '/':
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.DIVISION, t[2],t.lineno(0), t.lexpos(0))
 def p_expresion_parentesis(t):
     'E : PARIZQ E PARDER'
+    t[0] = t[2]
 def p_expresion_modal(t):
     'E : R_MATH PUNTO R_MOD PARIZQ E COMA E PARDER'
+    t[0] = Aritmetica(t[5], Tipo_Aritmetico.MODAL, t[7],t.lineno(0), t.lexpos(0))
 def p_expresion_unaria(t):
     'E : MENOS E %prec UMENOS'
+    t[0] = Constante(Primitivo(TipoObjeto.NEGATIVO,t[2]),t.lineno(0), t.lexpos(0))
 def p_constantes(t):
-    '''E : ID
-        | DECIMAL
-        | ENTERO
-        | CADENA
-        | ARREGLOS'''
-
+    'E : ID'
+    t[0] = Variable(t[1],t.lineno(0), t.lexpos(0))
+def p_constantes2(t):
+    'E : DECIMAL'
+    t[0] = Constante(Primitivo(Tipo_Dato.DECIMAL,t[1]),t.lineno(0), t.lexpos(0))
+def p_constentes3(t):
+    'E : ENTERO'
+    t[0] = Constante(Primitivo(Tipo_Dato.ENTERO,t[1]),t.lineno(0), t.lexpos(0))
+def p_constantes4(t):
+    'E : ARREGLOS'
 def p_ifs(t):
     '''IFS : R_IF  RE LLAVEIZQ SALTOS LLAVEDER '''
 def p_relacionales(t):
@@ -254,6 +281,9 @@ def p_relacionales(t):
             | RE NIGUALQUE RE
             | RE MENORIGUAL RE
             | RE MAYORIGUAL RE'''
+
+
+
 def p_relacionales2(t):
     'RE : PARIZQ RE PARDER'
 def p_relacioneales3(t):
@@ -261,15 +291,9 @@ def p_relacioneales3(t):
 def p_llamaditas(t):
     ' LLAMADAS : ID PARIZQ PARDER PTCOMA'     
 def p_arreglos(t):
-    'ARREGLOS : ID LISTASARREGLOS'
-def p_listasarreglos(t):
-    'LISTASARREGLOS : LISTASARREGLOS LISTAARREGLOS'
-def p_listasarreglos2(t):
-    'LISTASARREGLOS : LISTAARREGLOS'
-def p_listaarreglos(t):
-    '''LISTAARREGLOS : CORIZQ R_INT PARIZQ E PARDER CORDER'''
-def p_listaarreglos2(t):
-    '''LISTAARREGLOS : CORIZQ  E  CORDER'''
+    'ARREGLOS : ID CORIZQ E CORDER'
+def p_arreglos2(t):
+    'ARREGLOS : ID CORIZQ R_INT PARIZQ E PARDER CORDER'
 
 def p_error(t):
     print("Error sintáctico en '%s'" % str(t))

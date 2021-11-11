@@ -1,5 +1,6 @@
 
 from Instrucciones.Funciones import Funciones
+from Instrucciones.Llamadas import Llamadas
 from TablaSimbolos.Errores import Errores
 from TablaSimbolos.Tipos import Tipo_Aritmetico
 from Abstractas.NodoArbol import NodoArbol
@@ -107,6 +108,8 @@ class Aritmetica(NodoAST):
             valor2 = ""
             cadena = False
             cadena2 = False
+            llamada1 = {}
+            llamada2 = {}
             if isinstance(self.operador1,dict):
                 if "apuntador" in self.operador1:
                     apuntador = int(self.operador1["apuntador"])
@@ -145,10 +148,14 @@ class Aritmetica(NodoAST):
                     return self.operador2
             if not isinstance(self.operador1,dict):
                 if isinstance(self.operador1,NodoAST):
+                    if isinstance(self.operador1,Llamadas):
+                        keep.HayReturn = True
                     op1 = self.operador1.traducir(tree,table,keep)
                 # si es un diccionario quiere decir que es ID
                 if isinstance(op1,dict):
-                    if "apuntador" in op1:
+                    if "llamada" in op1:
+                        llamada1 = op1
+                    elif "apuntador" in op1:
                         apuntador = int(op1["apuntador"])
                         tipo = op1["tipo"]
                         valor = op1["valor"]
@@ -182,27 +189,16 @@ class Aritmetica(NodoAST):
                     if valor == "":
                         valor = op1 
                     tipo = "Float64"
-                elif isinstance(op1,Funciones):
-                    id = op1.nombre
-                    res = table.BuscarIdentificador("return-"+id)
-                    if res == None:
-                        tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
-                        return
-                    apuntador = res.getApuntador()
-                    tipo = res.getTipo()
-                    valor =res.getValor()
-                    T1 = keep.getNuevoTemporal()
-                    T2 = keep.getNuevoTemporal()
-                    codigo = keep.addOperacion(T1,"SP","+", keep.apuntador_return)
-                    codigo += keep.addIgual(T2,keep.getValStack(T1))
-                    keep.addCodigo(codigo)
-                    op1 = T2
             if not isinstance(self.operador2,dict):
                 if isinstance(self.operador2,NodoAST):
+                    if isinstance(self.operador2,Llamadas):
+                        keep.HayReturn = True
                     op2 = self.operador2.traducir(tree,table,keep)
                 #pos2 = keep.getStack()-1
                 if isinstance(op2,dict):
-                    if "apuntador" in op2:
+                    if "llamada" in op2:
+                        llamada2 = op2
+                    elif "apuntador" in op2:
                         apuntador2 = int(op2["apuntador"])
                         tipo2 = op2["tipo"]
                         valor2 = op2["valor"]
@@ -236,26 +232,32 @@ class Aritmetica(NodoAST):
                     if valor2 == "":
                         valor2 = op2
                     tipo2 = "Float64"
-                elif isinstance(op2,Funciones):
-                    id = op2.nombre
-                    res = table.BuscarIdentificador("return-"+id)
-                    if res == None:
-                        tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
-                        return
-                    apuntador2 = res.getApuntador()
-                    tipo2 = res.getTipo()
-                    valor2 =res.getValor()
+            if self.operacion == Tipo_Aritmetico.SUMA: 
+               
+                if "llamada" in llamada1:
                     T1 = keep.getNuevoTemporal()
                     T2 = keep.getNuevoTemporal()
-                    codigo = keep.addOperacion(T1,"SP","+", keep.apuntador_return)
-                    codigo += keep.addIgual(T2,keep.getValStack(T1))
+                    codigo = keep.addOperacion(T1,"SP","+",llamada1["apuntador"])
+                    codigo += keep.addIgual(T2, keep.getValStack(T1))
                     keep.addCodigo(codigo)
-                    op2 = T2
-            if self.operacion == Tipo_Aritmetico.SUMA:    
-                result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
+                    tipo = llamada1["tipo"]
+                    apuntador = llamada1["apuntador"]
+                else:
+                    T2 = op1
+                if "llamada" in llamada2:
+                    T3 = keep.getNuevoTemporal()
+                    T4 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T3,"SP","+",llamada2["apuntador"])
+                    codigo += keep.addIgual(T4, keep.getValStack(T3))
+                    keep.addCodigo(codigo)
+                    tipo2 = llamada2["tipo"]
+                    apuntador2 = llamada2["apuntador"]
+                else:
+                    T4 = op2
+                result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2)
                 if not result:
                     temp = keep.getNuevoTemporal()
-                    codigo = keep.addOperacion(temp,op1,"+",op2)
+                    codigo = keep.addOperacion(temp,T2,"+",T4)
                     keep.addCodigo(codigo)
                     if tipo == "Int64" and tipo2 == "Int64":
                         tipo = "Int64"
@@ -263,8 +265,29 @@ class Aritmetica(NodoAST):
                         tipo = "Float64"
                     return {"temp":temp, "valor": -1, "tipo":tipo}  
                 else:
-                    return result
-            elif self.operacion == Tipo_Aritmetico.RESTA:                
+                    result
+
+            elif self.operacion == Tipo_Aritmetico.RESTA:  
+                if "llamada" in llamada1:
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+",llamada1["apuntador"])
+                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                    keep.addCodigo(codigo)
+                    tipo = llamada1["tipo"]
+                    apuntador = llamada1["apuntador"]
+                else:
+                    T2 = op1
+                if "llamada" in llamada2:
+                    T3 = keep.getNuevoTemporal()
+                    T4 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T3,"SP","+",llamada2["apuntador"])
+                    codigo += keep.addIgual(T4, keep.getValStack(T3))
+                    keep.addCodigo(codigo)
+                    tipo2 = llamada2["tipo"]
+                    apuntador2 = llamada2["apuntador"]
+                else:
+                    T4 = op2              
                 temp = keep.getNuevoTemporal()
                 codigo = keep.addOperacion(temp,op1,"-",op2)
                 keep.addCodigo(codigo)
@@ -274,36 +297,78 @@ class Aritmetica(NodoAST):
                     tipo = "Float64"
                 return {"temp":temp , "valor":-1,"tipo":tipo}    
             elif self.operacion == Tipo_Aritmetico.MULTIPLICACION:  
-                result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2)
-                if not result:              
-                    temp = keep.getNuevoTemporal()
-                    codigo = keep.addOperacion(temp,op1,"*",op2)
+                if "llamada" in llamada1:
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+",llamada1["apuntador"])
+                    codigo += keep.addIgual(T2, keep.getValStack(T1))
                     keep.addCodigo(codigo)
-                    
-                    return {"temp":temp,"valor": -1, "tipo":"Float64"} 
+                    tipo = llamada1["tipo"]
+                    apuntador = llamada1["apuntador"]
+                else:
+                    T2 = op1
+                if "llamada" in llamada2:
+                    T3 = keep.getNuevoTemporal()
+                    T4 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T3,"SP","+",llamada2["apuntador"])
+                    codigo += keep.addIgual(T4, keep.getValStack(T3))
+                    keep.addCodigo(codigo)
+                    tipo2 = llamada2["tipo"]
+                    apuntador2 = llamada2["apuntador"]
+                else:
+                    T4 = op2
+                result = self.Concatenacion(keep,tipo,tipo2,apuntador,apuntador2,valor,valor2)
+                if not result:
+                    temp = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(temp,T2,"*",T4)
+                    keep.addCodigo(codigo)
+                    if tipo == "Int64" and tipo2 == "Int64":
+                        tipo = "Int64"
+                    else:
+                        tipo = "Float64"
+                    return {"temp":temp, "valor": -1, "tipo":tipo}  
                 else:
                     return result
             elif self.operacion == Tipo_Aritmetico.DIVISION:                
-                
+                if "llamada" in llamada1:
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+",llamada1["apuntador"])
+                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                    keep.addCodigo(codigo)
+                    tipo = llamada1["tipo"]
+                    apuntador = llamada1["apuntador"]
+                else:
+                    T2 = op1
+                if "llamada" in llamada2:
+                    T3 = keep.getNuevoTemporal()
+                    T4 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T3,"SP","+",llamada2["apuntador"])
+                    codigo += keep.addIgual(T4, keep.getValStack(T3))
+                    keep.addCodigo(codigo)
+                    tipo2 = llamada2["tipo"]
+                    apuntador2 = llamada2["apuntador"]
+                else:
+                    T4 = op2
                 #COMPROVACION DE DIVISIÓN POR 0
                 ef = keep.getNuevaEtiqueta()
                 es = keep.getNuevaEtiqueta()
                 codigo = ""
                 aux2 = op2
-                if isinstance(op1,int) or isinstance(op1,float):
+                if isinstance(T2,int) or isinstance(T2,float):
                     temp1 = keep.getNuevoTemporal()
-                    codigo += keep.addIgual(temp1,str(op1))
-                    op1 = temp1
-                if isinstance(op2,int) or isinstance(op2,float):
+                    codigo += keep.addIgual(temp1,str(T2))
+                    T2 = temp1
+                if isinstance(T4,int) or isinstance(T4,float):
                     temp2 = keep.getNuevoTemporal()
-                    codigo += keep.addIgual(temp2,str(op2))
-                    op2 = temp2
+                    codigo += keep.addIgual(temp2,str(T4))
+                    T4 = temp2
                 temp = keep.getNuevoTemporal()
-                codigo += "if "+str(op2)+" != 0 {\n\tgoto "+ef+";\n}\n"
+                codigo += "if "+str(T4)+" != 0 {\n\tgoto "+ef+";\n}\n"
                 codigo += self.generarC3D_Cadenas(keep,"MATH ERROR")
                 codigo += "goto "+ es+";\n"
                 codigo += ef+":\n"
-                codigo += keep.addOperacion(temp,str(op1),"/",str(op2))
+                codigo += keep.addOperacion(temp,str(T2),"/",str(T4))
                 codigo += es+":\n"
                 keep.addCodigo(codigo)
                 if aux2 != 0:
@@ -312,6 +377,26 @@ class Aritmetica(NodoAST):
                 else:
                     return {"error": "error"}      
             elif self.operacion == Tipo_Aritmetico.POTENCIA:
+                if "llamada" in llamada1:
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+",llamada1["apuntador"])
+                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                    keep.addCodigo(codigo)
+                    tipo = llamada1["tipo"]
+                    apuntador = llamada1["apuntador"]
+                else:
+                    T2 = op1
+                if "llamada" in llamada2:
+                    T3 = keep.getNuevoTemporal()
+                    T4 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T3,"SP","+",llamada2["apuntador"])
+                    codigo += keep.addIgual(T4, keep.getValStack(T3))
+                    keep.addCodigo(codigo)
+                    tipo2 = llamada2["tipo"]
+                    apuntador2 = llamada2["apuntador"]
+                else:
+                    T4 = op2
                 if tipo == "String":
                     return self.multiplicidad(keep,valor,valor2)
                 elif tipo != "String" and tipo2 != "String":
@@ -319,10 +404,10 @@ class Aritmetica(NodoAST):
                     temp1 = keep.getNuevoTemporal()
                     temp2 = keep.getNuevoTemporal()
                     temp3 = keep.getNuevoTemporal()
-                    codigo = keep.addIgual(temp0,op1)
-                    codigo += keep.addIgual(temp1,op2)
+                    codigo = keep.addIgual(temp0,T2)
+                    codigo += keep.addIgual(temp1,T4)
                     codigo += keep.addIgual(temp2,1)
-                    codigo += keep.addIgual(temp3,op1)
+                    codigo += keep.addIgual(temp3,T2)
                     ei = keep.getNuevaEtiqueta()
                     ev = keep.getNuevaEtiqueta()
                     es = keep.getNuevaEtiqueta()
@@ -343,25 +428,45 @@ class Aritmetica(NodoAST):
                         tipo = "Float64"
                     return {"temp":temp3, "valor": -1, "tipo":tipo}
             elif self.operacion == Tipo_Aritmetico.MODAL:
+                if "llamada" in llamada1:
+                    T1 = keep.getNuevoTemporal()
+                    T2 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T1,"SP","+",llamada1["apuntador"])
+                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                    keep.addCodigo(codigo)
+                    tipo = llamada1["tipo"]
+                    apuntador = llamada1["apuntador"]
+                else:
+                    T2 = op1
+                if "llamada" in llamada2:
+                    T3 = keep.getNuevoTemporal()
+                    T4 = keep.getNuevoTemporal()
+                    codigo = keep.addOperacion(T3,"SP","+",llamada2["apuntador"])
+                    codigo += keep.addIgual(T4, keep.getValStack(T3))
+                    keep.addCodigo(codigo)
+                    tipo2 = llamada2["tipo"]
+                    apuntador2 = llamada2["apuntador"]
+                else:
+                    T4 = op2
                 #COMPROVACION DE DIVISIÓN POR 0
                 ef = keep.getNuevaEtiqueta()
                 es = keep.getNuevaEtiqueta()
                 codigo = ""
                 aux2 = op2
-                if isinstance(op1,int) or isinstance(op1,float):
+                if isinstance(T2,int) or isinstance(T2,float):
                     temp1 = keep.getNuevoTemporal()
-                    codigo += keep.addIgual(temp1,str(op1))
-                    op1 = temp1
-                if isinstance(op2,int) or isinstance(op2,float):
+                    codigo += keep.addIgual(temp1,str(T2))
+                    T2 = temp1
+                if isinstance(T4,int) or isinstance(T4,float):
                     temp2 = keep.getNuevoTemporal()
-                    codigo += keep.addIgual(temp2,str(op2))
-                    op2 = temp2
+                    codigo += keep.addIgual(temp2,str(T4))
+                    T4 = temp2
                 temp = keep.getNuevoTemporal()
                 codigo += "if "+str(op2)+" != 0 {\n\tgoto "+ef+";\n}\n"
                 codigo += self.generarC3D_Cadenas(keep,"MATH ERROR")
                 codigo += "goto "+ es+";\n"
                 codigo += ef+":\n"
-                codigo += keep.addIgual(temp,"math.Mod("+str(op1)+","+str(op2)+")")
+                codigo += keep.addIgual(temp,"math.Mod("+str(T2)+","+str(T4)+")")
                 codigo += es+":\n"
                 keep.addCodigo(codigo)
                 if aux2 != 0:
@@ -434,7 +539,7 @@ class Aritmetica(NodoAST):
         #keep.liberarTemporales(temp3)
     
  
-    def Concatenacion(self, keep,tipo,tipo2,apuntador,apuntador2,valor,valor2,cadena,cadena2):
+    def Concatenacion(self, keep,tipo,tipo2,apuntador,apuntador2,valor,valor2):
         codigo = ""
         if tipo == "String":
             temp = keep.getNuevoTemporal()

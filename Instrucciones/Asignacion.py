@@ -1,6 +1,4 @@
 from Expresiones.Acceso import Acceso
-from Instrucciones.Funciones import Funciones
-from Objetos.KeepData import KeepData
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
 from Abstractas.NodoArbol import NodoArbol
 from Expresiones.Array import Array
@@ -315,17 +313,21 @@ class Asignacion(NodoAST):
                                 #keep.liberarTemporales(temp)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)                      
-                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
-                                if isinstance(valor,Funciones):
-                                    idfuncion = valor.nombre
-                                    res = table.BuscarIdentificador("return-"+idfuncion)
-                                    if res == None:
-                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
-                                        return
-                                    apuntador2 = res.getApuntador()
-                                    tipo2 = res.getTipo()
-                                    valor2 =res.getValor()  
-                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
+                            elif isinstance(valor,dict):
+                                if "llamada" in valor:
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    codigo = keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                                    temp = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(temp, "SP","+",simbolo.apuntador)
+                                    codigo += keep.addIgual(keep.getValStack(temp),T2)
+                                    keep.addCodigo(codigo)
+                                    tipo = valor["tipo"]
+                                    simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,tipo,simbolo.apuntador)
+                                    #keep.liberarTemporales(temp)
+                                    #codigo += keep.addOperacion("SP","SP","+","1")
+                                    keep.addCodigo(codigo)
                                 if "temp" in valor:
                                     val = valor["valor"]
                                     tipo = valor["tipo"]
@@ -450,17 +452,21 @@ class Asignacion(NodoAST):
                                 #keep.liberarTemporales(temp2)
                                 #codigo += keep.addOperacion("SP","SP","+","1")
                                 keep.addCodigo(codigo)                      
-                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
-                                if isinstance(valor,Funciones):
-                                    idfuncion = valor.nombre
-                                    res = table.BuscarIdentificador("return-"+idfuncion)
-                                    if res == None:
-                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
-                                        return
-                                    apuntador2 = res.getApuntador()
-                                    tipo2 = res.getTipo()
-                                    valor2 =res.getValor()  
-                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
+                            elif isinstance(valor,dict):
+                                if "llamada" in valor:
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    codigo = keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                                    temp = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(temp, "SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(temp),T2)
+                                    keep.addCodigo(codigo)
+                                    tipo = valor["tipo"]
+                                    simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,tipo,keep.getStack())
+                                    #keep.liberarTemporales(temp)
+                                    #codigo += keep.addOperacion("SP","SP","+","1")
+                                    keep.addCodigo(codigo)
                                 if "temp" in valor:
                                     val = valor["valor"]
                                     tipo = valor["tipo"]
@@ -599,18 +605,22 @@ class Asignacion(NodoAST):
                                 else:
                                     table.actualizarSimbolo(simbolo)
                                 tree.agregarTS(id,simbolo)
-                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
-                                if isinstance(valor,Funciones):
-                                    idfuncion = valor.nombre
-                                    res = table.BuscarIdentificador("return-"+idfuncion)
-                                    if res == None:
-                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
-                                        return
-                                    apuntador2 = res.getApuntador()
-                                    tipo2 = res.getTipo()
-                                    valor2 =res.getValor()  
-                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
-                                if "etiquetas" in valor:
+                            elif isinstance(valor,dict):
+                                if "llamada" in valor:
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    codigo = keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                                    temp = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(temp, "SP","+",simbolo.apuntador)
+                                    codigo += keep.addIgual(keep.getValStack(temp),T2)
+                                    keep.addCodigo(codigo)
+                                    tipo = valor["tipo"]
+                                    simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,tipo,simbolo.apuntador)
+                                    #keep.liberarTemporales(temp)
+                                    #codigo += keep.addOperacion("SP","SP","+","1")
+                                    keep.addCodigo(codigo)
+                                elif "etiquetas" in valor:
                                     simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,"Bool",simbolo.apuntador)
                                     ev = valor["etiquetas"][0]
                                     ef = valor["etiquetas"][1]
@@ -837,18 +847,22 @@ class Asignacion(NodoAST):
                                 else:
                                     table.actualizarSimbolo(simbolo)
                                 tree.agregarTS(id,simbolo)
-                            elif isinstance(valor,dict) or isinstance(valor,Funciones):
-                                if isinstance(valor,Funciones):
-                                    idfuncion = valor.nombre
-                                    res = table.BuscarIdentificador("return-"+idfuncion)
-                                    if res == None:
-                                        tree.insertError(Errores(idfuncion,"Semántico","Variable no definida", self.fila,self.columna))
-                                        return
-                                    apuntador2 = res.getApuntador()
-                                    tipo2 = res.getTipo()
-                                    valor2 =res.getValor()  
-                                    valor = {"apuntador":apuntador2,"tipo":tipo2,"valor":valor2}
-                                if "etiquetas" in valor:
+                            elif isinstance(valor,dict) :
+                                if "llamada" in valor:
+                                    T1 = keep.getNuevoTemporal()
+                                    T2 = keep.getNuevoTemporal()
+                                    codigo = keep.addOperacion(T1,"SP","+",valor["apuntador"])
+                                    codigo += keep.addIgual(T2, keep.getValStack(T1))
+                                    temp = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(temp, "SP","+",keep.getStack())
+                                    codigo += keep.addIgual(keep.getValStack(temp),T2)
+                                    keep.addCodigo(codigo)
+                                    tipo = valor["tipo"]
+                                    simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,tipo,keep.getStack())
+                                    #keep.liberarTemporales(temp)
+                                    #codigo += keep.addOperacion("SP","SP","+","1")
+                                    keep.addCodigo(codigo)
+                                elif "etiquetas" in valor:
                                     simbolo = Simbolo(id,None,table.nombre,self.fila,self.columna,"Bool",keep.getStack())
                                     ev = valor["etiquetas"][0]
                                     ef = valor["etiquetas"][1]

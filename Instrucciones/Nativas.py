@@ -106,7 +106,7 @@ class Nativas_conTipo(NodoAST):
                             codigo += keep.addIgual(keep.getValStack(temp2),temp)
                             codigo += keep.addOperacion("SP","SP","+",keep.getStack())
                             codigo += "Parse();\n"
-                            totales = keep.Parse("-1") 
+                            totales = keep.Parse() 
                             temp3 = keep.getNuevoTemporal()
                             codigo += keep.addIgual(temp3,keep.getValStack("SP"))
                             codigo += keep.addIgual(keep.getValStack(apuntador),temp3)

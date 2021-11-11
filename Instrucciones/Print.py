@@ -1,5 +1,6 @@
 from Expresiones.Constante import Constante
 from Instrucciones.Funciones import Funciones
+from Instrucciones.Llamadas import Llamadas
 from Objetos.Primitivos import Primitivo
 from TablaSimbolos.TablaSimbolos import TablaSimbolos
 from TablaSimbolos.Errores import Errores
@@ -80,6 +81,8 @@ class Print(NodoAST):
         if self.tipo == Tipo_Print.PRINT:  
             if self.contenido != "":
                 for instrucciones in self.contenido:
+                    if isinstance(instrucciones,Llamadas):
+                        keep.HayReturn = True
                     resultado = instrucciones.traducir(tree,table,keep)
 
                     if isinstance(resultado,bool):
@@ -114,16 +117,7 @@ class Print(NodoAST):
                         result += keep.llamada("Native_PrintString")
                         result += keep.addOperacion("SP","SP","-",keep.getStack())
                         keep.addCodigo(result)
-                    elif isinstance(resultado, dict) or isinstance(resultado,Funciones):
-                        if isinstance(resultado,Funciones):
-                            id = resultado.nombre
-                            res = table.BuscarIdentificador("return-"+id)
-                            if res == None:
-                                tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
-                                return
-                            apuntador = res.getApuntador()
-                            tipo = res.getTipo()
-                            resultado = {"apuntador":apuntador, "tipo":tipo, "valor":res.getValor()}
+                    elif isinstance(resultado, dict):         
                         if "apuntador" in resultado:
                             #guardo el valor actual del stack
                             actual = keep.getStack()
@@ -196,6 +190,8 @@ class Print(NodoAST):
         if self.tipo == Tipo_Print.PRINTLN:
             if self.contenido != "":
                 for instrucciones in self.contenido:
+                    if isinstance(instrucciones,Llamadas):
+                        keep.HayReturn = True
                     resultado = instrucciones.traducir(tree,table,keep)
                     if isinstance(resultado, float):
                         result=keep.imprimir(resultado,"f")
@@ -230,16 +226,7 @@ class Print(NodoAST):
                         result += keep.addOperacion("SP","SP","-",keep.getStack())
                         keep.addCodigo(result)
                        
-                    elif isinstance(resultado, dict)or isinstance(resultado,Funciones):
-                        if isinstance(resultado,Funciones):
-                            id = resultado.nombre
-                            res = table.BuscarIdentificador("return-"+id)
-                            if res == None:
-                                tree.insertError(Errores(id,"Semántico","Variable no definida", self.fila,self.columna))
-                                return
-                            apuntador = res.getApuntador()
-                            tipo = res.getTipo()
-                            resultado = {"apuntador":apuntador, "tipo":tipo, "valor":res.getValor()}
+                    elif isinstance(resultado, dict):
                         if "apuntador" in resultado:
                             #guardo el valor actual del stack
                             actual = keep.getStack()
