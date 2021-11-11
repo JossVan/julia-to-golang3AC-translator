@@ -2,8 +2,10 @@ import re
 import sys
 from Abstractas.Objeto import TipoObjeto
 from optimizacion.Arreglo import Arreglo
+from optimizacion.Codigo import Codigo
 from optimizacion.Declaracion import Declaracion
 from optimizacion.Encabezado import Encabezado
+from optimizacion.General import General
 from optimizacion.Llamada import Llamada
 from optimizacion.Pila import Pila
 from optimizacion.Print import Print
@@ -166,7 +168,7 @@ from optimizacion.Constante import Constante
 
 def p_inicio(t):
     '''INICIO :   R_PAQUETES R_MAIN PTCOMA IMPORTES PILA_HEAP PILA_STACK DECLARACIONES FUNCIONES'''
-    t[0]= Encabezado(t[2],t[4],t[5],t[6],t[7],t[8])
+    t[0]= [Encabezado(t[2],t[4],t[5],t[6],t[7],t[8])]
 def p_paquetitos(t):
     '''IMPORTES : R_IMPORT PARIZQ LISTAIMPORTES PARDER PTCOMA'''
     t[0] = t[3]
@@ -344,7 +346,13 @@ def parse(input) :
     lexer = lex.lex(reflags= re.IGNORECASE)
     parser = yacc.yacc()
     instrucciones=parser.parse(input)
-    print(instrucciones)
-    return instrucciones
-
     
+    general = General()
+
+    for instruccion in instrucciones:
+
+        if isinstance(instruccion,Codigo):
+            instruccion.Concatenar(general)
+    
+
+    return general.codigo

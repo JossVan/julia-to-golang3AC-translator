@@ -2,7 +2,7 @@ class General():
 
     codigo = ""
     funciones = []
-
+    listaFuncion = {}
     def __init__(self):
         self.codigo = ""
         self.funciones = []
@@ -13,3 +13,10 @@ class General():
     
     def getCodigo(self):
         return self.codigo
+    
+    def addCodigo(self,codigo):
+        self.codigo += codigo
+    
+    def addListaFuncion(self,nombre,codigo):
+        self.listaFuncion[nombre]= codigo
+        

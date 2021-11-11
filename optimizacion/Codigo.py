@@ -6,8 +6,8 @@ class Codigo(ABC):
         self.columna=columna
         super().__init__()
     @abstractmethod
-    def optimizar(self,tree,table, keep):
+    def optimizar(self, codigo):
         pass
     @abstractmethod
-    def Concatenar(self):
+    def Concatenar(self, codigo):
         pass
