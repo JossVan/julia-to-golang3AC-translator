@@ -1,13 +1,26 @@
 // referencia a codemirror: https://codemirror.net/doc/manual.html
-CodeMirror.fromTextArea(document.getElementById("entrada"),{
+var entrada = CodeMirror.fromTextArea(document.getElementById("entrada"),{
     lineNumbers : true,
     theme:'material-palenight',
+    autoRefresh: true,
     mode : 'julia',
-    matchBrackets: true
+   // matchBrackets: true
 });
-CodeMirror.fromTextArea(document.getElementById("salida"),{
+var salidas = CodeMirror.fromTextArea(document.getElementById("salida"),{
     lineNumbers : true,
     theme:'material-palenight',
+    autoRefresh: true,
     mode : 'go',
-    matchBrackets: true
+    //matchBrackets: true,
 });
+var consola = CodeMirror.fromTextArea(document.getElementById("consola"),{
+    lineNumbers : true,
+    theme:'material-palenight',
+    autoRefresh: true,
+    mode : 'powershell',
+    readonly: true
+    //matchBrackets: true,
+});
+
+entrada.setSize(650,700);
+salidas.setSize(650,700);

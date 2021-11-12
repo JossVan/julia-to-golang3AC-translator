@@ -895,8 +895,10 @@ def traduce(input):
     retorno.append(codigo)
     tab = AST.htmlTablaSimbolos()
     retorno.append(tab)
-    keep.listaFuncion = {}
-    keep.listFunction = {}
-    keep.nombrefunciones = {}
+    errores = ""
+    for err in AST.getErrores():
+        errores += err.getCadena()+"\n"
+    retorno.append(errores)
+    retorno.append(AST.htmlErrores())
     keep = KeepData()
     return retorno 
