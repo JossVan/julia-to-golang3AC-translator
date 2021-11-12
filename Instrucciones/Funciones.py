@@ -34,10 +34,13 @@ class Funciones(NodoAST):
             keep.nombrefuncion = self.nombre
             for instruccion in self.instrucciones:
                 instruccion.traducir(tree,nuevaTabla,keep)
+            keep.Activa = None
             keep.addCodigo("}\n")
             keep.listaFuncion[self.nombre]= keep.codigo
             keep.codigo = cod
             return
+        else:
+            keep.Activa = None
     def getNodo(self):
         
         NodoNuevo = NodoArbol("Función")

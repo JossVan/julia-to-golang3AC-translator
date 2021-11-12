@@ -898,4 +898,5 @@ def traduce(input):
     keep.listaFuncion = {}
     keep.listFunction = {}
     keep.nombrefunciones = {}
+    keep = KeepData()
     return retorno 

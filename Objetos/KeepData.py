@@ -20,7 +20,8 @@ class KeepData:
     nombrefunciones ={}
     codigo3d = None
     apuntador_return = ""
-
+    Activa = None 
+    stackactivo = None 
     def __init__(self) -> None:
         
         self.contador = 0
