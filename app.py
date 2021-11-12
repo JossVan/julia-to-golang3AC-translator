@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from gramatica.gramatica import traduce
-from gramatica.optimizacion import parse
+#from gramatica.optimizacion import parse
 app = Flask(__name__)
 import logging
 import sys
@@ -26,8 +26,8 @@ def principal():
             global tmp_val2
             tmp_val2=inpt  
             global result2
-            result2 =  parse(tmp_val2+"\n")
-            return render_template('principal.html', entrada = inpt, salida = result2)
+            #result2 =  parse(tmp_val2+"\n")
+            return render_template('principal.html', entrada = inpt, salida = "result2")
 
     else:
         return render_template('principal.html')

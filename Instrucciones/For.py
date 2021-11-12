@@ -149,7 +149,9 @@ class For(NodoAST):
                     return
                 apuntador = resultado.getApuntador()
                 #tipo = resultado.getTipo()
-                codigo += keep.addIgual(keep.getValStack(apuntador),indice)
+                temporal = keep.getNuevoTemporal()
+                codigo += keep.addOperacion(temporal,"SP","+",str(apuntador))
+                codigo += keep.addIgual(keep.getValStack(temporal),indice)
                 keep.addCodigo(codigo)
                 for instruccion in self.instrucciones:
                     resp= instruccion.traducir(tree,nuevaTabla,keep)

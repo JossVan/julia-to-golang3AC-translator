@@ -184,7 +184,9 @@ class Llamadas(NodoAST):
                                     codigo = "// INGRESANDO AL STACK LA INFO DEL ARREGLO\n"
                                     codigo += keep.addOperacion(T1,"SP","+",valor["apuntador"])
                                     codigo += keep.addIgual(T2,keep.getValStack(T1))
-                                    codigo += keep.addIgual(keep.getValStack(cont2),T2)
+                                    T3 = keep.getNuevoTemporal()
+                                    codigo += keep.addOperacion(T3,"SP","+",cont2)
+                                    codigo += keep.addIgual(keep.getValStack(T3),T2)
                                     variable = funcion.parametros[contador].id
                                     simbolo = Simbolo(variable,valor,self.id,self.fila,self.columna,valor["tipo"],cont2)
                                     keep.incrementarStack()

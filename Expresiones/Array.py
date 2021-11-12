@@ -413,139 +413,72 @@ class Array(NodoAST):
                 #keep.liberarTemporales(n3)
                 return {"temp": temp, "valor":None, "tipo":"Float64"}
             else:
+                
+                #*********** INICIANDO LA BUSQUEDA DEL VALOR DE LA POSICIÓN DEL ARREGLO *************
                 T1 = keep.getNuevoTemporal()
+                codigo = "//**************INICIANDO LA EXTRACCIÓN DE LA POSICIÓN DEL ARREGLO ****************\n"
+                codigo += keep.addOperacion(T1,"SP","+", apuntador)
+                codigo += "//Se saca la posición del heap del arreglo\n"
                 T2 = keep.getNuevoTemporal()
+                codigo += keep.addIgual(T2,keep.getValStack(T1))
+                codigo += "//Se suma 2 posiciones para sacar el valor superior del arreglo\n"
                 T3 = keep.getNuevoTemporal()
+                codigo += keep.addOperacion(T3,T2,"+",2)
+                codigo += "//Se saca el valor superior del arreglo del heap\n"
                 T4 = keep.getNuevoTemporal()
-                T5 = keep.getNuevoTemporal()
-                T6 = keep.getNuevoTemporal()
-                T7 = keep.getNuevoTemporal()
-                T8 = keep.getNuevoTemporal()
-                T9 = keep.getNuevoTemporal()
-                T10 = keep.getNuevoTemporal()
-                T11 = keep.getNuevoTemporal()
-                T12 = keep.getNuevoTemporal()
-                #T13 = keep.getNuevoTemporal()
-                cod = "//***** INICIANDO ACCESO A LA POSICIÓN DEL ARREGLO*****\n"
-                cod += keep.addOperacion(T1,"SP","+",apuntador)
-                cod += keep.addIgual(T2,keep.getValStack(T1))
-                #PARA VERIFICAR EL LÍMITE SUPERIOR
-                cod += keep.addOperacion(T11,T2,"+","2")
-                # ACCEDIENDO AL VALOR DEL LÍMITE SUPERIOR
-                cod += keep.addIgual(T12,keep.getValHeap(T11))
-                cod += keep.addOperacion(T12,T12,"+","1")
-
-                cod += keep.addOperacion(T3,T2,"+","1")
-                #accediendo al límite inferior
-                cod += keep.addIgual(T4,keep.getValHeap(T3))
-                # ACCEDER AL PARÁMETRO SOLICITADO
-                if isinstance(self.posicion,list):
-                    for pos in self.posicion:
-                        if isinstance(pos,NodoAST):
-                            valor = pos.traducir(tree,table,keep)
-                            if isinstance(valor,int) or isinstance(valor,float):
-                                L1 = keep.getNuevaEtiqueta()
-                                L2 = keep.getNuevaEtiqueta()
-                                L3 = keep.getNuevaEtiqueta()
-                                L4 = keep.getNuevaEtiqueta()
-                                cod += "//***** INICIANDO ACCESO A LA POSICIÓN NÚMERO*****\n"
-                                cod += "if "+str(valor)+"> 0 "+"{goto "+L3+";}\n"
-                                cod += "goto "+L4+";\n"
-                                cod += L3+":\n"
-                                cod += "if "+str(valor)+"<= "+T12+"{goto "+L1+";}\n"
-                                cod += L4+":\n"
-                                keep.addCodigo(cod)
-                                if not "boundserror" in keep.listaFuncion:
-                                    cc = keep.codigo
-                                    keep.codigo = ""
-                                    keep.errorDimension()
-                                    keep.listaFuncion["boundserror"]= keep.codigo
-                                    keep.codigo = cc
-                                cod = "boundserror();\n"
-                                cod += "goto "+ L2+";\n"
-                                cod += L1+":\n"
-                                cod += keep.addOperacion(T5,(valor-1),"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA
-                                cod += keep.addOperacion(T6,T2,"+","3") #PRIMERA POSICIÓN DEL ARREGLO
-                                cod += keep.addOperacion(T7,T6,"+",T5) #POSICIÓN REAL DEL HEAP
-                                cod += keep.addIgual(T8,keep.getValHeap(T7))
-                                if isinstance(valor,int):
-                                    valor = "Int64"
-                                elif isinstance(valor,float):
-                                    valor = "Float64"
-                                cod += L2+":\n"
-                                keep.addCodigo(cod)
-                                return {"temp": T8, "valor":None, "tipo":valor}
-                            elif isinstance(valor,dict):
-                                if "apuntador" in valor:
-                                    cod += "//***** INICIANDO ACCESO A LA POSICIÓN VARIABLE*****\n"
-                                    cod += keep.addOperacion(T9,"SP","+",valor["apuntador"])
-                                    cod += keep.addIgual(T10,keep.getValStack(T9))
-                                    cod += keep.addOperacion(T10,T10,"-","1")
-                                    L1 = keep.getNuevaEtiqueta()
-                                    L2 = keep.getNuevaEtiqueta()
-                                    L3 = keep.getNuevaEtiqueta()
-                                    L4 = keep.getNuevaEtiqueta()
-                                    cod += "if "+T10+"> 0 "+"{goto "+L3+";}\n"
-                                    cod += "goto "+L4+";\n"
-                                    cod += L3+":\n"
-                                    cod += "if "+T10+"<= "+T12+"{goto "+L1+";}\n"
-                                    cod += L4+":\n"
-                                    keep.addCodigo(cod)
-                                    if not "boundserror" in keep.listaFuncion:
-                                        cc = keep.codigo
-                                        keep.codigo = ""
-                                        keep.errorDimension()
-                                        keep.listaFuncion["boundserror"]= keep.codigo
-                                        keep.codigo = cc
-                                    cod = "boundserror();\n"
-                                    cod += "goto "+ L2+";\n"
-                                    cod += L1+":\n"
-                                    cod += keep.addOperacion(T5,T10,"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA
-                                    cod += keep.addOperacion(T6,T2,"+","3") #PRIMERA POSICIÓN DEL ARREGLO
-                                    cod += keep.addOperacion(T7,T6,"+",T5) #POSICIÓN REAL DEL HEAP
-                                    cod += keep.addIgual(T8,keep.getValHeap(T7))
-                                    cod += L2+":\n"
-                                    keep.addCodigo(cod)
-                                    return {"temp": T8, "valor":None, "tipo":valor["tipo"]}
-                                elif "temp" in valor:
-                                    cod = "//***** INICIANDO ACCESO A LA POSICIÓN DEL ARREGLO TEMPORAL*****\n"
-                                    cod += keep.addOperacion(T10,valor["temp"],"-","1")
-                                    L1 = keep.getNuevaEtiqueta()
-                                    L2 = keep.getNuevaEtiqueta()
-                                    L3 = keep.getNuevaEtiqueta()
-                                    L4 = keep.getNuevaEtiqueta()
-                                    cod += "if "+T10+"> 0 "+"{goto "+L3+";}\n"
-                                    cod += "goto "+L4+";\n"
-                                    cod += L3+":\n"
-                                    cod += "if "+T10+"<= "+T12+"{goto "+L1+";}\n"
-                                    cod += L4+":\n"
-                                    keep.addCodigo(cod)
-                                    if not "boundserror" in keep.listaFuncion:
-                                        cc = keep.codigo
-                                        keep.codigo = ""
-                                        keep.errorDimension()
-                                        keep.listaFuncion["boundserror"]= keep.codigo
-                                        keep.codigo = cc
-                                    cod = "boundserror();\n"
-                                    cod += "goto "+ L2+";\n"
-                                    cod += L1+":\n"
-                                    cod += keep.addOperacion(T5,T10,"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA
-                                    cod += keep.addOperacion(T6,T2,"+","3") #PRIMERA POSICIÓN DEL ARREGLO
-                                    cod += keep.addOperacion(T7,T6,"+",T5) #POSICIÓN REAL DEL HEAP
-                                    cod += keep.addIgual(T8,keep.getValHeap(T7))
-                                    cod += L2+":\n"
-                                    keep.addCodigo(cod)
-                                    return {"temp": T8, "valor":None, "tipo":valor["tipo"]}
-                keep.liberarTemporales(T1)
-                keep.liberarTemporales(T2)
-                keep.liberarTemporales(T3)
-                keep.liberarTemporales(T4)
-                keep.liberarTemporales(T5)
-                keep.liberarTemporales(T6)
-                keep.liberarTemporales(T7)
-                keep.liberarTemporales(T8)
-                keep.liberarTemporales(T9)
-                keep.liberarTemporales(T10)
+                codigo += keep.addIgual(T4,keep.getValHeap(T3))
+                indice = None 
+                tipo = ""
+                # VERIFICANDO QUE LA POSICIÓN DEL INDICE SEA CORRECTA 
+                if isinstance(posi, int) or isinstance(posi,float):
+                    indice = posi 
+                elif isinstance(posi,dict):
+                    if "apuntador" in posi:
+                        T5 = keep.getNuevoTemporal()
+                        codigo += keep.addOperacion(T5,"SP","+",posi["apuntador"])
+                        T6 = keep.getNuevoTemporal()
+                        codigo += keep.addIgual(T6, keep.getValStack(T5))
+                        indice = T6
+                        tipo = posi["tipo"]
+                    elif "temp" in posi:
+                        indice = posi["temp"]
+                        tipo = posi["tipo"]
+                L1 = keep.getNuevaEtiqueta()
+                L2 = keep.getNuevaEtiqueta()
+                L3 = keep.getNuevaEtiqueta()
+                L4 = keep.getNuevaEtiqueta()
+                codigo += "if "+str(indice)+"> 0 {goto " + L1 +"}\n"
+                codigo += "goto "+L2+";\n"
+                codigo += L1+":\n"
+                codigo += "if "+str(indice)+"<= "+ T4+" {goto "+L3+"}\n"
+                codigo += L2+":\n"
+                if not "boundserror" in keep.listaFuncion:
+                    cc = keep.codigo
+                    keep.codigo = ""
+                    keep.errorDimension()
+                    keep.listaFuncion["boundserror"]= keep.codigo
+                    keep.codigo = cc
+                codigo += "boundserror();\n"
+                codigo += "goto "+L4+";\n"
+                codigo += L3+":\n"
+                codigo += keep.addOperacion(T1,indice,"-","1")
+                codigo += keep.addOperacion(T1,T3,"+",T1)
+                codigo += "//*VALOR EN LA POSICIÓN DEL INDICE CONSULTADO*\n"
+                codigo += keep.addIgual(T2,keep.getValHeap(T1))
+                codigo += L4+":\n"
+                codigo += "//********************************************\n"
+                keep.addCodigo(codigo)
+                return {"temp": T2, "valor":None, "tipo":tipo}
+                #keep.liberarTemporales(T1)
+                #keep.liberarTemporales(T2)
+                #keep.liberarTemporales(T3)
+                #keep.liberarTemporales(T4)
+                #keep.liberarTemporales(T5)
+                #keep.liberarTemporales(T6)
+                #keep.liberarTemporales(T7)
+                #keep.liberarTemporales(T8)
+                #keep.liberarTemporales(T9)
+                #keep.liberarTemporales(T10)
 
     def actualizar(self, valor, tree, table, keep):
         id = self.id
@@ -692,7 +625,7 @@ class Array(NodoAST):
                             codigo = keep.addOperacion(temp,"SP","+",val["apuntador"])
                             codigo += keep.addIgual(temp,keep.getValStack(temp))
                             codigo += keep.addIgual(keep.getValHeap(T12),temp)
-                            keep.liberarTemporales(temp)
+                            #keep.liberarTemporales(temp)
                         elif "temp" in val:
                             codigo = keep.addIgual(keep.getValHeap(T12),val["temp"])
                 codigo += "goto "+L6+";\n"
@@ -899,7 +832,7 @@ class Array(NodoAST):
                 T6 = keep.getNuevoTemporal()
                 T7 = keep.getNuevoTemporal()
                 # VERIFICAMOS EL INDICE EN LA QUE SE QUIERE INGRESAR LA INFORMACIÓN
-                val = valor.traducir(tree,table,keep)
+                
                 temp = keep.getNuevoTemporal()
                 temp2 = keep.getNuevoTemporal()
                 codigo = "// *****ASIGNANDO NUEVO VALOR A UN INDICE DEL ARREGLO*****\n"
@@ -909,16 +842,16 @@ class Array(NodoAST):
                 codigo += keep.addIgual(T4,keep.getValHeap(T3)) #SE OBTIENE EL VALOR INFERIOR DEL ARREGLO
                 codigo += keep.addOperacion(temp,T2,"+","2")
                 codigo += keep.addIgual(temp2,keep.getValHeap(temp))
-                codigo += keep.addOperacion(temp2,temp2,"+","1")
+                #codigo += keep.addOperacion(temp2,temp2,"+","1")
                 if isinstance(posi,int):      
                     L1 = keep.getNuevaEtiqueta()
                     L2 = keep.getNuevaEtiqueta()
                     L3 = keep.getNuevaEtiqueta()
                     L4 = keep.getNuevaEtiqueta()
-                    codigo += "if "+str(posi-1)+"> 0 "+"{goto "+L3+";}\n"
+                    codigo += "if "+str(posi)+"> 0 "+"{goto "+L3+";}\n"
                     codigo += "goto "+L4+";\n"
                     codigo += L3+":\n"
-                    codigo += "if "+str(posi-1)+"<= "+temp2+"{goto "+L1+";}\n"
+                    codigo += "if "+str(posi)+"<= "+temp2+"{goto "+L1+";}\n"
                     codigo += L4+":\n"
                     keep.addCodigo(codigo)
                     if not "boundserror" in keep.listaFuncion:
@@ -930,7 +863,7 @@ class Array(NodoAST):
                     codigo = "boundserror();\n"
                     codigo += "goto "+L2+";\n"
                     codigo += L1+":\n"
-                    codigo += keep.addOperacion(T5,(posi-1),"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA LINEAL DE DATOS
+                    codigo += keep.addOperacion(T5,posi,"-","0") #POSICIÓN DENTRO DE LA ESTRUCTURA LINEAL DE DATOS
                 elif isinstance(posi,dict):
                     if "apuntador" in posi:
                         T10 = keep.getNuevoTemporal()
@@ -939,15 +872,15 @@ class Array(NodoAST):
                         codigo += "// *****ACCEDIENDO A LA VARIABLE APUNTADOR*****\n"
                         codigo += keep.addOperacion(T10,"SP","+",posi["apuntador"])
                         codigo += keep.addIgual(T11,keep.getValStack(T10))
-                        codigo += keep.addOperacion(T12,T11,"-","1")
+                        #codigo += keep.addOperacion(T12,T11,"-","1")
                         L1 = keep.getNuevaEtiqueta()
                         L2 = keep.getNuevaEtiqueta()
                         L3 = keep.getNuevaEtiqueta()
                         L4 = keep.getNuevaEtiqueta()
-                        codigo += "if "+T12+"> 0 "+"{goto "+L3+";}\n"
+                        codigo += "if "+T11+"> 0 "+"{goto "+L3+";}\n"
                         codigo += "goto "+L4+";\n"
                         codigo += L3+":\n"
-                        codigo += "if "+T12+"<= "+temp2+"{goto "+L1+";}\n"
+                        codigo += "if "+T11+"<= "+temp2+"{goto "+L1+";}\n"
                         codigo += L4+":\n"
                         keep.addCodigo(codigo)
                         if not "boundserror" in keep.listaFuncion:
@@ -959,13 +892,13 @@ class Array(NodoAST):
                         codigo = "boundserror();\n"
                         codigo += "goto "+L2+";\n"
                         codigo += L1+":\n"
-                        codigo += keep.addOperacion(T5,T12,"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA LINEAL DE DATOS
-                        keep.liberarTemporales(T10)
-                        keep.liberarTemporales(T11)
-                        keep.liberarTemporales(T12)
+                        codigo += keep.addOperacion(T5,T11,"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA LINEAL DE DATOS
+                        #keep.liberarTemporales(T10)
+                        #keep.liberarTemporales(T11)
+                        #keep.liberarTemporales(T12)
                     elif "temp" in posi:
                         T12 = keep.getNuevoTemporal()
-                        codigo += keep.addIgual(T12,posi["temp"],"-","1")
+                        codigo += keep.addIgual(T12,posi["temp"],"-","0")
                         L1 = keep.getNuevaEtiqueta()
                         L2 = keep.getNuevaEtiqueta()
                         L3 = keep.getNuevaEtiqueta()
@@ -987,24 +920,26 @@ class Array(NodoAST):
                         codigo += "goto "+L2+";\n"
                         codigo += L1+":\n"
                         codigo += keep.addOperacion(T5,T12,"-",T4) #POSICIÓN DENTRO DE LA ESTRUCTURA LINEAL DE DATOS
-                        keep.liberarTemporales(T12)
+                        #keep.liberarTemporales(T12)
                 codigo += keep.addOperacion(T6, T5,"+",T2)
-                codigo += keep.addOperacion(T7,T6,"+","3")
+                codigo += keep.addOperacion(T7,T6,"+","2")
+                keep.addCodigo(codigo)
+                val = valor.traducir(tree,table,keep)
                 if isinstance(val,int):
-                    codigo += keep.addIgual(keep.getValHeap(T7),val) #se actualiza el valor
+                    codigo = keep.addIgual(keep.getValHeap(T7),val) #se actualiza el valor
                     keep.addCodigo(codigo)
                 elif isinstance(val,dict):
                     if "apuntador" in val:
                         T8 = keep.getNuevoTemporal()
                         T9 = keep.getNuevoTemporal()
-                        codigo += keep.addOperacion(T8,"SP","+",val["apuntador"])
+                        codigo = keep.addOperacion(T8,"SP","+",val["apuntador"])
                         codigo += keep.addIgual(T9, keep.getValStack(T8))
                         codigo += keep.addIgual(keep.getValHeap(T7),T9) #se actualiza el valor
                         keep.addCodigo(codigo)
-                        keep.liberarTemporales(T8)
-                        keep.liberarTemporales(T9)
+                        #keep.liberarTemporales(T8)
+                        #keep.liberarTemporales(T9)
                     elif "temp" in val:
-                        codigo += keep.addIgual(keep.getValHeap(T7),val["temp"]) #se actualiza el valor
+                        codigo = keep.addIgual(keep.getValHeap(T7),val["temp"]) #se actualiza el valor
                         keep.addCodigo(codigo)
             if resultado == None:
                     err = Errores(id,"Semántico","Variable indefinida", self.fila,self.columna)
