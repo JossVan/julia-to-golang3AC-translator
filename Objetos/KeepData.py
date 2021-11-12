@@ -171,7 +171,7 @@ class KeepData:
         #codigo += self.addOperacion("SP","SP","+","1")
         self.incrementarStack()
         self.addCodigo(codigo)
-        self.liberarTemporales(temp)
+        #self.liberarTemporales(temp)
 
 
     def generarC3D_CadenasCopia(self,cadena,posicion):
@@ -275,12 +275,12 @@ class KeepData:
         codigo += "goto "+ef+";\n"
         codigo += et+":\n"
         codigo += self.addIgual(self.getValStack(temp), totales)
-        self.liberarTemporales(temp)
-        self.liberarTemporales(temp2)
-        self.liberarTemporales(temp3)
-        self.liberarTemporales(temp4)
-        self.liberarTemporales(contador)
-        self.liberarTemporales(totales)
+        #self.liberarTemporales(temp)
+        #self.liberarTemporales(temp2)
+        #self.liberarTemporales(temp3)
+        #self.liberarTemporales(temp4)
+        #self.liberarTemporales(contador)
+        #self.liberarTemporales(totales)
         codigo += "\n}\n"
         self.codigoFuncion= codigo
         return totales
@@ -373,7 +373,7 @@ class KeepData:
         codigo += "goto "+L2+";\n"
         codigo += L7+":\n"
         codigo += self.addIgual(self.getValStack(T4),T15)
-        self.liberarTemporales(T4)
+        '''self.liberarTemporales(T4)
         self.liberarTemporales(T5)
         self.liberarTemporales(T6)
         self.liberarTemporales(T7)
@@ -385,7 +385,7 @@ class KeepData:
         self.liberarTemporales(T12)
         self.liberarTemporales(T13)
         self.liberarTemporales(T14)
-        self.liberarTemporales(T15)
+        self.liberarTemporales(T15)'''
         codigo += "\n}\n"
         self.codigoFuncion= codigo
     
@@ -451,9 +451,9 @@ class KeepData:
         codigo += "return;\n"
         codigo += L4+":\n}"
         self.addCodigo(codigo)
-        self.liberarTemporales(T1)
+        '''self.liberarTemporales(T1)
         self.liberarTemporales(T2)
         self.liberarTemporales(T3)
-        self.liberarTemporales(T4)
+        self.liberarTemporales(T4)'''
 
 

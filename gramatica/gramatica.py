@@ -897,4 +897,5 @@ def traduce(input):
     retorno.append(tab)
     keep.listaFuncion = {}
     keep.listFunction = {}
+    keep.nombrefunciones = {}
     return retorno 

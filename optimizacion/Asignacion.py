@@ -14,7 +14,7 @@ class Asignacion(Codigo):
         
         if isinstance(self.id, Codigo):
             id  = self.id.Concatenar(codigo)
-
+            
         if isinstance(self.expresion,Codigo):
             expresion = self.Concatenar(codigo)
     
