@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request
-from gramatica.gramatica import parse
+from flask import Flask,session, render_template, request
+from gramatica.gramatica import traduce
+from gramatica.optimizacion import parse
 app = Flask(__name__)
+app.secret_key = 'any random string'
 import logging
 import sys
+
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
 #por default
@@ -13,12 +16,21 @@ def index():
 @app.route('/principal',methods=["GET", "POST"])
 def principal():
     if request.method == "POST":
-        inpt = request.form['codigo']
-        global tmp_val
-        tmp_val=inpt  
-        global result
-        result =  parse(tmp_val+"\n")
-        return render_template('principal.html', resultado=result, entrada = inpt)
+        if request.form['nombre'] == 'traducir':
+            inpt = request.form['codigo']
+            tmp_val=inpt  
+            global result 
+            result =  traduce(tmp_val+"\n")
+            session['errores'] = result[3]
+            session['tabla'] = result[1]
+            return render_template('principal.html', salida=result[0], entrada = inpt, consola = result[2])
+        elif request.form['nombre'] == 'om':
+            inpt = request.form['salida']
+            global tmp_val2
+            tmp_val2=inpt  
+            result2 =  parse(tmp_val2+"\n")
+            session['optimizar'] = result2[1]
+            return render_template('principal.html', salida = inpt, opt = result2[0])
 
     else:
         return render_template('principal.html')
@@ -30,19 +42,31 @@ def reportes():
 
 @app.route('/AST')
 def AST():
-    '''try:
+    try:
         if result[0] != None:
             return render_template('AST.html', dot = result[0])
         else:
             return render_template('AST.html', dot ="")
     except:
-        return render_template('AST.html', dot ="")'''
+        return render_template('AST.html', dot ="")
+        
 @app.route('/TablaSimbolos')
 def tabla():
-    return render_template('tabla.html', '''tabla = result[2]''')
+    tab = session['tabla']
+    session['tabla']= ""
+    return render_template('tabla.html', tabla =tab)
+
+@app.route('/Optimizacion')
+def tablita():
+    tab = session['optimizar']
+    session['optimizar']= ""
+    return render_template('tabla.html', tabla =tab)
 
 @app.route('/Errores')
 def errores():
-    return render_template('errores.html', '''tabla = result[3]''')
+    tab = session['errores']
+    session['tabla'] = ""
+    return render_template('errores.html', tabla = tab)
+
 if __name__ == '__main__':
     app.run(debug = True)
