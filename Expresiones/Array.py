@@ -468,6 +468,8 @@ class Array(NodoAST):
                 codigo += L4+":\n"
                 codigo += "//********************************************\n"
                 keep.addCodigo(codigo)
+                if tipo == "":
+                    tipo = "Float64"
                 return {"temp": T2, "valor":None, "tipo":tipo}
                 #keep.liberarTemporales(T1)
                 #keep.liberarTemporales(T2)
