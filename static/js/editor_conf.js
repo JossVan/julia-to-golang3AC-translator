@@ -21,6 +21,13 @@ var consola = CodeMirror.fromTextArea(document.getElementById("consola"),{
     readonly: true
     //matchBrackets: true,
 });
+var opt = CodeMirror.fromTextArea(document.getElementById("opt"),{
+    lineNumbers : true,
+    theme:'material-palenight',
+    autoRefresh: true,
+    mode : 'go',
+    //matchBrackets: true,
+});
 
 entrada.setSize(650,700);
 salidas.setSize(650,700);

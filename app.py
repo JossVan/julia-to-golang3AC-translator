@@ -30,7 +30,7 @@ def principal():
             tmp_val2=inpt  
             result2 =  parse(tmp_val2+"\n")
             session['optimizar'] = result2[1]
-            return render_template('principal.html', entrada = inpt, salida = result2[0])
+            return render_template('principal.html', salida = inpt, opt = result2[0])
 
     else:
         return render_template('principal.html')
