@@ -28,25 +28,31 @@ class Asignacion(Codigo):
             if isinstance(expresion,dict):
                 if "expresion1" in expresion:
                     if id == expresion["expresion1"] and (expresion["operador"] == Tipo_Aritmetico.SUMA or expresion["operador"] == Tipo_Aritmetico.RESTA):
-                        if expresion["expresion2"] == "0":
-                            if isinstance(expresion["operador"],Tipo_Aritmetico):
+                        if isinstance(expresion["operador"],Tipo_Aritmetico):
                                 if expresion["operador"] == Tipo_Aritmetico.SUMA:
                                     op = "+"
                                 elif expresion["operador"] == Tipo_Aritmetico.RESTA:
                                     op = "-"
+                        if expresion["expresion2"] == "0":
                             original = id+" = "+expresion["expresion1"]+op+expresion["expresion2"]
                             regla = Reporte("Optimización por mirilla","Regla 6",original,"Eliminada",self.linea)
                             codigo.addReporte(regla)
+                        else:
+                            original = id+" = "+expresion["expresion1"]+op+expresion["expresion2"]
+                            return {"optimizada": "\t"+original+"\n"}
                     elif id == expresion["expresion1"] and (expresion["operador"] == Tipo_Aritmetico.MULTIPLICACION or expresion["operador"] == Tipo_Aritmetico.DIVISION):
-                        if expresion["expresion2"] == "1":
-                            if isinstance(expresion["operador"],Tipo_Aritmetico):
+                        if isinstance(expresion["operador"],Tipo_Aritmetico):
                                 if expresion["operador"] == Tipo_Aritmetico.DIVISION:
                                     op = "/"
                                 elif expresion["operador"] == Tipo_Aritmetico.MULTIPLICACION:
                                     op = "*"
+                        if expresion["expresion2"] == "1":
                             original = id+" = "+expresion["expresion1"]+op+expresion["expresion2"]
                             regla = Reporte("Optimización por mirilla","Regla 6",original,"Eliminada",self.linea)
                             codigo.addReporte(regla)
+                        else:
+                            original = id+" = "+expresion["expresion1"]+op+expresion["expresion2"]
+                            return {"optimizada": "\t"+original+"\n"}
                     elif expresion["expresion2"] == "0" and (expresion["operador"] == Tipo_Aritmetico.SUMA or expresion["operador"] == Tipo_Aritmetico.RESTA):
                         if isinstance(expresion["operador"],Tipo_Aritmetico):
                             if expresion["operador"] == Tipo_Aritmetico.SUMA:
@@ -154,7 +160,7 @@ class Asignacion(Codigo):
             return {"id":id,"exp":exp}
         elif isinstance(self.expresion,Constante):
             exp = self.expresion.Concatenar(codigo)
-            cod = "\t"+ id+" = "+ exp+";\n"
+            cod = "\t"+ id+" = "+ str(exp)+";\n"
             #codigo.addCodigo(cod)
             return {"id":id,"exp":exp}
         

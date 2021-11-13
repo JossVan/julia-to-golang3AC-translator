@@ -21,7 +21,7 @@ class Print(Codigo):
         else:
             cod += "int("+val+"));\n"
 
-        return {"print":cod}
+        return {"print":"\t"+cod}
 
     def optimizar(self, codigo):
         return super().optimizar(codigo)

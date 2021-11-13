@@ -38,13 +38,16 @@ class Funcion(Codigo):
                                                 codigo.addCodigo("\t"+cod)
                                                 regla = Reporte("Optimización por mirilla","Regla 1",original,cod,self.linea)
                                                 codigo.addReporte(regla)
-                                                
+                                            else:
+                                                cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
+                                                cod += "\t" +resultado2["id"]+" = "+resultado2["exp"]+";\n"
+                                                codigo.addCodigo(cod)
                                         else:
                                             cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
                                             cod += "\t" +resultado2["id"]+" = "+resultado2["exp"]+";\n"
                                             codigo.addCodigo(cod)
                                     elif "optimizada" in resultado2:
-                                        cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
+                                        cod = "\t" +str(resultado["id"])+" = "+str(resultado["exp"])+";\n"
                                         cod += resultado2["optimizada"]
                                         codigo.addCodigo(cod)
                                     elif "goto" in resultado2:
@@ -61,13 +64,26 @@ class Funcion(Codigo):
                                                     inalcanzable = True
                                     elif "etiqueta" in resultado2:
                                         cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
+                                        codigo.addCodigo(cod)
                                         codigo.addCodigo(resultado2["etiqueta"]+":\n")
                                     elif "print" in resultado2:
                                         cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
                                         codigo.addCodigo(cod)
                                         codigo.addCodigo(resultado2["print"])
+                                    elif "funcion" in resultado2:
+                                        cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
+                                        codigo.addCodigo(cod)
+                                        codigo.addCodigo(resultado2["funcion"])
+                                    elif "if" in resultado2:
+                                        cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
+                                        codigo.addCodigo(cod)
+                                        codigo.addCodigo(resultado2["if"]+"\n")
+                                    elif "return" in resultado2:
+                                        cod = "\t" +resultado["id"]+" = "+resultado["exp"]+";\n"
+                                        codigo.addCodigo(cod)
+                                        codigo.addCodigo(resultado2["return"])
                                 elif resultado2 == None:
-                                    cod = resultado["id"]+" = "+resultado["exp"]+";\n"
+                                    cod = str(resultado["id"])+" = "+str(resultado["exp"])+";\n"
                                     codigo.addCodigo(cod)
                             else:
                                 cod = resultado["id"]+" = "+resultado["exp"]+";\n"
@@ -75,7 +91,7 @@ class Funcion(Codigo):
                         elif "optimizada" in resultado:
                             codigo.addCodigo(resultado["optimizada"])
                         elif "goto" in resultado:
-                            codigo.addCodigo("\tgoto"+resultado["goto"]+";\n")
+                            codigo.addCodigo("\tgoto "+resultado["goto"]+";\n")
                             if (contador+1)< tam:
                                 contador = contador +1
                                 resultado2 = self.instrucciones[contador].Concatenar(codigo)
@@ -88,6 +104,12 @@ class Funcion(Codigo):
                             codigo.addCodigo(resultado["etiqueta"]+":\n")
                         elif "print" in resultado:
                             codigo.addCodigo(resultado["print"])
+                        elif "funcion" in resultado:
+                            codigo.addCodigo(resultado["funcion"])
+                        elif "if" in resultado:
+                            codigo.addCodigo(resultado["if"]+"\n")
+                        elif "return" in resultado:
+                            codigo.addCodigo(resultado["return"])
                 else:
                     
                     if isinstance(self.instrucciones[contador],Etiqueta):
@@ -97,7 +119,7 @@ class Funcion(Codigo):
                             if "etiqueta" in resultado:
                                 codigo.addCodigo(resultado["etiqueta"]+":\n")
             contador = contador +1
-        codigo.addCodigo("}")
+        codigo.addCodigo("}\n")
 
     def optimizar(self, codigo):
         return super().optimizar(codigo)

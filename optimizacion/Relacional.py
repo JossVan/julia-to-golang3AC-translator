@@ -35,7 +35,8 @@ class Relacional(Codigo):
             tipo = "!="
         elif self.tipo == Tipo_Relacional.IGUAL:
             tipo = "=="
-        cod = val1+" "+tipo+" "+val2
-        return {"condicion":cod}
+
+        cod = str(val1)+" "+str(tipo)+" "+str(val2)
+        return cod
     def optimizar(self, codigo):
         return super().optimizar(codigo)
