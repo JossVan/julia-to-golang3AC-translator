@@ -12,7 +12,9 @@ class Aritmetica(Codigo):
     
 
     def Concatenar(self, codigo):
-        return super().Concatenar(codigo)
+        exp1 = self.exp1.Concatenar(codigo)
+        exp2 = self.exp2.Concatenar(codigo)
+        return {"expresion1": exp1,"operador":self.operador,"expresion2": exp2}
     
     def optimizar(self, codigo):
         return super().optimizar(codigo)

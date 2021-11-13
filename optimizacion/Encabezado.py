@@ -23,7 +23,7 @@ class Encabezado(Codigo):
         tam = len(self.importaciones)
         contador = 1
         for importe in self.importaciones:
-            cod += importe
+            cod += "\""+importe+"\""
             if contador< tam:
                 cod+= ";"
             contador = contador+1
@@ -41,4 +41,4 @@ class Encabezado(Codigo):
 
         for funcion in self.funciones:
             if isinstance(funcion,Funcion):
-                declaracion.Concatenar(codigo)
+                funcion.Concatenar(codigo)

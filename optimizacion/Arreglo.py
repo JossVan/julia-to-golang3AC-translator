@@ -12,7 +12,20 @@ class Arreglo(Codigo):
     
 
     def Concatenar(self, codigo):
-        return super().Concatenar(codigo)
-    
+        
+        if self.int == None:
+            if isinstance(self.indice,Codigo):
+                indice = self.indice.Concatenar(codigo)
+            else:
+                indice= self.indice
+            cod = self.id+"["+str(indice)+"]"
+            return cod
+        else:
+            if isinstance(self.indice,Codigo):
+                indice = self.indice.Concatenar(codigo)
+            else:
+                indice= self.indice
+            cod = self.id +"[int("+str(indice)+")]"
+            return cod 
     def optimizar(self, codigo):
         return super().optimizar(codigo)

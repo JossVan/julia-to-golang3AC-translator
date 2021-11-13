@@ -249,45 +249,45 @@ def p_println2(t):
     t[0] = Print(t[5],t[9],t[7],t.lineno(0), t.lexpos(0))
 def p_etiquetas(t):
     'ETIQUETAS : ID DOSPUNTITOS'  
-    t[0] = Etiqueta(t[0],t.lineno(0), t.lexpos(0))
+    t[0] = Etiqueta(t[1],t.lineno(1), t.lexpos(0))
 def p_saltos (t):
     'SALTOS : R_GOTO ID PTCOMA'
-    t[0] = Salto(t[2],t.lineno(0), t.lexpos(0))
+    t[0] = Salto(t[2],t.lineno(1), t.lexpos(0))
 def p_asignacion(t):
     '''ASIGNACION : ID IGUAL E PTCOMA
                     | ARREGLOS IGUAL E PTCOMA'''
-    t[0] = Asignacion(t[1],t[3],t.lineno(0), t.lexpos(0))       
+    t[0] = Asignacion(t[1],t[3],t.lineno(1), t.lexpos(0))       
 def p_expresiones(t):
     '''E : E MAS E
         | E MENOS E
         | E POR E
         | E DIVIDIDO E'''
     if t[2] == '+':
-        t[0] = Aritmetica(t[1],Tipo_Aritmetico.SUMA, t[2],t.lineno(0), t.lexpos(0))
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.SUMA, t[3],t.lineno(1), t.lexpos(0))
     elif t[2] ==  '-':
-        t[0] = Aritmetica(t[1],Tipo_Aritmetico.RESTA, t[2],t.lineno(0), t.lexpos(0))
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.RESTA, t[3],t.lineno(1), t.lexpos(0))
     elif t[2] == '*':
-        t[0] = Aritmetica(t[1],Tipo_Aritmetico.MULTIPLICACION, t[2],t.lineno(0), t.lexpos(0))
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.MULTIPLICACION, t[3],t.lineno(1), t.lexpos(0))
     elif t[2] == '/':
-        t[0] = Aritmetica(t[1],Tipo_Aritmetico.DIVISION, t[2],t.lineno(0), t.lexpos(0))
+        t[0] = Aritmetica(t[1],Tipo_Aritmetico.DIVISION, t[3],t.lineno(1), t.lexpos(0))
 def p_expresion_parentesis(t):
     'E : PARIZQ E PARDER'
     t[0] = t[2]
 def p_expresion_modal(t):
     'E : R_MATH PUNTO R_MOD PARIZQ E COMA E PARDER'
-    t[0] = Aritmetica(t[5], Tipo_Aritmetico.MODAL, t[7],t.lineno(0), t.lexpos(0))
+    t[0] = Aritmetica(t[5], Tipo_Aritmetico.MODAL, t[7],t.lineno(1), t.lexpos(0))
 def p_expresion_unaria(t):
     'E : MENOS E %prec UMENOS'
-    t[0] = Constante(Primitivo(TipoObjeto.NEGATIVO,t[2]),t.lineno(0), t.lexpos(0))
+    t[0] = Constante(Primitivo(TipoObjeto.NEGATIVO,t[2]),t.lineno(1), t.lexpos(0))
 def p_constantes(t):
     'E : ID'
     t[0] = Variable(t[1],t.lineno(0), t.lexpos(0))
 def p_constantes2(t):
     'E : DECIMAL'
-    t[0] = Constante(Primitivo(Tipo_Dato.DECIMAL,t[1]),t.lineno(0), t.lexpos(0))
+    t[0] = Constante(Primitivo(Tipo_Dato.DECIMAL,t[1]),t.lineno(1), t.lexpos(0))
 def p_constentes3(t):
     'E : ENTERO'
-    t[0] = Constante(Primitivo(Tipo_Dato.ENTERO,t[1]),t.lineno(0), t.lexpos(0))
+    t[0] = Constante(Primitivo(Tipo_Dato.ENTERO,t[1]),t.lineno(1), t.lexpos(0))
 def p_constantes4(t):
     'E : ARREGLOS'
     t[0] = t[1]
@@ -354,5 +354,7 @@ def parse(input) :
         if isinstance(instruccion,Codigo):
             instruccion.Concatenar(general)
     
-
-    return general.codigo
+    enviar = []
+    enviar.append(general.codigo)
+    enviar.append(general.htmlOptimizacion())
+    return enviar

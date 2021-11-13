@@ -447,10 +447,10 @@ class Array(NodoAST):
                 L2 = keep.getNuevaEtiqueta()
                 L3 = keep.getNuevaEtiqueta()
                 L4 = keep.getNuevaEtiqueta()
-                codigo += "if "+str(indice)+"> 0 {goto " + L1 +"}\n"
+                codigo += "if "+str(indice)+"> 0 {goto " + L1 +";}\n"
                 codigo += "goto "+L2+";\n"
                 codigo += L1+":\n"
-                codigo += "if "+str(indice)+"<= "+ T4+" {goto "+L3+"}\n"
+                codigo += "if "+str(indice)+"<= "+ T4+" {goto "+L3+";}\n"
                 codigo += L2+":\n"
                 if not "boundserror" in keep.listaFuncion:
                     cc = keep.codigo
@@ -461,7 +461,7 @@ class Array(NodoAST):
                 codigo += "boundserror();\n"
                 codigo += "goto "+L4+";\n"
                 codigo += L3+":\n"
-                codigo += keep.addOperacion(T1,indice,"-","1")
+                codigo += keep.addOperacion(T1,indice,"-","0")
                 codigo += keep.addOperacion(T1,T3,"+",T1)
                 codigo += "//*VALOR EN LA POSICIÓN DEL INDICE CONSULTADO*\n"
                 codigo += keep.addIgual(T2,keep.getValHeap(T1))

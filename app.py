@@ -29,7 +29,8 @@ def principal():
             global tmp_val2
             tmp_val2=inpt  
             result2 =  parse(tmp_val2+"\n")
-            return render_template('principal.html', entrada = inpt, salida = result2)
+            session['optimizar'] = result2[1]
+            return render_template('principal.html', entrada = inpt, salida = result2[0])
 
     else:
         return render_template('principal.html')
@@ -53,6 +54,12 @@ def AST():
 def tabla():
     tab = session['tabla']
     session['tabla']= ""
+    return render_template('tabla.html', tabla =tab)
+
+@app.route('/Optimizacion')
+def tablita():
+    tab = session['optimizar']
+    session['optimizar']= ""
     return render_template('tabla.html', tabla =tab)
 
 @app.route('/Errores')
