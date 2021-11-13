@@ -1,6 +1,6 @@
 from flask import Flask,session, render_template, request
 from gramatica.gramatica import traduce
-from gramatica.optimizacion import parse
+#from gramatica.optimizacion import parse
 app = Flask(__name__)
 app.secret_key = 'any random string'
 import logging
@@ -28,9 +28,9 @@ def principal():
             inpt = request.form['salida']
             global tmp_val2
             tmp_val2=inpt  
-            result2 =  parse(tmp_val2+"\n")
-            session['optimizar'] = result2[1]
-            return render_template('principal.html', salida = inpt, opt = result2[0])
+            #result2 =  parse(tmp_val2+"\n")
+            #session['optimizar'] = result2[1]
+            return render_template('principal.html', salida = inpt, opt = "result2[0]")
 
     else:
         return render_template('principal.html')

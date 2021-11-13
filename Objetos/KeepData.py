@@ -22,6 +22,7 @@ class KeepData:
     apuntador_return = ""
     Activa = None 
     stackactivo = None 
+    actual = ""
     def __init__(self) -> None:
         
         self.contador = 0

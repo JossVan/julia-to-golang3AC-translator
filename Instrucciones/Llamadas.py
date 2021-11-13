@@ -73,7 +73,7 @@ class Llamadas(NodoAST):
             return
         elif funcion != None and struct == None:
             relativo = None 
-            if keep.Activa != None:
+            if keep.Activa != None :
                 relativo = keep.Activa 
             else:
                 keep.Activa = 1 
@@ -223,7 +223,8 @@ class Llamadas(NodoAST):
                     keep.PS = relativo
                     keep.Activa = relativo
                     funcion.traducir(tree,NuevaTabla,keep)
-                    keep.PS = stack
+                    if keep.actual != self.id:
+                        keep.PS = stack
                     if keep.HayReturn:
                         T1 = keep.getNuevoTemporal()
                         T2 = keep.getNuevoTemporal()
@@ -242,9 +243,11 @@ class Llamadas(NodoAST):
             else:
                 keep.addCodigo(keep.addOperacion("SP","SP","+",stack))
                 keep.PS = relativo
+                keep.Activa = relativo
                 #keep.apuntador_return = stack
                 funcion.traducir(tree,NuevaTabla,keep)
-                keep.PS = stack
+                if keep.actual != self.id:
+                        keep.PS = stack
                 if keep.HayReturn:
                     T1 = keep.getNuevoTemporal()
                     T2 = keep.getNuevoTemporal()
